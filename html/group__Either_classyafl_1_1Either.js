@@ -11,7 +11,7 @@ var group__Either_classyafl_1_1Either =
     [ "operator!", "group__Either.html#a4cc5bc9a9bcc704eafa650e95a32454d", null ],
     [ "operator=", "group__Either.html#a708e5c46300dcf0c02f90834e6f7557a", null ],
     [ "operator=", "group__Either.html#aaebaa03da2996adb7a8064485c98bbc9", null ],
-    [ "operator==", "group__Either.html#add678708475775075bbf2f4581d3ff00", null ],
+    [ "operator==", "group__Either.html#a87431e63d0fa91e547fc881308cc6298", null ],
     [ "value", "group__Either.html#a6774a00c8b6df8711d68dc5c105ea5eb", null ],
     [ "valueOr", "group__Either.html#aa9d3f4205f07547b176a0f033d91e8a9", null ]
 ];
