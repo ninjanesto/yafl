@@ -62,5 +62,4 @@ function(set_default_compile_flags)
     if (ARG_WARNINGS_AS_ERRORS)
         add_compile_options(-Werror -pedantic-errors)
     endif()
-
 endfunction()

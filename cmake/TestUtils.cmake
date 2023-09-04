@@ -8,40 +8,27 @@ find_package(GTest)
 # Must be called once from the top CMakeLists.txt.
 #
 function(setup_testing)
-    option(ENABLE_UNIT_TESTS "Compile unit test executables" ON)
-
     include(CTest)
 
-    message(STATUS "Compile unit tests: ${ENABLE_UNIT_TESTS}")
-    message(STATUS "Target directory for test executables: ${INSTALL_TESTDIR}")
+    message(STATUS "Compile unit tests: ${BUILD_YAFL_TESTS}")
 
-    if(COVERAGE_REPORTS AND NOT ENABLE_UNIT_TESTS)
-        message(FATAL_ERROR "Unit tests must be enabled when building with COVERAGE_REPORTS=YES")
-    endif()
-
-    if (ENABLE_UNIT_TESTS)
-        find_package(GTest CONFIG REQUIRED)
-
-        set(GTEST_INCLUDE_DIRS "${GMOCK_INCLUDE_DIRS};${GTEST_INCLUDE_DIRS}" CACHE INTERNAL "GTest include directories")
-
-        # We use our own main(), thus we don't need the ones provided by GMock/GTest
-        set(GTEST_LIBS "${GMOCK_LIBRARIES};${GTEST_LIBRARIES};pthread" CACHE INTERNAL "GTest libraries")
-    endif()
-
+    find_package(GTest CONFIG REQUIRED)
+    set(GTEST_INCLUDE_DIRS "${GMOCK_INCLUDE_DIRS};${GTEST_INCLUDE_DIRS}" CACHE INTERNAL "GTest include directories")
+    set(GTEST_LIBS "${GMOCK_LIBRARIES};${GTEST_LIBRARIES};pthread" CACHE INTERNAL "GTest libraries")
 endfunction()
 
+
+#
+# Helper function that aid in the setup of tests
+#
 function(add_unit_test)
     set(_single_value_args BASENAME TYPE)
     set(_multi_value_args LIBS SOURCES)
-    cmake_parse_arguments(_UT
-            "${_options}" "${_single_value_args}" "${_multi_value_args}" ${ARGN}
-            )
+    cmake_parse_arguments(_UT "${_options}" "${_single_value_args}" "${_multi_value_args}" ${ARGN})
 
     set(_single_value_args BASENAME TYPE)
     set(_multi_value_args LIBS SOURCES)
-    cmake_parse_arguments(_XT
-            "${_options}" "${_single_value_args}" "${_multi_value_args}" ${ARGN}
-            )
+    cmake_parse_arguments(_XT "${_options}" "${_single_value_args}" "${_multi_value_args}" ${ARGN})
 
     if (_XT_UNPARSED_ARGUMENTS)
         message(FATAL_ERROR "Unrecognized params given ('${_XT_UNPARSED_ARGUMENTS}')!")
@@ -59,10 +46,7 @@ function(add_unit_test)
 
     add_executable(${testname} ${_XT_SOURCES})
 
-    target_link_libraries(${testname}
-            PUBLIC ${_XT_LIBS}
-            PUBLIC ${TEST_MAIN}
-            )
+    target_link_libraries(${testname} PUBLIC ${_XT_LIBS} ${TEST_MAIN})
 
     target_include_directories(${testname} SYSTEM PUBLIC ${GTEST_INCLUDE_DIRS})
 

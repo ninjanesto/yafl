@@ -13,7 +13,7 @@ using namespace yafl;
 template<typename T>
 int xpto(const T&) {return 0;}
 
-TEST(ComposeTest, validate_function_composition) {
+TEST(HOFTest, validate_function_composition) {
     {
         const auto f1 = []() {};
         const auto f2 = []() {};
@@ -40,7 +40,7 @@ TEST(ComposeTest, validate_function_composition) {
     }
 }
 
-TEST(ComposeTest, validate_compose_id) {
+TEST(HOFTest, validate_compose_id) {
     {
         const auto f1 = [](int i ) { return 42 * i;};
         const auto f = compose(id<int>, f1);
@@ -53,7 +53,7 @@ TEST(ComposeTest, validate_compose_id) {
     }
 }
 
-TEST(ComposeTest, validate_curry) {
+TEST(HOFTest, validate_curry) {
     {
         const auto func = [](){ return 21*2; };
         const auto result = yafl::curry(func);
@@ -78,7 +78,7 @@ TEST(ComposeTest, validate_curry) {
     }
 }
 
-TEST(ComposeTest, validate_uncurry) {
+TEST(HOFTest, validate_uncurry) {
     {
         const auto func = [](int i){ return i*2; };
         const auto curried_func = yafl::curry(func);
@@ -112,7 +112,7 @@ TEST(ComposeTest, validate_uncurry) {
     }
 }
 
-TEST(ComposeTest, validate_partial_application) {
+TEST(HOFTest, validate_partial_application) {
     const auto func = [](int i, int j, const std::string& s){ return s + std::to_string(i*j); };
     {
         const auto partial0 = yafl::partial(func);

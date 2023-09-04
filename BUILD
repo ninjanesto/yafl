@@ -35,8 +35,8 @@ cc_library(
 )
 
 cc_test(
-    name = "yafl-compose-test",
-    srcs = ["tests/compose/ComposeTest.cpp",],
+    name = "yafl-hof-test",
+    srcs = ["tests/hof/HOFTest.cpp",],
     deps = ["@gtest//:gtest",
             "@gtest//:gtest_main",
             "//:yafl-common",],
