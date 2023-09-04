@@ -3,38 +3,12 @@ include(GNUInstallDirs)
 find_package(GTest)
 
 #
-# Internal macro used by SetUpTesting to determine the installation directory for tests executables.
-#
-macro(DetermineInstallDirForTestExecutables)
-
-    # Will be given to install(), thus is relative to CMAKE_INSTALL_PREFIX by default.
-    # The user can still give an absolute path to INSTALL_TESTDIR if he wants to.
-    set(_default_installdir "${CMAKE_INSTALL_LIBDIR}/${PROJECT_NAME}-tests")
-    # If BCI_TESTS_DESTINATION is set, use that instead
-    if (DEFINED ENV{BCI_TESTS_DESTINATION})
-        message(STATUS "Using BCI_TESTS_DESTINATION")
-        set(_default_installdir $ENV{BCI_TESTS_DESTINATION})
-    endif()
-
-    # Do not use type PATH here. If we do, CMake would convert a value given on the
-    # command line that looks like a relative path to an absolute one based on the
-    # current working directory. This is not what we want :) Also, we don't FORCE,
-    # so whatever is given on the command line (or is already in the cache) takes
-    # precedence.
-    set(INSTALL_TESTDIR ${_default_installdir}
-            CACHE STRING "Directory to install test executables in. Relative to CMAKE_INSTALL_PREFIX.")
-
-endmacro()
-
-#
 # Perform global setup required to build and run tests.
 #
 # Must be called once from the top CMakeLists.txt.
 #
 function(setup_testing)
     option(ENABLE_UNIT_TESTS "Compile unit test executables" ON)
-
-    DetermineInstallDirForTestExecutables()
 
     include(CTest)
 
@@ -97,10 +71,4 @@ function(add_unit_test)
     else()
         add_test(NAME ${testname} COMMAND ${testname} WORKING_DIRECTORY ${_XT_WORKINGDIR})
     endif()
-
-    install(
-            TARGETS ${testname}
-            RUNTIME
-            DESTINATION ${INSTALL_TESTDIR}
-    )
 endfunction()

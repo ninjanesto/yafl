@@ -1,8 +1,6 @@
 /**
- * \file
  * \brief       Yet Another Functional Library
  *
- * \project     Critical TechWorks SA
  * \copyright   Critical TechWorks SA
  */
 #pragma once
@@ -18,22 +16,43 @@
 
 namespace yafl {
 
-template <typename T>
+/**
+ * Maybe monad traits
+ */
+template <typename>
 struct MaybeDetails;
 
-template <template <typename> typename Maybe, typename Inner>
-struct MaybeDetails<Maybe<Inner>> {
-    using ValueType = Inner;
-};
-template <template <typename> typename Maybe, typename Inner>
-struct MaybeDetails<const Maybe<Inner>> {
+/**
+ * Maybe monad traits specialization that enable getting the inner type
+ * @tparam MaybeT Maybe monad type
+ * @tparam Inner Inner type
+*/
+template <template <typename> typename MaybeT, typename Inner>
+struct MaybeDetails<MaybeT<Inner>> {
     using ValueType = Inner;
 };
 
-//Monad Maybe
-template <typename T>
+/**
+ * Maybe monad traits specialization for const types that enable getting the inner type
+ * @tparam Maybe Maybe monad type
+ * @tparam Inner Inner type
+ */
+template <template <typename> typename MaybeT, typename Inner>
+struct MaybeDetails<const MaybeT<Inner>> {
+    using ValueType = Inner;
+};
+
+/**
+ * Maybe class. This class implements the Maybe type by realizing concepts from functional programming
+ * such as Functor, Applicative and Monad. The implementation for maybe class was based on Haskell Maybe
+ * type as defined in https://hackage.haskell.org/package/base-4.18.0.0/docs/Data-Maybe.html
+ */
+template <typename>
 class Maybe;
 
+/**
+ * Specialization of the Maybe class for void type
+ */
 template<>
 class Maybe<void> : public Functor<Maybe,void>,
                     public Monad<Maybe,void> {
@@ -43,14 +62,28 @@ private:
     explicit Maybe(bool v) : _value(v) {}
 
 public:
+    /**
+     * Constructs a Maybe type that has Nothing
+     * @return maybe nothing
+     */
     static Maybe<void> Nothing() {
         return Maybe<void>(false);
     }
 
+    /**
+     * Constructs a Maybe type with a "valid" value.
+     * Since Maybe is defined with void, this method doesn't
+     * receive any argument
+     * @return maybe with "void" value
+     */
     static Maybe<void> Just() {
         return Maybe<void>{true};
     }
 
+    /**
+     * Returns whether maybe has nothing or a valid value
+     * @return true if valid and false otherwise
+     */
     [[nodiscard]] bool hasValue() const { return _value; }
 
 private:
@@ -84,7 +117,9 @@ private:
     bool _value;
 };
 
-
+/**
+ * Generalization of the Maybe class for any type other than void
+ */
 template <typename T>
 class Maybe : public Functor<Maybe, T>,
               public Applicative<Maybe, T>,
@@ -99,23 +134,49 @@ private:
     Maybe() : _value{nullptr}{}
     explicit Maybe(const T& value) :_value{std::make_unique<T>(value)}{}
 public:
+    /**
+     * Constructs a Maybe type that has Nothing
+     * @return maybe nothing
+     */
     static Maybe<T> Nothing() {
         return Maybe<T>();
     }
 
+    /**
+     * Constructs a Maybe type with a "valid" value.
+     * Since Maybe is defined with void, this method doesn't
+     * receive any argument
+     * @param value
+     * @return maybe with "void" value
+     */
     static Maybe<T> Just(const T& value) {
         return Maybe<T>(value);
     }
 
+    /**
+     * Checks whether maybe has nothing or a valid value
+     * @return true if valid and false otherwise
+     */
     [[nodiscard]] bool hasValue() const { return !!_value; }
 
+    /**
+     * Extracts the wrapped value from the Maybe
+     * @return the value wrapped
+     * @throws std::runtime_error when maybe contains nothing
+     */
     [[nodiscard]] T value() const {
         if (_value) return *(_value.get());
         throw std::runtime_error("Nothing");
     }
 
-    [[nodiscard]] T valueOr(const T& _v) const {
-        return hasValue() ? value() : _v;
+    /**
+     * Extracts the wrapped value from the Maybe if exists.
+     * If Maybe contains nothing then returns provided default value
+     * @param arg default value to return if Maybe contains nothing
+     * @return the wrapped value if exists or the default otherwise
+     */
+    [[nodiscard]] T valueOr(const T& arg) const {
+        return hasValue() ? value() : arg;
     }
 private:
     template <typename Callable>
@@ -219,29 +280,28 @@ private:
     std::unique_ptr<T> _value;
 };
 
-template <typename T>
-std::ostream& operator<<(std::ostream& s, const Maybe<T>& m) {
-    if (m.hasValue()) {
-        return s << "Just: " << m.value();
-    } else {
-        return s << "Nothing";
-    }
-}
-
-template <typename = void>
-std::ostream& operator<<(std::ostream& s, const Maybe<void>& m) {
-    if (m.hasValue()) {
-        return s << "Just: void";
-    } else {
-        return s << "Nothing";
-    }
-}
+/**
+ * Function that helps build a Maybe with Nothing
+ * @tparam T Maybe inner type
+ * @return maybe with nothing
+ */
 template<typename ...T>
 Maybe<T...> Nothing() { return Maybe<T...>::Nothing(); }
 
+/**
+ * Function that helps build a Maybe with a value
+ * @tparam T Maybe inner type
+ * @param args Argument to be wrapped
+ * @return maybe with the value wrapped
+ */
 template<typename ...T>
 Maybe<T...> Just(T&& ...args) { return Maybe<T...>::Just(std::forward<T>(args)...); }
 
+/**
+ * Function that helps build a Maybe with a void "value"
+ * @tparam T Maybe inner type
+ * @return maybe with void value
+ */
 template<typename = void>
 Maybe<void> Just() { return Maybe<void>::Just(); }
 
@@ -252,8 +312,7 @@ Maybe<void> Just() { return Maybe<void>::Just(); }
  * @param callable Callable to lift
  * @return callable lifted into the given abstract monadic type
  */
-template<template <typename> typename MonadType, typename Callable, typename = std::enable_if_t<std::is_same_v<yafl::Maybe<void>, MonadType<void>>
-                                                                                                && IsMonadicBase<MonadType<void>>::value, void>>
+template<template <typename> typename MonadType, typename Callable, typename = std::enable_if_t<std::is_same_v<yafl::Maybe<void>, MonadType<void>> && IsMonadicBase<MonadType<void>>::value, void>>
 decltype(auto) lift(Callable&& callable) {
     if constexpr (std::is_invocable_v<Callable>) {
         using ReturnType = std::remove_reference_t<std::invoke_result_t<Callable>>;

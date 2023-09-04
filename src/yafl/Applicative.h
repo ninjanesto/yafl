@@ -1,8 +1,6 @@
 /**
- * \file
  * \brief       Yet Another Functional Library
  *
- * \project     Critical TechWorks SA
  * \copyright   Critical TechWorks SA
  */
 #pragma once
@@ -12,8 +10,6 @@
 
 namespace yafl {
 
-//pure  :: a -> A a
-//apply :: A (a -> b) -> A a -> A b
 /**
  * Functional Applicative Functor class. Defines the apply function that performs a partial function application
  * of the received argument to the callable object of the Applicative Functor. The apply method receives a type A(a), unwraps
@@ -39,7 +35,7 @@ public:
      * return a new function with an input argument less. If the function contains only one input argument then the function
      * is executed.
      * @tparam Head Type of input argument
-     * @param applicative Wrapper that contains the value to be partialy applied to the Application Functor function
+     * @param head Wrapper that contains the value to be partialy applied to the Application Functor function
      * @return a new Applicative Functor containing a new function with one input argument less
      */
     template<typename Head>
@@ -54,7 +50,8 @@ public:
      * arguments then the function is executed.
      * @tparam Head Type of input argument
      * @tparam Tail Variadic arguments list type
-     * @param applicative Wrapper that contains the value to be partialy applied to the Application Functor function
+     * @param head Wrapper that contains the value to be partialy applied to the Application Functor function
+     * @param tail Remaining arguments
      * @return a new Applicative Functor containing a new function with one input argument less
      */
     template<typename Head, typename ...Tail>

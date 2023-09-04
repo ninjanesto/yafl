@@ -1,8 +1,6 @@
 /**
- * \file
  * \brief       Yet Another Functional Library
  *
- * \project     Critical TechWorks SA
  * \copyright   Critical TechWorks SA
  */
 #pragma once
@@ -12,8 +10,6 @@
 
 namespace yafl {
 
-//mreturn :: a -> M a
-//bind :: (a -> M b) -> M a -> M b
 /**
  * Functional Monad class. Defines the bind function that receives a function from a -> M b and applies that function
  * to a given Monadic type, by unwrapping the value inside the monad and applying the function. Result type will depend
@@ -36,15 +32,31 @@ public:
     }
 };
 
+/**
+ * Structure to validate if given type is derived from Monad. This class works as sinkhole for all
+ * non monadic types and sets a value attribute as false
+ *
+ * @tparam T type to validate
+ */
 template <typename T>
 struct IsMonadicBase {
+    ///boolean flag that states whether type T is a monad or not
     static constexpr bool value = false;
 };
 
+/**
+ * Structure to validate if given type is derived from Monad. This class validates if the given type
+ * is derived from Monad and set the value attribute accordingly
+ * @tparam MonadType monad type
+ * @tparam Args monad type arguments
+ */
 template <template <typename...> typename MonadType, typename ...Args>
 struct IsMonadicBase<MonadType<Args...>> {
+    /// Base type
     using BaseType = Monad<MonadType, Args...>;
+    /// Derived type
     using DerivedType = MonadType<Args...>;
+    ///boolean flag that states whether type T is a monad or not
     static constexpr bool value = std::is_base_of_v<BaseType, DerivedType>;
 };
 

@@ -9,12 +9,8 @@ include(CommonBuildUtils)
 
 set_default_compile_flags()
 
-if(CMAKE_BUILD_TYPE STREQUAL ASAN)
-    include(AddressSanitizerTarget)
-endif()
-
-if(CMAKE_BUILD_TYPE STREQUAL VALGRIND)
-    include(ValgrindTarget)
+if(BUILD_YAFL_DOCS)
+    include(doc/DocumentationUtils.cmake)
 endif()
 
 add_subdirectory(src)

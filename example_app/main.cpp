@@ -1,8 +1,6 @@
 /**
- * \file
  * \brief       CAPI Clients Factory
  *
- * \project     BMW Platform Software
  * \copyright   Critical TechWorks SA
  */
 
@@ -158,9 +156,9 @@ int main(int argc, char** argv) {
 
     {
         // lift
-        const auto validate_filename = [](int i, const std::string& fn) { return fn + std::to_string(i);};
+        const auto validate_filename = [](const std::string& fn) { return fn;};
         const auto liftedMaybe = yafl::lift<yafl::Maybe>(validate_filename);
-        const auto fn = liftedMaybe(yafl::Just(2), yafl::Just<std::string>(filename));
+        const auto fn = liftedMaybe(yafl::Just<std::string>(filename));
 
         const auto result = validate_seed(seedString)
                 .bind(validate_operation(operation))
@@ -168,7 +166,7 @@ int main(int argc, char** argv) {
         std::cout << result.isOk() << std::endl;
 
         const auto liftedEither = yafl::lift<yafl::Either>(validate_filename);
-        const auto fn2 = liftedEither(yafl::Ok<void>(2), yafl::Ok<void, std::string>(filename));
+        const auto fn2 = liftedEither(yafl::Ok<void, std::string>(filename));
 
         const auto result2 = validate_seed(seedString)
                 .bind(validate_operation(operation))

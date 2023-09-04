@@ -1,8 +1,6 @@
 /**
- * \file
  * \brief       Yet Another Functional Library
  *
- * \project     Critical TechWorks SA
  * \copyright   Critical TechWorks SA
  */
 #pragma once
@@ -17,24 +15,47 @@
 
 namespace yafl {
 
-template <typename T>
+/**
+ * Either monad traits
+ */
+template <typename>
 struct EitherDetails;
 
-template <template <typename, typename> typename Either, typename InnerError, typename InnerValue>
-struct EitherDetails<Either<InnerError, InnerValue>> {
-    using ErrorType = InnerError;
-    using ValueType = InnerValue;
-};
-template <template <typename, typename> typename Either, typename InnerError, typename InnerValue>
-struct EitherDetails<const Either<InnerError, InnerValue>> {
+/**
+ * Maybe monad traits specialization that enable getting the inner error and value types
+ * @tparam EitherT Either monad type
+ * @tparam InnerError Error type
+ * @tparam InnerValue Value type
+ */
+template <template <typename, typename> typename EitherT, typename InnerError, typename InnerValue>
+struct EitherDetails<EitherT<InnerError, InnerValue>> {
     using ErrorType = InnerError;
     using ValueType = InnerValue;
 };
 
-// Either Monad
+/**
+ * Maybe monad traits specialization for const types that enable getting the inner error and value types
+ * @tparam EitherT Either monad type
+ * @tparam InnerError Error type
+ * @tparam InnerValue Value type
+ */
+template <template <typename, typename> typename EitherT, typename InnerError, typename InnerValue>
+struct EitherDetails<const EitherT<InnerError, InnerValue>> {
+    using ErrorType = InnerError;
+    using ValueType = InnerValue;
+};
+
+/**
+ * Either class. This class implements the Either type by realizing concepts from functional programming
+ * such as Functor, Applicative and Monad. The implementation for Either class was based on Haskell Either
+ * type as defined in https://hackage.haskell.org/package/base-4.18.0.0/docs/Data-Either.html
+ */
 template<typename Error, typename Value>
 class Either;
 
+/**
+ * Specialization of the Either class for void error and void value types
+ */
 template<>
 class Either<void, void> : public Functor<Either, void, void>
                          , public Monad<Either, void, void> {
@@ -45,16 +66,32 @@ private:
     explicit Either(bool v) : _value(v) {}
 
 public:
+    /**
+     * Constructs an Either type that is an Error
+     * @return Either with error defined
+     */
     static Either<void, void> Error() {
         return Either<void, void>(false);
     }
 
+    /**
+     * Constructs an Either type that is an Ok
+     * @return Either with value defined
+     */
     static Either<void, void> Ok() {
         return Either<void, void>{true};
     }
 
+    /**
+     * Returns whether Either is an Error or a Value
+     * @return true if error and false otherwise
+     */
     [[nodiscard]] bool isError() const { return !_value; }
 
+    /**
+     * Returns whether Either is an Error or a Value
+     * @return true if value and false otherwise
+     */
     [[nodiscard]] bool isOk() const { return _value; }
 
 private:
@@ -92,6 +129,9 @@ private:
     bool _value;
 };
 
+/**
+ * Partial specialization of the Either class for void error and generic value type
+ */
 template <typename ValueType>
 class Either<void, ValueType> : public Functor<Either, void, ValueType>
                               , public Applicative<Either, void, ValueType>
@@ -104,20 +144,42 @@ private:
     explicit Either(bool isError) : _isError{isError} {}
 
 public:
+    /**
+     * Constructs an Either type that is an Error
+     * @return Either with error defined
+     */
     static Either<void, ValueType> Error() {
         return Either<void, ValueType>(true);
     }
 
+    /**
+     * Constructs an Either type that is a Value
+     * @param value to be wrapped in the Either
+     * @return Either with value defined
+     */
     static Either<void, ValueType> Ok(const ValueType& value) {
         Either<void, ValueType> result(false);
         result._right = std::make_unique<ValueType>(value);
         return result;
     }
 
+    /**
+     * Returns whether Either is an Error or a Value
+     * @return true if error and false otherwise
+     */
     [[nodiscard]] bool isError() const { return _isError; }
 
+    /**
+     * Returns whether Either is an Error or a Value
+     * @return true if value and false otherwise
+     */
     [[nodiscard]] bool isOk() const { return !_isError; }
 
+    /**
+     * Extracts the wrapped value from the Either
+     * @return the value wrapped
+     * @throws std::runtime_error when either contains error
+     */
     ValueType value() const {
         if (!_isError) return *(_right.get());
         throw std::runtime_error("Ok not defined");
@@ -229,7 +291,9 @@ private:
     bool _isError;
 };
 
-
+/**
+ * Partial specialization of the Either class for generic error and void value type
+ */
 template <typename ErrorType>
 class Either<ErrorType, void> : public Functor<Either, ErrorType, void>
                               , public Monad<Either, ErrorType, void> {
@@ -240,20 +304,42 @@ private:
     explicit Either(bool isError) : _isError{isError} {}
 
 public:
+    /**
+     * Constructs an Either type that is an Ok
+     * @return Either with value defined
+     */
     static Either<ErrorType, void> Ok() {
         return Either<ErrorType, void>(false);
     }
 
+    /**
+     * Constructs an Either type that is an Error
+     * @param value to be wrapped as error
+     * @return Either with error defined
+     */
     static Either<ErrorType, void> Error(const ErrorType& value) {
         Either<ErrorType, void> result(true);
         result._left = std::make_unique<ErrorType>(value);
         return result;
     }
 
+    /**
+     * Returns whether Either is an Error or a Value
+     * @return true if error and false otherwise
+     */
     [[nodiscard]] bool isError() const { return _isError; }
 
+    /**
+     * Returns whether Either is an Error or a Value
+     * @return true if value and false otherwise
+     */
     [[nodiscard]] bool isOk() const { return !_isError; }
 
+    /**
+     * Extracts the wrapped error from the Either
+     * @return the error wrapped
+     * @throws std::runtime_error when either contains value
+     */
     ErrorType error() const {
         if (_isError) return *(_left.get());
         throw std::runtime_error("Ok not defined");
@@ -295,6 +381,9 @@ private:
     bool _isError;
 };
 
+/**
+ * Generalization of the Either class for any error and value types other than void
+ */
 template <typename ErrorType, typename ValueType>
 class Either : public Functor<Either, ErrorType, ValueType>
              , public Applicative<Either, ErrorType, ValueType>
@@ -307,27 +396,55 @@ private:
     explicit Either(bool isError): _isError{isError}{}
 
 public:
+    /**
+     * Constructs an Either type that is an Error
+     * @param value to be wrapped as error
+     * @return Either with error defined
+     */
     static Either<ErrorType, ValueType> Error(const ErrorType& value) {
         Either<ErrorType, ValueType> result{true};
         result._value.template emplace<0>(value);
         return result;
     }
 
+    /**
+     * Constructs an Either type that is a Value
+     * @param value to be wrapped in the Either
+     * @return Either with value defined
+     */
     static Either<ErrorType,ValueType> Ok(const ValueType& value) {
         Either<ErrorType, ValueType> result{false};
         result._value.template emplace<1>(value);
         return result;
     }
 
+    /**
+     * Returns whether Either is an Error or a Value
+     * @return true if error and false otherwise
+     */
     [[nodiscard]] bool isError() const { return _isError; }
 
+    /**
+     * Returns whether Either is an Error or a Value
+     * @return true if value and false otherwise
+     */
     [[nodiscard]] bool isOk() const { return !_isError; }
 
+    /**
+     * Extracts the wrapped error from the Either
+     * @return the error wrapped
+     * @throws std::runtime_error when either contains value
+     */
     ErrorType error() const {
         if (isError()) return std::get<0>(_value);
         throw std::runtime_error("Error not defined");
     }
 
+    /**
+     * Extracts the wrapped value from the Either
+     * @return the value wrapped
+     * @throws std::runtime_error when either contains error
+     */
     ValueType value() const {
         if (isOk()) return std::get<1>(_value);
         throw std::runtime_error("Ok not defined");
@@ -443,35 +560,94 @@ private:
     bool _isError;
 };
 
-
+/**
+ * Helper function to create an Either that is an Ok.
+ * Is this case this function is applicable when both error and value types are void
+ * @tparam ErrorType Type of error
+ * @tparam ValueType Type of value
+ * @return valid value Either
+ */
 template<typename ErrorType, typename ValueType>
 std::enable_if_t<std::is_void_v<ValueType> && std::is_void_v<ErrorType>, Either<void, void>>
 Ok() { return Either<void, void>::Ok(); }
 
+/**
+ * Helper function to create an Either that is an Ok.
+ * Is this case this function is applicable when error type is not void and value type is void
+ * @tparam ErrorType Type of error
+ * @tparam ValueType Type of value
+ * @return valid value Either
+ */
 template<typename ErrorType, typename ValueType>
 std::enable_if_t<(!std::is_void_v<ErrorType>) && std::is_void_v<ValueType>, Either<ErrorType, void>>
 Ok() { return Either<ErrorType, void>::Ok(); }
 
+/**
+ * Helper function to create an Either that is an Ok.
+ * Is this case this function is applicable when error type is not void and value type is not void
+ * @tparam ErrorType Type of error
+ * @tparam ValueType Type of value
+ * @param arg Value to be wrapped
+ * @return valid value Either
+ */
 template<typename ErrorType, typename ValueType>
 std::enable_if_t<!std::is_void_v<ErrorType> && !std::is_void_v<ValueType>, Either<ErrorType, ValueType>>
 Ok(const ValueType& arg) { return Either<ErrorType, ValueType>::Ok(arg); }
 
+/**
+ * Helper function to create an Either that is an Ok.
+ * Is this case this function is applicable when error type is void and value type is not void
+ * @tparam ErrorType Type of error
+ * @tparam ValueType Type of value
+ * @param arg Value to be wrapped
+ * @return valid value Either
+ */
 template<typename ErrorType, typename ValueType>
 std::enable_if_t<std::is_void_v<ErrorType> && !std::is_void_v<ValueType>, Either<void, ValueType>>
 Ok(const ValueType& arg) { return Either<void, ValueType>::Ok(arg); }
 
+/**
+ * Helper function to create an Either that is an Error.
+ * Is this case this function is applicable when both error and value types are void
+ * @tparam ErrorType Type of error
+ * @tparam ValueType Type of value
+ * @return valid eror Either
+ */
 template<typename ErrorType, typename ValueType>
 std::enable_if_t<std::is_void_v<ErrorType> && std::is_void_v<ValueType>, Either<void, void>>
 Error() { return Either<void, void>::Error(); }
 
+/**
+ * Helper function to create an Either that is an Error.
+ * Is this case this function is applicable when error type is not void and value type is void
+ * @tparam ErrorType Type of error
+ * @tparam ValueType Type of value
+ * @param arg Error to be wrapped
+ * @return valid error Either
+ */
 template<typename ErrorType, typename ValueType>
 std::enable_if_t<!std::is_void_v<ErrorType> && std::is_void_v<ValueType>, Either<ErrorType, void>>
 Error(const ErrorType& arg) { return Either<ErrorType, void>::Error(arg); }
 
+/**
+ * Helper function to create an Either that is an Error.
+ * Is this case this function is applicable when error type is not void and value type is not void
+ * @tparam ErrorType Type of error
+ * @tparam ValueType Type of value
+ * @param arg Error to be wrapped
+ * @return valid error Either
+ */
 template<typename ErrorType, typename ValueType>
 std::enable_if_t<!std::is_void_v<ErrorType> && !std::is_void_v<ValueType>, Either<ErrorType, ValueType>>
 Error(const ErrorType& arg) { return Either<ErrorType, ValueType>::Error(arg); }
 
+/**
+ * Helper function to create an Either that is an Error.
+ * Is this case this function is applicable when error type is void and value type is not void
+ * @tparam ErrorType Type of error
+ * @tparam ValueType Type of value
+ * @return valid error Either
+ */
 template<typename ErrorType, typename ValueType>
 std::enable_if_t<std::is_void_v<ErrorType> && !std::is_void_v<ValueType>, Either<void, ValueType>>
 Error() { return Either<void, ValueType>::Error(); }

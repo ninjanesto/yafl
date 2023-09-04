@@ -1,25 +1,11 @@
-# - FindCoverage
-# Find coverage tools from the lcov package and generate coverage target.
-#
-# Configuration:
-#  COVERAGE_INCLUDES  - List of additional include patterns.
-#
-# This module defines the following variables:
-#  PYTHON3            - The python3 executable
-#  GENHTML_EXECUTABLE - The genhtml executable
-#
-# This module also defines a target called "coverage" that runs all automated tests and generates a
-# report in COVERAGE_DIR.
-
-# Find required tools
 find_program(PYTHON3 python3)
 find_program(GENHTML_EXECUTABLE genhtml)
 
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(Coverage
-        REQUIRED_VARS PYTHON3 GENHTML_EXECUTABLE
-        FAIL_MESSAGE "Could not find required tools for coverage generation"
-        )
+    REQUIRED_VARS PYTHON3 GENHTML_EXECUTABLE
+    FAIL_MESSAGE "Could not find required tools for coverage generation"
+)
 mark_as_advanced(PYTHON3 GENHTML_EXECUTABLE)
 
 # Set options and locations

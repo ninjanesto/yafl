@@ -1,8 +1,6 @@
 /**
- * \file
  * \brief       Yet Another Functional Library
  *
- * \project     Critical TechWorks SA
  * \copyright   Critical TechWorks SA
  */
 #pragma once
@@ -25,10 +23,16 @@ using remove_cvref_t = typename std::remove_cv_t<std::remove_reference_t<T>>;
  * @tparam ...
  */
 template <typename ...>
-struct function_traits;
+struct function_traits_aux;
 
+/**
+ * One or more argument function traits
+ * @tparam Ret Return type
+ * @tparam FirstArg First argument type
+ * @tparam Args Remaining Types
+ */
 template <typename Ret, typename FirstArg, typename... Args>
-struct function_traits<Ret, FirstArg, Args...> {
+struct function_traits_aux<Ret, FirstArg, Args...> {
     using Signature = std::function<Ret(FirstArg, Args...)>;
     using PartialApplyFirst = std::function<Ret(Args...)>;
     using ReturnType = Ret;
@@ -38,9 +42,13 @@ struct function_traits<Ret, FirstArg, Args...> {
     using ArgType = std::tuple_element_t<idx, ArgTypes>;
 };
 
+/**
+ * Zero arguments function traits
+ * @tparam Ret Return type
+ */
 template <typename Ret>
-struct function_traits<Ret> {
-    using Signature = Ret();
+struct function_traits_aux<Ret> {
+    using Signature = std::function<Ret()>;
     using ReturnType = Ret;
     using ArgTypes = std::tuple<>;
     static constexpr std::size_t ArgCount = 0;
@@ -49,27 +57,24 @@ struct function_traits<Ret> {
 } // namespace detail
 
 template <typename Func>
-struct function_traits;
-
-template <typename Func>
 struct function_traits : function_traits<decltype(&detail::remove_cvref_t<Func>::operator())>{};
 
 template <typename Ret, typename ClassType, typename... Args>
-struct function_traits<Ret (ClassType::*)(Args...) const> : detail::function_traits<Ret, Args...>{};
+struct function_traits<Ret (ClassType::*)(Args...) const> : detail::function_traits_aux<Ret, Args...>{};
 
 template <typename Ret, typename ClassType, typename... Args>
-struct function_traits<Ret (ClassType::*)(Args...)> : detail::function_traits<Ret, Args...>{};
+struct function_traits<Ret (ClassType::*)(Args...)> : detail::function_traits_aux<Ret, Args...>{};
 
 template <typename Ret, typename ClassType, typename... Args>
-struct function_traits<Ret (ClassType::*&)(Args...)> : detail::function_traits<Ret, Args...>{};
+struct function_traits<Ret (ClassType::*&)(Args...)> : detail::function_traits_aux<Ret, Args...>{};
 
 template <typename Ret, typename... Args>
-struct function_traits<Ret (*)(Args...)> : detail::function_traits<Ret, Args...>{};
+struct function_traits<Ret (*)(Args...)> : detail::function_traits_aux<Ret, Args...>{};
 
 template <typename Ret, typename... Args>
-struct function_traits<Ret (&)(Args...)> : detail::function_traits<Ret, Args...>{};
+struct function_traits<Ret (&)(Args...)> : detail::function_traits_aux<Ret, Args...>{};
 
 template <typename Ret, typename... Args>
-struct function_traits<Ret (Args...)> : detail::function_traits<Ret, Args...>{};
+struct function_traits<Ret (Args...)> : detail::function_traits_aux<Ret, Args...>{};
 
 } // namespace yafl
