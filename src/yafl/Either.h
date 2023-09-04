@@ -190,9 +190,18 @@ public:
      * @return the value wrapped
      * @throws std::runtime_error when either contains error
      */
-    ValueType value() const {
+    [[nodiscard]] ValueType value() const {
         if (!_isError) return *(_right.get());
         throw std::runtime_error("Ok not defined");
+    }
+
+    /**
+     * Extracts the wrapped value from the Either if exists or returns
+     * te provided default value if either contains error
+     * @return the value wrapped or default
+     */
+    [[nodiscard]] ValueType valueOr(const ValueType& defaultValue) const {
+        return (!_isError) ? *(_right.get()) : defaultValue;
     }
 
 private:
@@ -351,7 +360,7 @@ public:
      * @return the error wrapped
      * @throws std::runtime_error when either contains value
      */
-    ErrorType error() const {
+    [[nodiscard]] ErrorType error() const {
         if (_isError) return *(_left.get());
         throw std::runtime_error("Ok not defined");
     }
@@ -447,7 +456,7 @@ public:
      * @return the error wrapped
      * @throws std::runtime_error when either contains value
      */
-    ErrorType error() const {
+    [[nodiscard]] ErrorType error() const {
         if (isError()) return std::get<0>(_value);
         throw std::runtime_error("Error not defined");
     }
@@ -457,9 +466,18 @@ public:
      * @return the value wrapped
      * @throws std::runtime_error when either contains error
      */
-    ValueType value() const {
+    [[nodiscard]] ValueType value() const {
         if (isOk()) return std::get<1>(_value);
         throw std::runtime_error("Ok not defined");
+    }
+
+    /**
+     * Extracts the wrapped value from the Either if exists or returns
+     * te provided default value if either contains error
+     * @return the value wrapped or default
+     */
+    [[nodiscard]] ValueType valueOr(const ValueType& defaultValue) const {
+        return (isOk()) ? std::get<1>(_value) : defaultValue;
     }
 
 private:

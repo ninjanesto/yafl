@@ -7,6 +7,7 @@
 #include "yafl/HOF.h"
 #include "yafl/Either.h"
 #include <gtest/gtest.h>
+#include <gmock/gmock.h>
 
 template<typename T>
 class EitherTest : public ::testing::Test {};
@@ -63,6 +64,19 @@ TYPED_TEST(EitherTest, assertErrorCreateAValidEitherForAnyType) {
 TYPED_TEST(EitherTest, assertOkCreateAValidEitherForAnyType) {
     Either<typename TypeParam::Error, typename TypeParam::Ok> either = createOk<typename TypeParam::Error, typename TypeParam::Ok>();
     ASSERT_TRUE(either.isOk());
+}
+
+TYPED_TEST(EitherTest, assertValueOr) {
+    if constexpr (!std::is_void_v<typename TypeParam::Ok>) {
+        Either<typename TypeParam::Error, typename TypeParam::Ok> eitherOk = createOk<typename TypeParam::Error, typename TypeParam::Ok>();
+        ASSERT_TRUE(eitherOk.isOk());
+        ASSERT_EQ(eitherOk.value(), 0);
+        ASSERT_EQ(eitherOk.valueOr(42), 0);
+        Either<typename TypeParam::Error, typename TypeParam::Ok> eitherError = createError<typename TypeParam::Error, typename TypeParam::Ok>();
+        ASSERT_TRUE(eitherError.isError());
+        EXPECT_THAT([&eitherError]() { std::ignore = eitherError.value(); }, testing::Throws<std::runtime_error>());
+        ASSERT_EQ(eitherError.valueOr(42), 42);
+    }
 }
 
 TYPED_TEST(EitherTest, assertFmapComputesCorrectType) {
@@ -310,14 +324,14 @@ TYPED_TEST(EitherTest, assertBindComputesCorrectType) {
 TYPED_TEST(EitherTest, validateValueThrowsExceptionWhenEitherIsError) {
     if constexpr (!std::is_void_v<typename TypeParam::Ok>) {
         const auto either = createError<typename TypeParam::Error, typename TypeParam::Ok>();
-        EXPECT_THROW({either.value();}, std::runtime_error );
+        EXPECT_THROW({std::ignore = either.value();}, std::runtime_error );
     }
 }
 
 TYPED_TEST(EitherTest, validateErrorThrowsExceptionWhenEitherIsValue) {
     if constexpr (!std::is_void_v<typename TypeParam::Error>) {
         const auto either = createOk<typename TypeParam::Error, typename TypeParam::Ok>();
-        EXPECT_THROW({either.error();}, std::runtime_error );
+        EXPECT_THROW({std::ignore = either.error();}, std::runtime_error );
     }
 }
 
