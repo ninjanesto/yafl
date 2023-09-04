@@ -102,12 +102,12 @@ TYPED_TEST(MaybeTest, assertFmapComputesCorrectType) {
         }
         {
             const auto maybe = createMaybe<TypeParam>();
-            const auto resultVoid = fmap([](){}, maybe);
+            const auto resultVoid = functor::fmap([](){}, maybe);
             ASSERT_TRUE(std::is_void_v<typename monad::Details<decltype(resultVoid)>::ValueType>);
         }
         {
             const auto maybe = createMaybe<TypeParam>();
-            const auto f = fmap<yafl::Maybe>([](){});
+            const auto f = functor::fmap<yafl::Maybe>([](){});
             const auto resultVoid = f(maybe);
             ASSERT_TRUE(std::is_void_v<typename monad::Details<decltype(resultVoid)>::ValueType>);
         }
@@ -132,12 +132,12 @@ TYPED_TEST(MaybeTest, assertFmapComputesCorrectType) {
         }
         {
             const auto maybe = createMaybe<TypeParam>();
-            const auto resultVoid = fmap([](const TypeParam&){}, maybe);
+            const auto resultVoid = functor::fmap([](const TypeParam&){}, maybe);
             ASSERT_TRUE(std::is_void_v<typename monad::Details<decltype(resultVoid)>::ValueType>);
         }
         {
             const auto maybe = createMaybe<TypeParam>();
-            const auto f = fmap<yafl::Maybe>([](const TypeParam&){});
+            const auto f = functor::fmap<yafl::Maybe>([](const TypeParam&){});
             const auto resultVoid = f(maybe);
             ASSERT_TRUE(std::is_void_v<typename monad::Details<decltype(resultVoid)>::ValueType>);
         }
@@ -231,22 +231,22 @@ TEST(MaybeTest, assertApply) {
         const auto multBy42 = maybe::Just([](const int &x) { return x * 42; });
         const auto result = multBy42(maybe::Just(2));
         ASSERT_EQ(result.value(), 84);
-        ASSERT_EQ(apply(multBy42, maybe::Just(2)).value(), 84);
-        ASSERT_EQ(apply(multBy42)(maybe::Just(2)).value(), 84);
+        ASSERT_EQ(applicative::apply(multBy42, maybe::Just(2)).value(), 84);
+        ASSERT_EQ(applicative::apply(multBy42)(maybe::Just(2)).value(), 84);
         const auto result2 = multBy42(2);
         ASSERT_EQ(result2.value(), 84);
-        ASSERT_EQ(apply(multBy42, 2).value(), 84);
-        ASSERT_EQ(apply(multBy42)(2).value(), 84);
+        ASSERT_EQ(applicative::apply(multBy42, 2).value(), 84);
+        ASSERT_EQ(applicative::apply(multBy42)(2).value(), 84);
         const auto result3 = multBy42(Maybe<int>::Nothing());
         ASSERT_FALSE(result3.hasValue());
-        ASSERT_FALSE(apply(multBy42, Maybe<int>::Nothing()).hasValue());
-        ASSERT_FALSE(apply(multBy42)(Maybe<int>::Nothing()).hasValue());
+        ASSERT_FALSE(applicative::apply(multBy42, Maybe<int>::Nothing()).hasValue());
+        ASSERT_FALSE(applicative::apply(multBy42)(Maybe<int>::Nothing()).hasValue());
     }
     {
         const auto void42 = maybe::Just([]() { return 42; });
         const auto result = void42();
         ASSERT_EQ(result.value(), 42);
-        ASSERT_EQ(apply(void42)().value(), 42);
+        ASSERT_EQ(applicative::apply(void42)().value(), 42);
     }
     {
         const auto voidFunc = []() { return ;};

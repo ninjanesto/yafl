@@ -53,9 +53,9 @@ namespace detail {
  */
 template <typename TLeft, typename TRight>
 decltype(auto) function_compose(TLeft&& lhs, TRight&& rhs) {
-    using LhsReturnType = typename yafl::FunctionTraits<TLeft>::ReturnType;
-    if constexpr (yafl::FunctionTraits<TLeft>::ArgCount > 0) {
-        using InputArg = typename FunctionTraits<TLeft>::template ArgType<0>;
+    using LhsReturnType = typename yafl::function::Details<TLeft>::ReturnType;
+    if constexpr (yafl::function::Details<TLeft>::ArgCount > 0) {
+        using InputArg = typename function::Details<TLeft>::template ArgType<0>;
         if constexpr (std::is_void_v<LhsReturnType>) {
             return [rhs = std::forward<TRight>(rhs), lhs = std::forward<TLeft>(lhs)](InputArg&& arg) {
                 lhs(std::move(arg));
@@ -92,11 +92,11 @@ decltype(auto) function_compose(TLeft&& lhs, TRight&& rhs) {
  */
 template <typename TLeft, typename TRight>
 decltype(auto) kleisli_compose(TLeft&& lhs, TRight&& rhs) {
-    using FirstArg = typename FunctionTraits<TLeft>::template ArgType<0>;
-    using RhsReturnType = typename FunctionTraits<TRight>::ReturnType;
+    using FirstArg = typename function::Details<TLeft>::template ArgType<0>;
+    using RhsReturnType = typename function::Details<TRight>::ReturnType;
 
     return [rhs = std::forward<TRight>(rhs), lhs = std::forward<TLeft>(lhs)](const FirstArg& arg) -> RhsReturnType {
-        using LhsReturnType = typename yafl::FunctionTraits<TLeft>::ReturnType;
+        using LhsReturnType = typename yafl::function::Details<TLeft>::ReturnType;
         const LhsReturnType intermediate_result = lhs(arg);
 
         if constexpr (std::is_void_v<typename monad::Details<LhsReturnType>::ValueType>) {
@@ -106,7 +106,7 @@ decltype(auto) kleisli_compose(TLeft&& lhs, TRight&& rhs) {
                 return rhs();
             }
         } else {
-            if constexpr (monad::Details<typename FunctionTraits<TRight>::template ArgType<0>>::hasMonadicBase) {
+            if constexpr (monad::Details<typename function::Details<TRight>::template ArgType<0>>::hasMonadicBase) {
                 return rhs(intermediate_result);
             } else {
                 if (!intermediate_result) {
@@ -129,7 +129,7 @@ decltype(auto) kleisli_compose(TLeft&& lhs, TRight&& rhs) {
  */
 template <typename TLeft, typename TRight>
 decltype(auto) compose(TLeft&& lhs, TRight&& rhs) {
-    using LhsReturnType = typename yafl::FunctionTraits<TLeft>::ReturnType;
+    using LhsReturnType = typename yafl::function::Details<TLeft>::ReturnType;
     if constexpr (monad::Details<LhsReturnType>::hasMonadicBase) {
         return kleisli_compose(std::forward<TLeft>(lhs), std::forward<TRight>(rhs));
     } else {
@@ -149,9 +149,9 @@ decltype(auto) curry(Callable&& callable) {
     if constexpr (std::is_invocable_v<Callable>) {
         return callable();
     } else {
-        using FirstArg = typename FunctionTraits<Callable>::template ArgType<0>;
+        using FirstArg = typename function::Details<Callable>::template ArgType<0>;
         return [callable = std::forward<Callable>(callable)](const FirstArg& arg) {
-            using ReturnFunType = typename FunctionTraits<Callable>::PartialApplyFirst;
+            using ReturnFunType = typename function::Details<Callable>::PartialApplyFirst;
 
             const ReturnFunType inner_func = [callable, arg = std::move(arg)](auto&& ...args) {
                 return callable(std::move(arg), std::forward<decltype(args)>(args)...);

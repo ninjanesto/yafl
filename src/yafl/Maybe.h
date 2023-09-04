@@ -354,12 +354,12 @@ private:
                 }
             } else {
                 if (arg.hasValue() && hasValue()) {
-                    return Maybe<typename FunctionTraits<T>::PartialApplyFirst>::Just(
+                    return Maybe<typename function::Details<T>::PartialApplyFirst>::Just(
                             [callable = value(), first = std::forward<Head>(arg.value())](auto&& ...args) {
                                 return std::apply(callable, std::tuple_cat(std::make_tuple(first), std::make_tuple(args...)));
                             });
                 } else {
-                    return Maybe<typename FunctionTraits<T>::PartialApplyFirst>::Nothing();
+                    return Maybe<typename function::Details<T>::PartialApplyFirst>::Nothing();
                 }
             }
         } else {
@@ -367,30 +367,30 @@ private:
         }
     }
 
-    template<typename Head>
-    decltype(auto) internal_apply_non_monad(Head&& arg) const {
-        if constexpr (std::is_invocable_v<T, Head>) {
-            using ReturnType = yafl::function::remove_cvref_t<std::invoke_result_t<T, Head>>;
+    template<typename Arg>
+    decltype(auto) internal_apply_non_monad(Arg&& arg) const {
+        if constexpr (std::is_invocable_v<T, Arg>) {
+            using ReturnType = yafl::function::remove_cvref_t<std::invoke_result_t<T, Arg>>;
             if (!hasValue()) {
                 return Maybe<ReturnType>::Nothing();
             } else {
                 if constexpr (std::is_void_v<ReturnType>) {
-                    std::invoke<T>(value(), std::forward<Head>(arg));
+                    std::invoke<T>(value(), std::forward<Arg>(arg));
                     return Maybe<ReturnType>::Just();
                 } else {
-                    return Maybe<ReturnType>::Just(value()(std::forward<Head>(arg)));
+                    return Maybe<ReturnType>::Just(value()(std::forward<Arg>(arg)));
                 }
             }
         } else if constexpr (std::is_invocable_v<T>) {
             using RT = std::invoke_result_t<T>;
-            if constexpr (std::is_invocable_v<RT, Head>) {
-                using RTT = std::invoke_result_t<RT, Head>;
+            if constexpr (std::is_invocable_v<RT, Arg>) {
+                using RTT = std::invoke_result_t<RT, Arg>;
                 if (hasValue()) {
                     if constexpr (std::is_void_v<RTT>) {
-                        std::invoke<RT>(value()(), std::forward<Head>(arg));
+                        std::invoke<RT>(value()(), std::forward<Arg>(arg));
                         return Maybe<RTT>::Just();
                     } else {
-                        return Maybe<RTT>::Just(std::invoke<RT>(value()(), std::forward<Head>(arg)));
+                        return Maybe<RTT>::Just(std::invoke<RT>(value()(), std::forward<Arg>(arg)));
                     }
                 } else {
                     return Maybe<RTT>::Nothing();
@@ -400,12 +400,12 @@ private:
             }
         } else {
             if (hasValue()) {
-                return Maybe<typename FunctionTraits<T>::PartialApplyFirst>::Just(
-                        [callable = value(), first = std::forward<Head>(arg)](auto&& ...args) mutable {
+                return Maybe<typename function::Details<T>::PartialApplyFirst>::Just(
+                        [callable = value(), first = std::forward<Arg>(arg)](auto&& ...args) mutable {
                             return callable(std::move(first), std::forward<decltype(args)>(args)...);
                         });
             } else {
-                return Maybe<typename FunctionTraits<T>::PartialApplyFirst>::Nothing();
+                return Maybe<typename function::Details<T>::PartialApplyFirst>::Nothing();
             }
         }
     }
@@ -484,7 +484,7 @@ decltype(auto) lift(Callable &&callable) {
             };
         }
     } else {
-        using ReturnType = typename yafl::FunctionTraits<Callable>::ReturnType;
+        using ReturnType = typename yafl::function::Details<Callable>::ReturnType;
 
         return [callable = std::forward<Callable>(callable)](auto ...args) -> Maybe<ReturnType> {
             if (detail::all_true([](auto &&v) { return v.hasValue(); }, args...)) {

@@ -76,8 +76,8 @@ decltype(auto) bind(Callable&& callable, const MonadT& monad) {
  */
 template<template<typename...> typename MonadType, typename Callable>
 decltype(auto) bind(Callable&& callable) {
-    if constexpr (FunctionTraits<Callable>::ArgCount > 0) {
-        using FirstArg = typename FunctionTraits<Callable>::template ArgType<0>;
+    if constexpr (function::Details<Callable>::ArgCount > 0) {
+        using FirstArg = typename function::Details<Callable>::template ArgType<0>;
 
         return [callable = std::forward<Callable>(callable)](const MonadType<FirstArg> &monad) {
             static_assert(monad::Details<MonadType<FirstArg>>::hasMonadicBase, "Argument not a Functor");

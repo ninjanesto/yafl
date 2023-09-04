@@ -44,7 +44,8 @@ public:
      */
     template<typename Head>
     decltype(auto) operator()(Head &&head) const {
-        return static_cast<const TDerivedApplicative<Args...> *>(this)->internal_apply(std::forward<Head>(head));
+        return static_cast<const TDerivedApplicative<Args...> *>(this)->internal_apply(
+                std::forward<Head>(head));
     }
 
     /**
@@ -60,11 +61,11 @@ public:
      */
     template<typename Head, typename ...Tail>
     decltype(auto) operator()(Head &&head, Tail &&...tail) const {
-        return static_cast<const TDerivedApplicative<Args...> *>(this)->internal_apply(std::forward<Head>(head))(
+        return static_cast<const TDerivedApplicative<Args...> *>(this)->internal_apply(
+                std::forward<Head>(head))(
                 std::forward<Tail>(tail)...);
     }
 };
-
 
 
 /**
@@ -74,7 +75,7 @@ public:
  *
  * @tparam T type to validate
  */
-template <typename T>
+template<typename T>
 struct HasApplicativeFBase {
     ///boolean flag that states whether type T is a Applicative Functor or not
     static constexpr bool value = false;
@@ -87,7 +88,7 @@ struct HasApplicativeFBase {
  * @tparam ApplicativeFType applicative functor type
  * @tparam Args applicative functor type arguments
  */
-template <template <typename...> typename ApplicativeFType, typename ...Args>
+template<template<typename...> typename ApplicativeFType, typename ...Args>
 struct HasApplicativeFBase<ApplicativeFType<Args...>> {
     /// Base type
     using BaseType = Applicative<ApplicativeFType, Args...>;
@@ -98,6 +99,8 @@ struct HasApplicativeFBase<ApplicativeFType<Args...>> {
 };
 
 } // namespace core
+
+namespace applicative {
 
 /**
  * This function is used to apply a callable type to a value of type Applicative
@@ -130,4 +133,5 @@ decltype(auto) apply(ApplicableT&& callable) {
     };
 }
 
+} // namespace applicative
 } // namespace yafl

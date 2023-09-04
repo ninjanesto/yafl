@@ -70,6 +70,7 @@ struct HasFunctorBase<FunctorType<Args...>> {
 
 } // namespace core
 
+namespace functor {
 /**
  * This function is used to apply a callable type to a value of type Functor
  * @tparam Callable callable type
@@ -96,8 +97,8 @@ decltype(auto) fmap(Callable&& callable, const FunctorT& functor) {
  */
 template<template<typename...> typename FunctorType, typename Callable>
 decltype(auto) fmap(Callable&& callable) {
-    if constexpr (FunctionTraits<Callable>::ArgCount > 0) {
-        using FirstArg = typename FunctionTraits<Callable>::template ArgType<0>;
+    if constexpr (function::Details<Callable>::ArgCount > 0) {
+        using FirstArg = typename function::Details<Callable>::template ArgType<0>;
 
         return [callable = std::forward<Callable>(callable)](const FunctorType<FirstArg> &functor) {
             static_assert(core::HasFunctorBase<FunctorType<FirstArg>>::value, "Argument not a Functor");
@@ -110,5 +111,6 @@ decltype(auto) fmap(Callable&& callable) {
         };
     }
 }
+} // namespace functor
 
 } // namespace yafl

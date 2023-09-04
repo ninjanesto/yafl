@@ -22,13 +22,15 @@ namespace function {
 template<typename T>
 using remove_cvref_t = typename std::remove_cv_t<std::remove_reference_t<T>>;
 
+namespace {
+
 /**
  * @ingroup TypeTraits
  * Forward declaration of Details struct
  * @tparam ...
  */
 template <typename ...>
-struct Details;
+struct TraitDetails;
 
 /**
  * @ingroup TypeTraits
@@ -39,7 +41,7 @@ struct Details;
  * @tparam Args Remaining Types
  */
 template <typename Ret, typename FirstArg, typename... Args>
-struct Details<Ret, FirstArg, Args...> {
+struct TraitDetails<Ret, FirstArg, Args...> {
     ///Function Signature
     using Signature = std::function<Ret(FirstArg, Args...)>;
     ///Function Signature after applying first argument
@@ -62,7 +64,7 @@ struct Details<Ret, FirstArg, Args...> {
  * @tparam Ret Return type
  */
 template <typename Ret>
-struct Details<Ret> {
+struct TraitDetails<Ret> {
     ///Function Signature
     using Signature = std::function<Ret()>;
     ///Return type
@@ -77,24 +79,29 @@ template<typename>
 struct Traits;
 
 template<typename Ret, typename... Args>
-struct Traits<std::function<Ret(&)(Args...)>> : function::Details<Ret, Args...> {};
+struct Traits<std::function<Ret(&)(Args...)>> : function::TraitDetails<Ret, Args...> {
+};
 
 template<typename Ret, typename... Args>
-struct Traits<std::function<Ret(Args...)>> : function::Details<Ret, Args...> {};
+struct Traits<std::function<Ret(Args...)>> : function::TraitDetails<Ret, Args...> {
+};
 
 template<typename Ret, typename ClassType, typename... Args>
-struct Traits<std::function<Ret (ClassType::*)(Args...) const>> : function::Details<Ret, Args...> {};
+struct Traits<std::function<Ret (ClassType::*)(Args...) const>> : function::TraitDetails<Ret, Args...> {
+};
 
 template<typename Ret, typename ClassType, typename... Args>
-struct Traits<std::function<Ret (ClassType::*)(Args...)>> : function::Details<Ret, Args...> {};
+struct Traits<std::function<Ret (ClassType::*)(Args...)>> : function::TraitDetails<Ret, Args...> {
+};
 
 template<typename Ret, typename ClassType, typename... Args>
-struct Traits<std::function<Ret (ClassType::* &)(Args...)>> : function::Details<Ret, Args...> {};
+struct Traits<std::function<Ret (ClassType::* &)(Args...)>> : function::TraitDetails<Ret, Args...> {
+};
 
 template<typename Ret, typename... Args>
-struct Traits<std::function<Ret (*)(Args...)>> : function::Details<Ret, Args...> {};
-
-} // namespace function
+struct Traits<std::function<Ret (*)(Args...)>> : function::TraitDetails<Ret, Args...> {
+};
+} // namespace
 
 /**
  * @ingroup TypeTraits
@@ -104,7 +111,7 @@ struct Traits<std::function<Ret (*)(Args...)>> : function::Details<Ret, Args...>
  * @tparam Callable Callable type to inspect
  */
 template<typename Callable>
-struct FunctionTraits : function::Traits<decltype(std::function{std::declval<function::remove_cvref_t<Callable>>()})>{};
+struct Details : function::Traits<decltype(std::function{std::declval<function::remove_cvref_t<Callable>>()})>{};
 
 /**
  * Specialization for STL function
@@ -112,7 +119,8 @@ struct FunctionTraits : function::Traits<decltype(std::function{std::declval<fun
  * @tparam Args function argument types
  */
 template<typename Ret, typename ...Args>
-struct FunctionTraits<std::function<Ret(Args...)>> : function::Traits<std::function<Ret(Args...)>>{};
+struct Details<std::function<Ret(Args...)>> : function::Traits<std::function<Ret(Args...)>>{};
+
 
 /**
  * Helper struct that enables debugging by showing the information about the type T
@@ -122,4 +130,5 @@ struct FunctionTraits<std::function<Ret(Args...)>> : function::Traits<std::funct
 template<typename T>
 struct WhatIsThis;
 
+} // namespace function
 } // namespace yafl
