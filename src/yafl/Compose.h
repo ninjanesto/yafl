@@ -104,7 +104,7 @@ constexpr decltype(auto) curry(const F& f) {
         using ReturnFunType = typename function_traits<F>::PartialApplyFirst;
         using FirstArg = typename function_traits<F>::template ArgType<0>;
 
-        return [f= std::move(f)](FirstArg&& arg) {
+        return [f= std::move(f)](const FirstArg& arg) {
             const ReturnFunType inner_func = [f, arg = std::move(arg)](auto&& ...args) {
                 return std::apply(f, std::tuple_cat(std::make_tuple(arg), std::make_tuple(args...)));
             };
@@ -112,6 +112,33 @@ constexpr decltype(auto) curry(const F& f) {
             return curry(std::move(inner_func));
         };
     }
+}
+
+
+namespace detail {
+    template<typename Callable, typename Head>
+    decltype(auto) uncurry_impl(Callable&& f, const Head& value) {
+        return f(value);
+    }
+
+    template<typename Callable, typename Head, typename ...Tail>
+    decltype(auto) uncurry_impl(Callable&& f, const Head& value, Tail&&...ts) {
+        const auto f2 = f(value);
+        return uncurry_impl(f2, std::forward<Tail>(ts)...);
+    }
+}
+
+/**
+ * Uncurry given callable
+ * @tparam F callable type
+ * @param f callable to apply uncurry
+ * @return Uncurried version of the given function
+ */
+template <typename Callable>
+constexpr decltype(auto) uncurry(Callable&& f) {
+    return [f = std::forward<Callable>(f)](auto&& ...args) noexcept {
+            return detail::uncurry_impl(f, std::forward<decltype(args)>(args)...);
+    };
 }
 
 /**
@@ -140,8 +167,8 @@ constexpr decltype(auto) partial(F&& f, Args&& ...args) {
  * @return argument
  */
 template<typename Arg>
-constexpr auto id(Arg&& arg) noexcept {
-    return std::forward<Arg>(arg);
+Arg id(const Arg& arg) {
+    return arg;
 }
 
 } // namespace yafl
