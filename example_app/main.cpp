@@ -93,7 +93,6 @@ Result<OperationType> validate_operation(const std::string& op) {
     return Result<OperationType>::Error();
 }
 
-
 int main(int argc, char** argv) {
 
     if (argc < 3) {
@@ -135,8 +134,8 @@ int main(int argc, char** argv) {
         // Method 4
         const auto op = validate_operation(operation).value();
         const auto curried_op = yafl::curry(op);
-        const auto caesar_cypher = yafl::compose(validate_seed, curried_op);
-        const auto result = caesar_cypher(seedString)(filename);
+        const auto caesar_cypher = validate_seed(seedString).fmap(curried_op);
+        const auto result = caesar_cypher(filename);
         std::cout << result.isOk() << std::endl;
     }
 
@@ -173,33 +172,6 @@ int main(int argc, char** argv) {
                 .bind(validate_operation(operation))
                         (fn2.value());
         std::cout << result2.isOk() << std::endl;
-    }
-
-    {
-        const auto l1 = [](int i){ std::cout << "I"<<i << std::endl;};
-        const auto l2 = [&l1]() {return l1;};
-        const auto l3 = [](auto&& f) { f(42);};
-        const auto f = yafl::compose(l2, l3);
-        f();
-
-        const auto r = yafl::Either<int, int>::Ok(4);
-        const auto r2 = r.fmap(yafl::constf<int>(2));
-        std::cout << r2.value() << std::endl;
-
-        const auto curried =  yafl::curry(yafl::fmap<std::function<int(int)>, yafl::Either<int,int>>);
-        const auto f2 = yafl::compose(yafl::constf<int>, curried);
-        const auto r32 = f2(24)(r);
-        std::cout << r32.value() << std::endl;
-
-        const auto ff = yafl::uncurry(f2);
-        const auto r3 = ff(31, r);
-        std::cout << r3.value() << std::endl;
-
-        const auto f3 = yafl::compose(yafl::constf<int>, yafl::fmap<std::function<int(int)>>);
-        const auto r4 = f3(29)(r);
-        std::cout << r4.value() << std::endl;
-        const auto f34= yafl::uncurry(f3);
-        std::cout << f34(28, r).value() << std::endl;
     }
 
     return 0;

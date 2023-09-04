@@ -34,7 +34,7 @@ const auto f2 =[](int i) { return std::to_string(i);};
 const auto f3 =[](const std::string& s) { return Xpto{ s };};
 
 const auto comp_f1_f2 = yafl::compose(f1, f2);
-const auto threeway = yafl::compose<std::function<std::string(int)>>(comp_f1_f2, f3);
+const auto threeway = yafl::compose(comp_f1_f2, f3);
 std::cout << threeway(1).value << std::endl;
 ```
 
@@ -152,7 +152,7 @@ where:
 const auto v = yafl::maybe::Just(420);
 const auto r2 = yafl::id(v);
 std::cout << (v.fmap(yafl::id<int>).value() == r2.value()) << std::endl;
-std::cout << (yafl::fmap(yafl::id<int>, v).value() == r2.value()) << std::endl;
+std::cout << (yafl::functor::fmap(yafl::id<int>, v).value() == r2.value()) << std::endl;
 ```
 
 ##### Functors preserve composition of morphisms
@@ -172,14 +172,14 @@ const auto f2 = [](const std::string& s) { return s + "dummy";};
 const auto m = yafl::maybe::Just(42);
 
 const auto compose = yafl::compose(f1, f2);
-const auto fmap_compose = yafl::fmap<yafl::Maybe>(compose);
+const auto fmap_compose = yafl::functor::fmap<yafl::Maybe>(compose);
 
-const auto compose2 = yafl::compose(yafl::fmap<yafl::Maybe>(f1), yafl::fmap<yafl::Maybe>(f2));
+const auto compose2 = yafl::compose(yafl::functor::fmap<yafl::Maybe>(f1), yafl::functor::fmap<yafl::Maybe>(f2));
 const auto result2 = compose2(m);
 
 std::cout << (fmap_compose(m).value() == result2.value()) << std::endl;
 std::cout << (m.fmap(compose).value() == result2.value()) << std::endl;
-std::cout << (yafl::fmap(compose, m).value() == result2.value()) << std::endl;
+std::cout << (yafl::functor::fmap(compose, m).value() == result2.value()) << std::endl;
 std::cout << (m.fmap(f1).fmap(f2).value() == result2.value()) << std::endl;
 ```
 
@@ -265,7 +265,6 @@ const auto ap = yafl::maybe::Just<std::function<int(int)>>(f);
 
 std::cout << (ap(2).value() == yafl::maybe::Just(f(2)).value()) << std::endl;
 std::cout << (ap(yafl::maybe::Just(2)).value() == yafl::maybe::Just(f(2)).value()) << std::endl;
-
 ```
 
 ##### Interchange
@@ -309,7 +308,7 @@ const auto v = yafl::maybe::Just(42);
 const auto result = v.bind(func);
 const auto result2 = func(42);
 std::cout << (result.value() == result2.value()) << std::endl;
-std::cout << (yafl::bind(func, v).value() == func(42).value()) << std::endl;
+std::cout << (yafl::monad::bind(func, v).value() == func(42).value()) << std::endl;
 ```
 
 ##### Right identity

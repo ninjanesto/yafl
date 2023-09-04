@@ -59,3 +59,13 @@ cc_test(
             "//:yafl-common",
             "//:yafl-either",],
 )
+
+cc_test(
+    name = "yafl-laws-test",
+    srcs = ["tests/common/LawsTest.cpp",],
+    deps = ["@gtest//:gtest",
+            "@gtest//:gtest_main",
+            "//:yafl-common",
+            "//:yafl-either",
+            "//:yafl-maybe",],
+)
