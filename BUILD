@@ -28,6 +28,13 @@ cc_library(
     visibility = ["//visibility:public",],
 )
 
+cc_library(
+    name = "yafl",
+    strip_include_prefix = "src",
+    deps = ["//:yafl-common", "//:yafl-maybe", "//:yafl-either"],
+    visibility = ["//visibility:public",],
+)
+
 cc_test(
     name = "yafl-maybe-test",
     srcs = ["tests/maybe/MaybeTest.cpp",],

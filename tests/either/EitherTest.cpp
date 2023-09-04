@@ -240,3 +240,81 @@ TYPED_TEST(EitherTest, validateErrorThrowsExceptionWhenEitherIsValue) {
         EXPECT_THROW({either.error();}, std::runtime_error );
     }
 }
+
+TEST(EitherTest, assertApply) {
+    {
+        const auto multBy42 = Ok<void>([](const int &x) { return x * 42; });
+        const auto result = multBy42(Ok<void>(2));
+        ASSERT_EQ(result.value(), 84);
+        const auto result2 = multBy42(Error<void, int>());
+        ASSERT_TRUE(result2.isError());
+    }
+//    {
+//        const auto void42 = Just([]() { return 42; });
+//        const auto result = void42();
+//        ASSERT_EQ(result.value(), 42);
+//    }
+//    {
+//        const auto voidFunc = []() { return ;};
+//        const auto nothingVoid = Nothing<decltype(voidFunc)>();
+//        const auto result = nothingVoid();
+//        ASSERT_FALSE(result.hasValue());
+//    }
+//    {
+//        const auto intFunc = []() { return 42;};
+//        const auto nothingInt = Nothing<decltype(intFunc)>();
+//        const auto result = nothingInt();
+//        ASSERT_FALSE(result.hasValue());
+//    }
+//    {
+//        const auto justVoidFunc = Just([]() { return ;});
+//        const auto result = justVoidFunc();
+//        ASSERT_TRUE(result.hasValue());
+//    }
+//    {
+//        const auto justIntFunc = Just([]() { return 42;});
+//        const auto result = justIntFunc();
+//        ASSERT_TRUE(result.hasValue());
+//    }
+//    {
+//        const auto printX = Just([](int x){ std::cout << x << std::endl;});
+//        const auto result = printX(Just(42));
+//        ASSERT_TRUE(result.hasValue());
+//        const auto result2 = printX(Nothing<int>());
+//        ASSERT_FALSE(result2.hasValue());
+//    }
+//    {
+//        const auto partialApply = Just([](int x, float f, const std::string& s){ return std::to_string(x*f*42) + s;});
+//        const auto resultPartialFunc = partialApply(Just(2));
+//        const auto resultPartialFunc2 = resultPartialFunc(Just(0.5));
+//        const auto resultPartialFunc3 = resultPartialFunc2(Just<std::string>("Text"));
+//
+//        ASSERT_EQ(resultPartialFunc3.value(), "42.000000Text");
+//
+//        const auto resultPartialFunc4 = partialApply(Just(1), Just(2.0))(Just(std::string("Text")));
+//        ASSERT_EQ(resultPartialFunc4.value(), "84.000000Text");
+//
+//        const auto resultPartialFunc5 = partialApply(Just(1))(Just(0.5))(Just(std::string("Text")));
+//        ASSERT_EQ(resultPartialFunc5.value(), "21.000000Text");
+//
+//        const auto resultPartialFunc6 = partialApply(Just(1), Just(0.5), Just(std::string("Text")));
+//        ASSERT_EQ(resultPartialFunc6.value(), "21.000000Text");
+//
+//        const auto resultPartialFunc7 = partialApply.value()(1,3, std::string("Text"));
+//        ASSERT_EQ(resultPartialFunc7, "126.000000Text");
+//    }
+//    {
+//        const auto partialApply = Just([](int x, float f, const std::string& s){ return std::to_string(x*f*42) + s;});
+//        const auto resultPartialNothing = partialApply(Nothing<int>());
+//        const auto resultPartialFunc2 = resultPartialNothing(Just(0.5));
+//        const auto resultPartialFunc3 = resultPartialFunc2(Just<std::string>("Text"));
+//
+//        ASSERT_FALSE(resultPartialFunc3.hasValue());
+//    }
+//    {
+//        const auto func = [](int){ return;};
+//        const auto partialApply = Nothing<decltype(func)>();
+//        const auto resultPartialJust = partialApply(Nothing<int>());
+//        ASSERT_FALSE(resultPartialJust.hasValue());
+//    }
+}

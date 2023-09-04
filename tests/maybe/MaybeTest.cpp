@@ -157,8 +157,10 @@ TEST(MaybeTest, assertApply) {
         const auto multBy42 = Just([](const int &x) { return x * 42; });
         const auto result = multBy42(Just(2));
         ASSERT_EQ(result.value(), 84);
-        const auto result2 = multBy42(Maybe<int>::Nothing());
-        ASSERT_FALSE(result2.hasValue());
+        const auto result2 = multBy42(2);
+        ASSERT_EQ(result2.value(), 84);
+        const auto result3 = multBy42(Maybe<int>::Nothing());
+        ASSERT_FALSE(result3.hasValue());
     }
     {
         const auto void42 = Just([]() { return 42; });
@@ -202,6 +204,12 @@ TEST(MaybeTest, assertApply) {
 
         ASSERT_EQ(resultPartialFunc3.value(), "42.000000Text");
 
+        const auto resultPartialFunc11 = partialApply(2);
+        const auto resultPartialFunc21 = resultPartialFunc11(0.5);
+        const auto resultPartialFunc31 = resultPartialFunc21("Text");
+
+        ASSERT_EQ(resultPartialFunc31.value(), "42.000000Text");
+
         const auto resultPartialFunc4 = partialApply(Just(1), Just(2.0))(Just(std::string("Text")));
         ASSERT_EQ(resultPartialFunc4.value(), "84.000000Text");
 
@@ -227,5 +235,22 @@ TEST(MaybeTest, assertApply) {
         const auto partialApply = Nothing<decltype(func)>();
         const auto resultPartialJust = partialApply(Nothing<int>());
         ASSERT_FALSE(resultPartialJust.hasValue());
+
+        const auto resultPartialJust2 = partialApply(2);
+        ASSERT_FALSE(resultPartialJust2.hasValue());
+    }
+    {
+        const auto func = [](int, float){ return;};
+        const auto partialApply = Nothing<decltype(func)>();
+        const auto resultPartialJust = partialApply(Nothing<int>());
+        ASSERT_FALSE(resultPartialJust.hasValue());
+
+        const auto resultPartialJust2 = partialApply(2);
+        ASSERT_FALSE(resultPartialJust2.hasValue());
+    }
+    {
+        const auto partialApply = Just([](int){ return;});
+        const auto resultPartialJust = partialApply(2);
+        ASSERT_TRUE(resultPartialJust.hasValue());
     }
 }

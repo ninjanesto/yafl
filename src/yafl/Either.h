@@ -6,6 +6,7 @@
 #include <variant>
 #include "yafl/Functor.h"
 #include "yafl/Monad.h"
+#include "yafl/Applicative.h"
 
 namespace yafl {
 
@@ -28,10 +29,8 @@ template<typename Error, typename Value>
 class Either;
 
 
-/// TODO Applicative implementation
 template<>
 class Either<void, void> : public Functor<Either, void, void>
-                         //, public Applicative<Maybe>
                          , public Monad<Either, void, void> {
     friend class Functor<Either, void, void>;
     friend class Monad<Either, void, void>;
@@ -84,10 +83,13 @@ private:
     bool _value;
 };
 
+/// TODO Applicative implementation
 template <typename ValueType>
 class Either<void, ValueType> : public Functor<Either, void, ValueType>
+                              , public Applicative<Either, void, ValueType>
                               , public Monad<Either, void, ValueType> {
     friend class Functor<Either, void, ValueType>;
+    friend class Applicative<Either, void, ValueType>;
     friend class Monad<Either, void, ValueType>;
 private:
     explicit Either(bool isError) : _right{nullptr}, _isError{isError} {}
@@ -138,6 +140,50 @@ private:
             return callable(this->value());
         } else {
             return Either<InnerTypeError, InnerTypeOK>::Error();
+        }
+    }
+
+    template<typename Head>
+    decltype(auto) internal_apply(const Either<void, Head>& arg) const {
+        if constexpr (function_traits<ValueType>::ArgCount > 1) {
+            if (arg.isOk() && this->isOk()) {
+                return Either<void, typename function_traits<ValueType>::PartialApplyFirst>::Just([callable = value(), first = arg.value()](const auto& ...args) {
+                    return callable(first, args...);
+                });
+            } else {
+                return Either<void, typename function_traits<ValueType>::PartialApplyFirst>::Error();
+            }
+        } else {
+            using ReturnType = std::invoke_result_t<ValueType, Head>;
+            if (this->isError()) {
+                return Either<void, ReturnType>::Error();
+            } else {
+                if (arg.isOk()) {
+                    if constexpr (std::is_void_v<ReturnType>) {
+                        value()(arg.value());
+                        return Either<void, ReturnType>::Ok();
+                    } else {
+                        return Either<void, ReturnType>::Ok(value()(arg.value()));
+                    }
+                } else {
+                    return Either<void, ReturnType>::Error();
+                }
+            }
+        }
+    }
+
+    template<typename std::enable_if<std::is_invocable_v<ValueType>>* = nullptr>
+    decltype(auto) internal_apply() const {
+        using ReturnType = std::invoke_result_t<ValueType>;
+        if (this->isError()) {
+            return Either<void, ReturnType>::Error();
+        } else {
+            if constexpr (std::is_void_v<ReturnType>) {
+                value()();
+                return Either<void, ReturnType>::Ok();
+            } else {
+                return Either<void, ReturnType>::Ok(value()());
+            }
         }
     }
 private:

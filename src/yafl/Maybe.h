@@ -29,7 +29,7 @@ class Maybe;
 
 template<>
 class Maybe<void> : public Functor<Maybe,void>,
-                public Monad<Maybe,void> {
+                    public Monad<Maybe,void> {
     friend class Functor<Maybe,void>;
     friend class Monad<Maybe,void>;
 private:
@@ -80,8 +80,8 @@ private:
 
 template <typename T>
 class Maybe : public Functor<Maybe, T>,
-                 public Applicative<Maybe, T>,
-                 public Monad<Maybe, T> {
+              public Applicative<Maybe, T>,
+              public Monad<Maybe, T> {
     friend class Functor<Maybe, T>;
     friend class Applicative<Maybe, T>;
     friend class Monad<Maybe, T>;
@@ -162,6 +162,31 @@ private:
                     }
                 } else {
                     return Maybe<ReturnType>::Nothing();
+                }
+            }
+        }
+    }
+
+    template<typename Head>
+    decltype(auto) internal_apply(const Head& arg) const {
+        if constexpr (function_traits<T>::ArgCount > 1) {
+            if (this->hasValue()) {
+                return Maybe<typename function_traits<T>::PartialApplyFirst>::Just([callable = value(), first = arg](const auto& ...args) {
+                    return callable(first, args...);
+                });
+            } else {
+                return Maybe<typename function_traits<T>::PartialApplyFirst>::Nothing();
+            }
+        } else {
+            using ReturnType = std::invoke_result_t<T, Head>;
+            if (!this->hasValue()) {
+                return Maybe<ReturnType>::Nothing();
+            } else {
+                if constexpr (std::is_void_v<ReturnType>) {
+                    value()(arg);
+                    return Maybe<ReturnType>::Just();
+                } else {
+                    return Maybe<ReturnType>::Just(value()(arg));
                 }
             }
         }
