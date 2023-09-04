@@ -9,7 +9,8 @@
 #include <memory>
 #include <functional>
 
-namespace yafl::core {
+namespace yafl {
+namespace core {
 
 /**
  * @ingroup Core
@@ -63,6 +64,36 @@ struct IsMonadicBase<MonadType<Args...>> {
     ///boolean flag that states whether type T is a monad or not
     static constexpr bool value = std::is_base_of_v<BaseType, DerivedType>;
 };
+} // namespace core
 
+/**
+ * This function is used to bind (flatmap) a callable type to a value of type Monad
+ * @tparam Callable callable type
+ * @tparam MonadT monad type
+ * @param callable function to be applied to the given monad
+ * @param monad monad to be used
+ * @return Monad type containing the result of the function application
+ */
+template<typename Callable, typename MonadT>
+decltype(auto) bind(Callable&& callable, const MonadT& monad) {
+    static_assert(core::IsMonadicBase<MonadT>::value, "MonadT argument not a Monad");
+    return monad.bind(std::forward<Callable>(callable));
+}
+
+/**
+ * This function is used to bind (flatmap) a callable type to a value of type Monad
+ * In this case the provided function is lifted to work at Monad level an so,
+ * this function returns a new callable that receives a Monad as argument and returns
+ * a Monad
+ * @tparam Callable callable type
+ * @param callable function to be applied to the given functor
+ * @return Function lifted to work at Monad level
+ */
+template<typename Callable>
+decltype(auto) bind(Callable&& callable) {
+    return [callable = std::forward<Callable>(callable)](const auto& monad){
+        return monad.bind(callable);
+    };
+}
 
 } // namespace yafl::core

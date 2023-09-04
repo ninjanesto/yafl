@@ -51,27 +51,27 @@ namespace detail {
  * @return function composed by executing rhs after lhs
  */
 template <typename TLeft, typename TRight>
-decltype(auto) function_compose(const TLeft& lhs, const TRight& rhs) {
+decltype(auto) function_compose(TLeft&& lhs, TRight&& rhs) {
     using LhsReturnType = typename yafl::FunctionTraits<TLeft>::ReturnType;
     if constexpr (yafl::FunctionTraits<TLeft>::ArgCount > 0) {
         if constexpr (std::is_void_v<LhsReturnType>) {
-            return [&rhs, &lhs](auto&& ...args) {
-                lhs(args ...);
+            return [rhs = std::forward<TRight>(rhs), lhs = std::forward<TLeft>(lhs)](auto&& ...args) {
+                std::apply(lhs, std::make_tuple(args...));
                 return rhs();
             };
         } else {
-            return [&rhs, &lhs](auto&& ...args) {
-                return rhs(lhs(args ...));
+            return [rhs = std::forward<TRight>(rhs), lhs = std::forward<TLeft>(lhs)](auto&& ...args) {
+                return rhs(std::apply(lhs, std::make_tuple(args...)));
             };
         }
     } else {
         if constexpr (std::is_void_v<LhsReturnType>) {
-            return [&rhs, &lhs]() {
+            return [rhs = std::forward<TRight>(rhs), lhs = std::forward<TLeft>(lhs)]() {
                 lhs();
                 return rhs();
             };
         } else {
-            return [&rhs, &lhs]() {
+            return [rhs = std::forward<TRight>(rhs), lhs = std::forward<TLeft>(lhs)]() {
                 return rhs(lhs());
             };
         }
@@ -89,14 +89,14 @@ decltype(auto) function_compose(const TLeft& lhs, const TRight& rhs) {
  * @return function composed by executing rhs after lhs
  */
 template <typename TLeft, typename TRight>
-decltype(auto) kleisli_compose(const TLeft& lhs, const TRight& rhs) {
+decltype(auto) kleisli_compose(TLeft&& lhs, TRight&& rhs) {
     using RhsReturnType = typename yafl::FunctionTraits<TRight>::ReturnType;
     if constexpr (core::IsMonadicBase<RhsReturnType>::value) {
-        return [&rhs, &lhs](auto&&... args) {
+        return [rhs = std::forward<TRight>(rhs), lhs = std::forward<TLeft>(lhs)](auto&&... args) {
             return lhs(args...).bind(rhs);
         };
     } else {
-        return [&rhs, &lhs](auto&&... args) {
+        return [rhs = std::forward<TRight>(rhs), lhs = std::forward<TLeft>(lhs)](auto&&... args) {
             return lhs(args...).fmap(rhs);
         };
     }
@@ -112,12 +112,12 @@ decltype(auto) kleisli_compose(const TLeft& lhs, const TRight& rhs) {
  * @return function composed by executing rhs after lhs
  */
 template <typename TLeft, typename TRight>
-decltype(auto) compose(const TLeft& lhs, const TRight& rhs) {
+decltype(auto) compose(TLeft&& lhs, TRight&& rhs) {
     using LhsReturnType = typename yafl::FunctionTraits<TLeft>::ReturnType;
     if constexpr (core::IsMonadicBase<LhsReturnType>::value) {
-        return kleisli_compose(lhs, rhs);
+        return kleisli_compose(std::forward<TLeft>(lhs), std::forward<TRight>(rhs));
     } else {
-        return function_compose(lhs, rhs);
+        return function_compose(std::forward<TLeft>(lhs), std::forward<TRight>(rhs));
     }
 }
 
@@ -191,6 +191,35 @@ decltype(auto) partial(F&& f, Args&& ...args) {
 template<typename Arg>
 Arg id(const Arg& arg) {
     return arg;
+}
+
+/**
+ * @ingroup HOF
+ * Function that always evaluates to the first argument, ignoring its second argument.
+ * @tparam First Type of argument
+ * @tparam Second Type of argument
+ * @param first argument
+ * @param second argument
+ * @return Returns the first argument
+ */
+template<typename First, typename Second>
+First constf(const First& first, const Second& second) {
+    std::ignore = second;
+    return first;
+}
+
+/**
+ * @ingroup HOF
+ * Function that always evaluates to the first argument, ignoring its second argument.
+ * @tparam First Type of argument
+ * @param first argument
+ * @return Returns a function that always returns the configured first argument
+ */
+template<typename First>
+decltype(auto) constf(First&& first) {
+    return [first = std::forward<First>(first)](auto&&) {
+        return first;
+    };
 }
 
 } // namespace yafl

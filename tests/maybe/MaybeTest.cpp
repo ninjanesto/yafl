@@ -71,7 +71,17 @@ TYPED_TEST(MaybeTest, assertFmapComputesCorrectType) {
         {
             const auto maybe = createMaybe<TypeParam>();
             const auto resultVoid = maybe.fmap([](){});
-
+            ASSERT_TRUE(std::is_void_v<typename maybe::Details<decltype(resultVoid)>::ValueType>);
+        }
+        {
+            const auto maybe = createMaybe<TypeParam>();
+            const auto resultVoid = fmap([](){}, maybe);
+            ASSERT_TRUE(std::is_void_v<typename maybe::Details<decltype(resultVoid)>::ValueType>);
+        }
+        {
+            const auto maybe = createMaybe<TypeParam>();
+            const auto f = fmap([](){});
+            const auto resultVoid = f(maybe);
             ASSERT_TRUE(std::is_void_v<typename maybe::Details<decltype(resultVoid)>::ValueType>);
         }
         {
@@ -91,6 +101,17 @@ TYPED_TEST(MaybeTest, assertFmapComputesCorrectType) {
         {
             const auto maybe = createMaybe<TypeParam>();
             const auto resultVoid = maybe.fmap([](const TypeParam&){});
+            ASSERT_TRUE(std::is_void_v<typename maybe::Details<decltype(resultVoid)>::ValueType>);
+        }
+        {
+            const auto maybe = createMaybe<TypeParam>();
+            const auto resultVoid = fmap([](const TypeParam&){}, maybe);
+            ASSERT_TRUE(std::is_void_v<typename maybe::Details<decltype(resultVoid)>::ValueType>);
+        }
+        {
+            const auto maybe = createMaybe<TypeParam>();
+            const auto f = fmap([](const TypeParam&){});
+            const auto resultVoid = f(maybe);
             ASSERT_TRUE(std::is_void_v<typename maybe::Details<decltype(resultVoid)>::ValueType>);
         }
         {
@@ -123,6 +144,17 @@ TYPED_TEST(MaybeTest, assertBindComputesCorrectType) {
         }
         {
             const auto maybe = createMaybe<TypeParam>();
+            const auto resultVoid = bind([](){ return Maybe<void>::Nothing();}, maybe);
+            ASSERT_TRUE(std::is_void_v<typename maybe::Details<decltype(resultVoid)>::ValueType>);
+        }
+        {
+            const auto maybe = createMaybe<TypeParam>();
+            const auto f = bind([](){ return Maybe<void>::Nothing();});
+            const auto resultVoid = f(maybe);
+            ASSERT_TRUE(std::is_void_v<typename maybe::Details<decltype(resultVoid)>::ValueType>);
+        }
+        {
+            const auto maybe = createMaybe<TypeParam>();
             const auto resultType = maybe.bind([](){ return Maybe<int>::Just(42);});
             constexpr const auto areSameType = std::is_same_v<int, decltype(resultType.value())>;
             ASSERT_TRUE(areSameType);
@@ -138,6 +170,17 @@ TYPED_TEST(MaybeTest, assertBindComputesCorrectType) {
         {
             const auto maybe = createMaybe<TypeParam>();
             const auto resultVoid = maybe.bind([](const TypeParam&){return Maybe<void>::Nothing();});
+            ASSERT_TRUE(std::is_void_v<typename maybe::Details<decltype(resultVoid)>::ValueType>);
+        }
+        {
+            const auto maybe = createMaybe<TypeParam>();
+            const auto resultVoid = bind([](const TypeParam&){return Maybe<void>::Nothing();}, maybe);
+            ASSERT_TRUE(std::is_void_v<typename maybe::Details<decltype(resultVoid)>::ValueType>);
+        }
+        {
+            const auto maybe = createMaybe<TypeParam>();
+            const auto f = bind([](const TypeParam&){return Maybe<void>::Nothing();});
+            const auto resultVoid = f(maybe);
             ASSERT_TRUE(std::is_void_v<typename maybe::Details<decltype(resultVoid)>::ValueType>);
         }
         {
