@@ -1,12 +1,11 @@
 var searchData=
 [
-  ['maybe_93',['Maybe',['../group__Maybe.html#classyafl_1_1Maybe',1,'yafl']]],
-  ['maybe_3c_20void_20_3e_94',['Maybe&lt; void &gt;',['../group__Maybe.html#classyafl_1_1Maybe_3_01void_01_4',1,'yafl']]],
-  ['monad_95',['Monad',['../group__Core.html#classyafl_1_1core_1_1Monad',1,'yafl::core']]],
-  ['monad_3c_20either_2c_20errortype_2c_20valuetype_20_3e_96',['Monad&lt; Either, ErrorType, ValueType &gt;',['../group__Core.html',1,'yafl::core']]],
-  ['monad_3c_20either_2c_20errortype_2c_20void_20_3e_97',['Monad&lt; Either, ErrorType, void &gt;',['../group__Core.html',1,'yafl::core']]],
-  ['monad_3c_20either_2c_20void_2c_20valuetype_20_3e_98',['Monad&lt; Either, void, ValueType &gt;',['../group__Core.html',1,'yafl::core']]],
-  ['monad_3c_20either_2c_20void_2c_20void_20_3e_99',['Monad&lt; Either, void, void &gt;',['../group__Core.html',1,'yafl::core']]],
-  ['monad_3c_20maybe_2c_20t_20_3e_100',['Monad&lt; Maybe, T &gt;',['../group__Core.html',1,'yafl::core']]],
-  ['monad_3c_20maybe_2c_20void_20_3e_101',['Monad&lt; Maybe, void &gt;',['../group__Core.html',1,'yafl::core']]]
+  ['info_150',['Info',['../group__Function.html#structyafl_1_1function_1_1Info',1,'yafl::function']]],
+  ['info_3c_20std_3a_3afunction_3c_20ret_28args_2e_2e_2e_29_3e_20_3e_151',['Info&lt; std::function&lt; Ret(Args...)&gt; &gt;',['../group__Function.html#structyafl_1_1function_1_1Info_3_01std_1_1function_3_01Ret_07Args_8_8_8_08_4_01_4',1,'yafl::function']]],
+  ['iscallable_152',['IsCallable',['../group__Type.html#structyafl_1_1type_1_1IsCallable',1,'yafl::type']]],
+  ['iscallablewithargs_153',['IsCallableWithArgs',['../group__Type.html#structyafl_1_1type_1_1IsCallableWithArgs',1,'yafl::type']]],
+  ['istuplesubset_154',['IsTupleSubset',['../group__Tuple.html#structyafl_1_1tuple_1_1IsTupleSubset',1,'yafl::tuple']]],
+  ['istuplesubsetimpl_155',['IsTupleSubsetImpl',['../structyafl_1_1tuple_1_1details_1_1IsTupleSubsetImpl.html',1,'yafl::tuple::details']]],
+  ['istuplesubsetimpl_3c_200_2c_20tuple1_2c_20tuple2_2c_20true_20_3e_156',['IsTupleSubsetImpl&lt; 0, Tuple1, Tuple2, true &gt;',['../structyafl_1_1tuple_1_1details_1_1IsTupleSubsetImpl.html',1,'yafl::tuple::details']]],
+  ['istuplesubsetimpl_3c_20index_2c_20tuple1_2c_20tuple2_2c_20false_20_3e_157',['IsTupleSubsetImpl&lt; Index, Tuple1, Tuple2, false &gt;',['../structyafl_1_1tuple_1_1details_1_1IsTupleSubsetImpl_3_01Index_00_01Tuple1_00_01Tuple2_00_01false_01_4.html',1,'yafl::tuple::details']]]
 ];

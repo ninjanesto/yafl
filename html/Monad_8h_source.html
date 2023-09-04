@@ -110,7 +110,7 @@ $(document).ready(function(){initNavTree('Monad_8h_source.html',''); initResizab
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160; </div>
 <div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> Callable, <span class="keyword">typename</span> MonadT&gt;</div>
 <div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;decltype(<span class="keyword">auto</span>) bind(Callable&amp;&amp; callable, const MonadT&amp; monad) {</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    static_assert(type::Details&lt;std::decay_t&lt;MonadT&gt;&gt;::hasMonadicBase, <span class="stringliteral">&quot;MonadT argument not a Monad&quot;</span>);</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    static_assert(type::DomainTypeInfo&lt;std::decay_t&lt;MonadT&gt;&gt;::hasMonadicBase, <span class="stringliteral">&quot;MonadT argument not a Monad&quot;</span>);</div>
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    <span class="keywordflow">return</span> monad.bind(std::forward&lt;Callable&gt;(callable));</div>
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;}</div>
 <div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160; </div>
@@ -118,14 +118,14 @@ $(document).ready(function(){initNavTree('Monad_8h_source.html',''); initResizab
 <div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;decltype(<span class="keyword">auto</span>) bind(Callable&amp;&amp; callable) {</div>
 <div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    <span class="keywordflow">if</span> constexpr (std::is_invocable_v&lt;Callable&gt;) {</div>
 <div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;        <span class="keywordflow">return</span> [callable = std::forward&lt;Callable&gt;(callable)](<span class="keyword">const</span> MonadType&lt;void&gt; &amp;monad) {</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;            static_assert(type::Details&lt;MonadType&lt;void&gt;&gt;::hasMonadicBase, <span class="stringliteral">&quot;Argument not a Functor&quot;</span>);</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;            static_assert(type::DomainTypeInfo&lt;MonadType&lt;void&gt;&gt;::hasMonadicBase, <span class="stringliteral">&quot;Argument not a Functor&quot;</span>);</div>
 <div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;            <span class="keywordflow">return</span> monad.bind(callable);</div>
 <div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;        };</div>
 <div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;        <span class="keyword">using</span> FirstArg = <span class="keyword">typename</span> function::Details&lt;Callable&gt;::template ArgType&lt;0&gt;;</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;        <span class="keyword">using</span> FirstArg = <span class="keyword">typename</span> function::Info&lt;Callable&gt;::template ArgType&lt;0&gt;;</div>
 <div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160; </div>
 <div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;        <span class="keywordflow">return</span> [callable = std::forward&lt;Callable&gt;(callable)](<span class="keyword">const</span> MonadType&lt;FirstArg&gt; &amp;monad) {</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;            static_assert(type::Details&lt;MonadType&lt;FirstArg&gt;&gt;::hasMonadicBase, <span class="stringliteral">&quot;Argument not a Functor&quot;</span>);</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;            static_assert(type::DomainTypeInfo&lt;MonadType&lt;FirstArg&gt;&gt;::hasMonadicBase, <span class="stringliteral">&quot;Argument not a Functor&quot;</span>);</div>
 <div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;            <span class="keywordflow">return</span> monad.bind(callable);</div>
 <div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;        };</div>
 <div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    }</div>

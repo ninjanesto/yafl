@@ -7,17 +7,42 @@ var annotated_dup =
         [ "Monad", "group__Core.html#classyafl_1_1core_1_1Monad", "group__Core_classyafl_1_1core_1_1Monad" ]
       ] ],
       [ "function", null, [
-        [ "Details", "group__Function.html#structyafl_1_1function_1_1Details", null ],
-        [ "Details< std::function< Ret(Args...)> >", "group__Function.html#structyafl_1_1function_1_1Details_3_01std_1_1function_3_01Ret_07Args_8_8_8_08_4_01_4", null ]
+        [ "details", null, [
+          [ "CallableDetails", "structyafl_1_1function_1_1details_1_1CallableDetails.html", null ],
+          [ "CallableDetails< Ret, FirstArg, Args... >", "structyafl_1_1function_1_1details_1_1CallableDetails_3_01Ret_00_01FirstArg_00_01Args_8_8_8_01_4.html", "structyafl_1_1function_1_1details_1_1CallableDetails_3_01Ret_00_01FirstArg_00_01Args_8_8_8_01_4" ],
+          [ "CallableDetails< Ret >", "structyafl_1_1function_1_1details_1_1CallableDetails_3_01Ret_01_4.html", "structyafl_1_1function_1_1details_1_1CallableDetails_3_01Ret_01_4" ],
+          [ "CallableHelper", "structyafl_1_1function_1_1details_1_1CallableHelper.html", null ],
+          [ "CallableHelper< std::function< Ret(&)(Args...)> >", "structyafl_1_1function_1_1details_1_1CallableHelper_3_01std_1_1function_3_01Ret_07_6_08_07Args_8_8_8_08_4_01_4.html", null ],
+          [ "CallableHelper< std::function< Ret(Args...)> >", "structyafl_1_1function_1_1details_1_1CallableHelper_3_01std_1_1function_3_01Ret_07Args_8_8_8_08_4_01_4.html", null ],
+          [ "CallableHelper< std::function< Ret(ClassType::*)(Args...) const > >", "structyafl_1_1function_1_1details_1_1CallableHelper_3_01std_1_1function_3_01Ret_07ClassType_1_1_0c017b4e5a6050597ebc8569af1f398a.html", null ],
+          [ "CallableHelper< std::function< Ret(ClassType::*)(Args...)> >", "structyafl_1_1function_1_1details_1_1CallableHelper_3_01std_1_1function_3_01Ret_07ClassType_1_1_5_08_07Args_8_8_8_08_4_01_4.html", null ],
+          [ "CallableHelper< std::function< Ret(ClassType::*&)(Args...)> >", "structyafl_1_1function_1_1details_1_1CallableHelper_3_01std_1_1function_3_01Ret_07ClassType_1_1_5_6_08_07Args_8_8_8_08_4_01_4.html", null ],
+          [ "CallableHelper< std::function< Ret(*)(Args...)> >", "structyafl_1_1function_1_1details_1_1CallableHelper_3_01std_1_1function_3_01Ret_07_5_08_07Args_8_8_8_08_4_01_4.html", null ],
+          [ "FunctionFromTupleImpl", "structyafl_1_1function_1_1details_1_1FunctionFromTupleImpl.html", null ],
+          [ "FunctionFromTupleImpl< Ret, std::tuple< Args... > >", "structyafl_1_1function_1_1details_1_1FunctionFromTupleImpl_3_01Ret_00_01std_1_1tuple_3_01Args_8_8_8_01_4_01_4.html", null ]
+        ] ],
+        [ "Info", "group__Function.html#structyafl_1_1function_1_1Info", null ],
+        [ "Info< std::function< Ret(Args...)> >", "group__Function.html#structyafl_1_1function_1_1Info_3_01std_1_1function_3_01Ret_07Args_8_8_8_08_4_01_4", null ]
       ] ],
       [ "tuple", "namespaceyafl_1_1tuple.html", [
+        [ "details", null, [
+          [ "IsTupleSubsetImpl", "structyafl_1_1tuple_1_1details_1_1IsTupleSubsetImpl.html", null ],
+          [ "IsTupleSubsetImpl< Index, Tuple1, Tuple2, false >", "structyafl_1_1tuple_1_1details_1_1IsTupleSubsetImpl_3_01Index_00_01Tuple1_00_01Tuple2_00_01false_01_4.html", null ],
+          [ "CreateSubsetTupleFromIndex", "structyafl_1_1tuple_1_1details_1_1CreateSubsetTupleFromIndex.html", null ],
+          [ "CreateSubsetTupleFromIndex< Index, Tuple, SubsetTuple, false >", "structyafl_1_1tuple_1_1details_1_1CreateSubsetTupleFromIndex_3_01Index_00_01Tuple_00_01SubsetTuple_00_01false_01_4.html", null ]
+        ] ],
         [ "IsTupleSubset", "group__Tuple.html#structyafl_1_1tuple_1_1IsTupleSubset", null ]
       ] ],
       [ "type", "namespaceyafl_1_1type.html", [
+        [ "details", null, [
+          [ "DomainDetailsImpl< Either< InnerError, InnerValue > >", "group__Type.html#structyafl_1_1type_1_1details_1_1DomainDetailsImpl_3_01Either_3_01InnerError_00_01InnerValue_01_4_01_4", "group__Type_structyafl_1_1type_1_1details_1_1DomainDetailsImpl_3_01Either_3_01InnerError_00_01InnerValue_01_4_01_4" ],
+          [ "DomainDetailsImpl< Maybe< Inner > >", "group__Type.html#structyafl_1_1type_1_1details_1_1DomainDetailsImpl_3_01Maybe_3_01Inner_01_4_01_4", "group__Type_structyafl_1_1type_1_1details_1_1DomainDetailsImpl_3_01Maybe_3_01Inner_01_4_01_4" ],
+          [ "DomainDetailsImpl", "structyafl_1_1type_1_1details_1_1DomainDetailsImpl.html", "structyafl_1_1type_1_1details_1_1DomainDetailsImpl" ]
+        ] ],
         [ "FixedErrorType", "structyafl_1_1type_1_1FixedErrorType.html", null ],
         [ "WhatIsThis", "group__Type.html#structyafl_1_1type_1_1WhatIsThis", null ],
         [ "WhatIsThisValue", "group__Type.html#structyafl_1_1type_1_1WhatIsThisValue", null ],
-        [ "Details", "group__Type.html#structyafl_1_1type_1_1Details", null ],
+        [ "DomainTypeInfo", "group__Type.html#structyafl_1_1type_1_1DomainTypeInfo", null ],
         [ "IsCallable", "group__Type.html#structyafl_1_1type_1_1IsCallable", null ],
         [ "IsCallableWithArgs", "group__Type.html#structyafl_1_1type_1_1IsCallableWithArgs", null ]
       ] ],

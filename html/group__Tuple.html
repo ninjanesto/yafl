@@ -99,10 +99,10 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
-<tr class="memitem:ga7033f008aa29ae8dd5fd5d6717522f18"><td class="memTemplParams" colspan="2">template&lt;std::size_t Index, typename Tuple &gt; </td></tr>
-<tr class="memitem:ga7033f008aa29ae8dd5fd5d6717522f18"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__Tuple.html#ga7033f008aa29ae8dd5fd5d6717522f18">yafl::tuple::TupleSubset</a> = typename CreateSubsetTupleFromIndex&lt; Index, Tuple, std::tuple&lt;&gt;, true &gt;::NewSubsetTuple</td></tr>
-<tr class="memdesc:ga7033f008aa29ae8dd5fd5d6717522f18"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a tuple subset type starting for the given index position.  <a href="group__Tuple.html#ga7033f008aa29ae8dd5fd5d6717522f18">More...</a><br /></td></tr>
-<tr class="separator:ga7033f008aa29ae8dd5fd5d6717522f18"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga638450c0ef2d8d0f8d0c1f698fc47a55"><td class="memTemplParams" colspan="2">template&lt;std::size_t Index, typename Tuple &gt; </td></tr>
+<tr class="memitem:ga638450c0ef2d8d0f8d0c1f698fc47a55"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__Tuple.html#ga638450c0ef2d8d0f8d0c1f698fc47a55">yafl::tuple::TupleSubset</a> = typename <a class="el" href="structyafl_1_1tuple_1_1details_1_1CreateSubsetTupleFromIndex.html">details::CreateSubsetTupleFromIndex</a>&lt; Index, Tuple, std::tuple&lt;&gt;, true &gt;::NewSubsetTuple</td></tr>
+<tr class="memdesc:ga638450c0ef2d8d0f8d0c1f698fc47a55"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a tuple subset type starting for the given index position.  <a href="group__Tuple.html#ga638450c0ef2d8d0f8d0c1f698fc47a55">More...</a><br /></td></tr>
+<tr class="separator:ga638450c0ef2d8d0f8d0c1f698fc47a55"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
@@ -138,19 +138,26 @@ struct yafl::tuple::IsTupleSubset&lt; Tuple1, Tuple2 &gt;</h3>
 <p>Extract information about whether a tuple is a subset of another tuple If true extracts the index. </p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">Tuple1</td><td></td></tr>
-    <tr><td class="paramname">Tuple2</td><td></td></tr>
+    <tr><td class="paramname">Tuple1</td><td>Original tuple type </td></tr>
+    <tr><td class="paramname">Tuple2</td><td>Subset tuple type </td></tr>
   </table>
   </dd>
 </dl>
-</div>
-<p>Inherits yafl::tuple::IsTupleSubsetImpl&lt; Valid, Index, Tuple1, Tuple2 &gt;.</p>
+</div><div class="dynheader">
+Inheritance diagram for yafl::tuple::IsTupleSubset&lt; Tuple1, Tuple2 &gt;:</div>
+<div class="dyncontent">
+ <div class="center">
+  <img src="group__Tuple.png" usemap="#yafl::tuple::IsTupleSubset_3C_20Tuple1_2C_20Tuple2_20_3E_map" alt=""/>
+  <map id="yafl::tuple::IsTupleSubset_3C_20Tuple1_2C_20Tuple2_20_3E_map" name="yafl::tuple::IsTupleSubset_3C_20Tuple1_2C_20Tuple2_20_3E_map">
+<area href="structyafl_1_1tuple_1_1details_1_1IsTupleSubsetImpl.html" alt="yafl::tuple::details::IsTupleSubsetImpl&lt; 0, Tuple1, Tuple2, true &gt;" shape="rect" coords="0,0,370,24"/>
+  </map>
+</div></div>
 
 </div>
 </div>
 <h2 class="groupheader">Typedef Documentation</h2>
-<a id="ga7033f008aa29ae8dd5fd5d6717522f18"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga7033f008aa29ae8dd5fd5d6717522f18">&#9670;&nbsp;</a></span>TupleSubset</h2>
+<a id="ga638450c0ef2d8d0f8d0c1f698fc47a55"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga638450c0ef2d8d0f8d0c1f698fc47a55">&#9670;&nbsp;</a></span>TupleSubset</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -158,7 +165,7 @@ struct yafl::tuple::IsTupleSubset&lt; Tuple1, Tuple2 &gt;</h3>
 template&lt;std::size_t Index, typename Tuple &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">using <a class="el" href="group__Tuple.html#ga7033f008aa29ae8dd5fd5d6717522f18">yafl::tuple::TupleSubset</a> = typedef typename CreateSubsetTupleFromIndex&lt;Index, Tuple, std::tuple&lt;&gt;, true&gt;::NewSubsetTuple</td>
+          <td class="memname">using <a class="el" href="group__Tuple.html#ga638450c0ef2d8d0f8d0c1f698fc47a55">yafl::tuple::TupleSubset</a> = typedef typename <a class="el" href="structyafl_1_1tuple_1_1details_1_1CreateSubsetTupleFromIndex.html">details::CreateSubsetTupleFromIndex</a>&lt;Index, Tuple, std::tuple&lt;&gt;, true&gt;::NewSubsetTuple</td>
         </tr>
       </table>
 </div><div class="memdoc">

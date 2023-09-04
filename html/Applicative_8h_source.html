@@ -119,14 +119,14 @@ $(document).ready(function(){initNavTree('Applicative_8h_source.html',''); initR
 <div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160; </div>
 <div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> ApplicableT, <span class="keyword">typename</span> ApplicableArg&gt;</div>
 <div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;decltype(<span class="keyword">auto</span>) apply(ApplicableT&amp;&amp; callable, const ApplicableArg&amp; applicative) {</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    static_assert(type::Details&lt;ApplicableT&gt;::hasApplicativeBase, <span class="stringliteral">&quot;ApplicableT argument not a Applicative&quot;</span>);</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    static_assert(<a class="code" href="structyafl_1_1type_1_1details_1_1DomainDetailsImpl.html#a2591d37316570ee3bf748d4800107042">type::DomainTypeInfo&lt;ApplicableT&gt;::hasApplicativeBase</a>, <span class="stringliteral">&quot;ApplicableT argument not a Applicative&quot;</span>);</div>
 <div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;    <span class="keywordflow">return</span> callable(applicative);</div>
 <div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;}</div>
 <div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160; </div>
 <div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> ApplicableT&gt;</div>
 <div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;decltype(<span class="keyword">auto</span>) apply(ApplicableT&amp;&amp; callable) {</div>
 <div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    <span class="keywordflow">return</span> [callable = std::forward&lt;ApplicableT&gt;(callable)](<span class="keyword">auto</span>&amp;&amp; ...args) {</div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;        static_assert(type::Details&lt;ApplicableT&gt;::hasApplicativeBase, <span class="stringliteral">&quot;ApplicableT argument not a Applicative&quot;</span>);</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;        static_assert(<a class="code" href="structyafl_1_1type_1_1details_1_1DomainDetailsImpl.html#a2591d37316570ee3bf748d4800107042">type::DomainTypeInfo&lt;ApplicableT&gt;::hasApplicativeBase</a>, <span class="stringliteral">&quot;ApplicableT argument not a Applicative&quot;</span>);</div>
 <div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;        <span class="keywordflow">return</span> callable(std::forward&lt;decltype(args)&gt;(args)...);</div>
 <div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;    };</div>
 <div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;}</div>
@@ -134,6 +134,7 @@ $(document).ready(function(){initNavTree('Applicative_8h_source.html',''); initR
 <div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;} <span class="comment">// namespace applicative</span></div>
 <div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;} <span class="comment">// namespace yafl</span></div>
 <div class="ttc" id="agroup__Core_html_classyafl_1_1core_1_1Applicative"><div class="ttname"><a href="group__Core.html#classyafl_1_1core_1_1Applicative">yafl::core::Applicative</a></div><div class="ttdoc">Functional Applicative Functor class.</div><div class="ttdef"><b>Definition:</b> Applicative.h:26</div></div>
+<div class="ttc" id="astructyafl_1_1type_1_1details_1_1DomainDetailsImpl_html_a2591d37316570ee3bf748d4800107042"><div class="ttname"><a href="structyafl_1_1type_1_1details_1_1DomainDetailsImpl.html#a2591d37316570ee3bf748d4800107042">yafl::type::details::DomainDetailsImpl&lt; std::decay_t&lt; T &gt; &gt;::hasApplicativeBase</a></div><div class="ttdeci">static constexpr bool hasApplicativeBase</div><div class="ttdoc">boolean flag that states whether type T is a Applicative or not</div><div class="ttdef"><b>Definition:</b> TypeTraits.h:342</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

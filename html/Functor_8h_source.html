@@ -110,7 +110,7 @@ $(document).ready(function(){initNavTree('Functor_8h_source.html',''); initResiz
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="keyword">namespace </span>functor {</div>
 <div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> Callable, <span class="keyword">typename</span> FunctorT&gt;</div>
 <div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;decltype(<span class="keyword">auto</span>) fmap(Callable&amp;&amp; callable, const FunctorT&amp; functor) {</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    static_assert(type::Details&lt;FunctorT&gt;::hasFunctorBase, <span class="stringliteral">&quot;FunctorT argument not a Functor&quot;</span>);</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    static_assert(<a class="code" href="structyafl_1_1type_1_1details_1_1DomainDetailsImpl.html#a3b7ecc860f332d0a857fdd8fd5d96f41">type::DomainTypeInfo&lt;FunctorT&gt;::hasFunctorBase</a>, <span class="stringliteral">&quot;FunctorT argument not a Functor&quot;</span>);</div>
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    <span class="keywordflow">return</span> functor.fmap(std::forward&lt;Callable&gt;(callable));</div>
 <div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;}</div>
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160; </div>
@@ -118,14 +118,14 @@ $(document).ready(function(){initNavTree('Functor_8h_source.html',''); initResiz
 <div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;decltype(<span class="keyword">auto</span>) fmap(Callable&amp;&amp; callable) {</div>
 <div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;    <span class="keywordflow">if</span> constexpr (std::is_invocable_v&lt;Callable&gt;) {</div>
 <div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;        <span class="keywordflow">return</span> [callable = std::forward&lt;Callable&gt;(callable)](<span class="keyword">const</span> FunctorType&lt;void&gt;&amp; functor) {</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;            static_assert(type::Details&lt;FunctorType&lt;void&gt;&gt;::hasFunctorBase, <span class="stringliteral">&quot;Argument not a Functor&quot;</span>);</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;            static_assert(type::DomainTypeInfo&lt;FunctorType&lt;void&gt;&gt;::hasFunctorBase, <span class="stringliteral">&quot;Argument not a Functor&quot;</span>);</div>
 <div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;            <span class="keywordflow">return</span> functor.fmap(callable);</div>
 <div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;        };</div>
 <div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;    } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;        <span class="keyword">using</span> FirstArg = <span class="keyword">typename</span> function::Details&lt;Callable&gt;::template ArgType&lt;0&gt;;</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;        <span class="keyword">using</span> FirstArg = <span class="keyword">typename</span> function::Info&lt;Callable&gt;::template ArgType&lt;0&gt;;</div>
 <div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160; </div>
 <div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;        <span class="keywordflow">return</span> [callable = std::forward&lt;Callable&gt;(callable)](<span class="keyword">const</span> FunctorType&lt;FirstArg&gt;&amp; functor) {</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;            static_assert(type::Details&lt;FunctorType&lt;FirstArg&gt;&gt;::hasFunctorBase, <span class="stringliteral">&quot;Argument not a Functor&quot;</span>);</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;            static_assert(type::DomainTypeInfo&lt;FunctorType&lt;FirstArg&gt;&gt;::hasFunctorBase, <span class="stringliteral">&quot;Argument not a Functor&quot;</span>);</div>
 <div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;            <span class="keywordflow">return</span> functor.fmap(callable);</div>
 <div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;        };</div>
 <div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    }</div>
@@ -135,6 +135,7 @@ $(document).ready(function(){initNavTree('Functor_8h_source.html',''); initResiz
 <div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;} <span class="comment">// namespace yafl</span></div>
 <div class="ttc" id="agroup__Core_html_a922307990f2f6aedff882acfc4d9abef"><div class="ttname"><a href="group__Core.html#a922307990f2f6aedff882acfc4d9abef">yafl::core::Functor::fmap</a></div><div class="ttdeci">decltype(auto) fmap(Callable &amp;&amp;callable) const</div><div class="ttdoc">Binds given callable (function, function object, lambda) to the Functor value.</div><div class="ttdef"><b>Definition:</b> Functor.h:36</div></div>
 <div class="ttc" id="agroup__Core_html_classyafl_1_1core_1_1Functor"><div class="ttname"><a href="group__Core.html#classyafl_1_1core_1_1Functor">yafl::core::Functor</a></div><div class="ttdoc">Functional Functor class.</div><div class="ttdef"><b>Definition:</b> Functor.h:27</div></div>
+<div class="ttc" id="astructyafl_1_1type_1_1details_1_1DomainDetailsImpl_html_a3b7ecc860f332d0a857fdd8fd5d96f41"><div class="ttname"><a href="structyafl_1_1type_1_1details_1_1DomainDetailsImpl.html#a3b7ecc860f332d0a857fdd8fd5d96f41">yafl::type::details::DomainDetailsImpl&lt; std::decay_t&lt; T &gt; &gt;::hasFunctorBase</a></div><div class="ttdeci">static constexpr bool hasFunctorBase</div><div class="ttdoc">boolean flag that states whether type T is a Functor or not</div><div class="ttdef"><b>Definition:</b> TypeTraits.h:340</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
