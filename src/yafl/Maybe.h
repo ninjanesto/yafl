@@ -19,38 +19,6 @@
 
 namespace yafl {
 
-namespace maybe {
-/**
- * @ingroup Maybe
- * Maybe monad traits
- */
-template<typename>
-struct Details;
-
-/**
- * @ingroup Maybe
- * Maybe monad traits specialization that enable getting the inner type
- * @tparam MaybeT Maybe monad type
- * @tparam Inner Inner type
-*/
-template<template<typename> typename MaybeT, typename Inner>
-struct Details<MaybeT<Inner>> {
-    using ValueType = Inner;
-};
-
-/**
- * @ingroup Maybe
- * Maybe monad traits specialization for const types that enable getting the inner type
- * @tparam Maybe Maybe monad type
- * @tparam Inner Inner type
- */
-template<template<typename> typename MaybeT, typename Inner>
-struct Details<const MaybeT<Inner>> {
-    using ValueType = Inner;
-};
-
-} // namespace maybe
-
 /**
  * @ingroup Maybe
  * Maybe class. This class implements the Maybe type by realizing concepts from functional programming
@@ -59,6 +27,49 @@ struct Details<const MaybeT<Inner>> {
  */
 template <typename>
 class Maybe;
+
+namespace monad {
+
+/**
+ * @ingroup Monad
+ * Maybe monad traits specialization that enable getting the inner type
+ * @tparam Inner Inner type
+*/
+template<typename Inner>
+struct Details<Maybe<Inner>> {
+    /// Base type
+    using BaseType = core::Monad<Maybe, Inner>;
+
+    /// Value Type
+    using ValueType = Inner;
+
+    /// Derived type
+    using DerivedType = Maybe<Inner>;
+
+    ///boolean flag that states whether type T is a monad or not
+    static constexpr bool hasMonadicBase = std::is_base_of_v<BaseType, DerivedType>;
+};
+
+/**
+ * @ingroup Monad
+ * Maybe monad traits specialization for const types that enable getting the inner type
+ * @tparam Inner Inner type
+ */
+template<typename Inner>
+struct Details<const Maybe<Inner>> {
+    /// Base type
+    using BaseType = core::Monad<Maybe, Inner>;
+
+    /// Value Type
+    using ValueType = Inner;
+
+    /// Derived type
+    using DerivedType = Maybe<Inner>;
+
+    ///boolean flag that states whether type T is a monad or not
+    static constexpr bool hasMonadicBase = std::is_base_of_v<BaseType, DerivedType>;
+};
+} // namespace monad
 
 /**
  * @ingroup Maybe
@@ -75,34 +86,45 @@ private:
 public:
     /**
      * Copy constructor
-     * @param maybe argument to be copied
+     * @param other argument to be copied
      */
-    Maybe(const Maybe& maybe) : _value{maybe._value} {}
+    Maybe(const Maybe<void>& other) = default;
 
     /**
      * Move constructor
-     * @param maybe arguent to be moved
+     * @param other argument to be moved
      */
-    Maybe(Maybe&& maybe) noexcept : _value(maybe._value) {}
+    Maybe(Maybe<void>&& other) noexcept = default;
 
     /**
-     * Copy operator
+     * Assignment operator
      * @param other argument to be copied
      * @return Maybe with the value copied
      */
-    Maybe& operator=(const Maybe& other) {
-        _value = other._value;
-        return *this;
-    }
+    Maybe<void>& operator=(const Maybe& other) = default;
 
     /**
      * Move operator
      * @param other argument to be moved
-     * @return Mayb with the value moved
+     * @return Maybe with the value moved
      */
-    Maybe& operator=(Maybe&& other) noexcept {
-        _value = other._value;
-        return *this;
+    Maybe<void>& operator=(Maybe<void>&& other) noexcept = default;
+
+    /**
+     * Comparison operator overload
+     * @param other instance of maybe to compare to
+     * @return true if objects are equal and false otherwise
+     */
+    bool operator==(const Maybe<void>& other) const noexcept {
+        return _value == other._value;
+    }
+
+    /**
+     * Logical not operator
+     * @return false if maybe has value and true otherwise
+     */
+    bool operator!() const {
+        return !_value;
     }
 
     /**
@@ -133,8 +155,8 @@ private:
     template <typename Callable>
     decltype(auto) internal_bind(Callable&& callable) const {
         static_assert(std::is_invocable_v<Callable>, "Input argument is not invocable");
-        using ReturnType = std::invoke_result_t<Callable>;
-        if (this->hasValue()) {
+        using ReturnType = std::remove_reference_t<std::invoke_result_t<Callable>>;
+        if (hasValue()) {
             return std::invoke<Callable>(std::forward<Callable>(callable));
         } else {
             return ReturnType::Nothing();
@@ -144,8 +166,8 @@ private:
     template <typename Callable>
     decltype(auto) internal_fmap(Callable&& callable) const {
         static_assert(std::is_invocable_v<Callable>, "Input argument is not invocable");
-        using ReturnType = std::invoke_result_t<Callable>;
-        if (this->hasValue()) {
+        using ReturnType = std::remove_reference_t<std::invoke_result_t<Callable>>;
+        if (hasValue()) {
             if constexpr (std::is_void_v<ReturnType>) {
                 std::invoke<Callable>(std::forward<Callable>(callable));
                 return Maybe<void>::Just();
@@ -176,42 +198,49 @@ class Maybe : public core::Functor<Maybe, T>,
 
 private:
     Maybe() : _value{}{}
-    explicit Maybe(const T& value) :_value{value}{}
+    explicit Maybe(const T& value) : _value{value}{}
 public:
     /**
      * Copy constructor
      * @param maybe argument to be copied
      */
-    Maybe(const Maybe<T>& maybe) : _value{} {
-        if (maybe._value) {
-            _value = maybe.value();
-        }
-    }
+    Maybe(const Maybe<T>& maybe) = default;
 
     /**
      * Move constructor
      * @param maybe arguent to be moved
      */
-    Maybe(Maybe<T>&& maybe) noexcept : _value{std::move(maybe._value)}{};
+    Maybe(Maybe<T>&& maybe) noexcept = default;
 
     /**
-     * Copy operator
+     * Assignment operator
      * @param other argument to be copied
      * @return Maybe with the value copied
      */
-    Maybe<T>& operator=(const Maybe<T>& other) noexcept {
-        _value = other._value;
-        return *this;
-    }
+    Maybe<T>& operator=(const Maybe<T>& other) = default;
 
     /**
      * Move operator
      * @param other argument to be moved
-     * @return Mayb with the value moved
+     * @return Maybe with the value moved
      */
-    Maybe<T>& operator=(Maybe<T>&& other) noexcept {
-        _value = std::move(other._value);
-        return *this;
+    Maybe<T>& operator=(Maybe<T>&& other) noexcept = default;
+
+    /**
+     * Comparison operator overload
+     * @param other instance of maybe to compare to
+     * @return true if objects are equal and false otherwise
+     */
+    bool operator==(const Maybe<T>& other) const noexcept {
+        return  _value == other._value;
+    }
+
+    /**
+     * Logical not operator
+     * @return false if maybe has value and true otherwise
+     */
+    bool operator!() const {
+        return !hasValue();
     }
 
     /**
@@ -237,7 +266,7 @@ public:
      * Checks whether maybe has nothing or a valid value
      * @return true if valid and false otherwise
      */
-    [[nodiscard]] bool hasValue() const { return !!_value; }
+    [[nodiscard]] bool hasValue() const { return _value.has_value(); }
 
     /**
      * Extracts the wrapped value from the Maybe
@@ -263,8 +292,8 @@ private:
     decltype(auto) internal_bind(Callable&& callable) const {
         static_assert(std::is_invocable_v<Callable, T>, "Input argument is not invocable");
         using ReturnType = std::remove_reference_t<std::invoke_result_t<Callable, T>>;
-        if (this->hasValue()) {
-            return std::invoke<Callable>(std::forward<Callable>(callable), this->value());
+        if (hasValue()) {
+            return std::invoke<Callable>(std::forward<Callable>(callable), value());
         } else {
             return ReturnType::Nothing();
         }
@@ -274,77 +303,116 @@ private:
     decltype(auto) internal_fmap(Callable&& callable) const {
         static_assert(std::is_invocable_v<Callable, T>, "Input argument is not invocable");
         using ReturnType = std::remove_reference_t<std::invoke_result_t<Callable, T>>;
-        if (this->hasValue()) {
+        if (hasValue()) {
             if constexpr (std::is_void_v<ReturnType>) {
-                std::invoke<Callable>(std::forward<Callable>(callable), this->value());
+                std::invoke<Callable>(std::forward<Callable>(callable), value());
                 return Maybe<ReturnType>::Just();
             } else {
-                return Maybe<ReturnType>::Just(std::invoke<Callable>(std::forward<Callable>(callable), this->value()));
+                return Maybe<ReturnType>::Just(std::invoke<Callable>(std::forward<Callable>(callable), value()));
             }
         } else {
             return Maybe<ReturnType>::Nothing();
         }
     }
 
-    template<typename Head>
-    decltype(auto) internal_apply(Maybe<Head>&& arg) const {
-        const auto var{std::move(arg)};
-        if constexpr (std::is_invocable_v<T, Head>) {
-            using ReturnType = std::remove_reference_t<std::invoke_result_t<T, Head>>;
-            if (!this->hasValue()) {
-                return Maybe<ReturnType>::Nothing();
-            } else {
-                if (var.hasValue()) {
-                    if constexpr (std::is_void_v<ReturnType>) {
-                        std::invoke<T>(value(), var.value());
-                        return Maybe<ReturnType>::Just();
+    template <typename Arg>
+    decltype(auto) internal_apply(Arg&& arg) const {
+        if constexpr (monad::Details<yafl::function::remove_cvref_t<Arg>>::hasMonadicBase) {
+            using Head = yafl::function::remove_cvref_t<typename yafl::monad::Details<yafl::function::remove_cvref_t<Arg>>::ValueType>;
+            if constexpr (std::is_invocable_v<T, Head>) {
+                using ReturnType = std::remove_reference_t<std::invoke_result_t<T, Head>>;
+                if (!hasValue()) {
+                    return Maybe<ReturnType>::Nothing();
+                } else {
+                    if (arg.hasValue()) {
+                        if constexpr (std::is_void_v<ReturnType>) {
+                            std::invoke<T>(value(), arg.value());
+                            return Maybe<ReturnType>::Just();
+                        } else {
+                            return Maybe<ReturnType>::Just(std::invoke<T>(value(), arg.value()));
+                        }
                     } else {
-                        return Maybe<ReturnType>::Just(std::invoke<T>(value(), var.value()));
+                        return Maybe<ReturnType>::Nothing();
+                    }
+                }
+            } else if constexpr (std::is_invocable_v<T>) {
+                using RT = std::invoke_result_t<T>;
+                if constexpr (std::is_invocable_v<RT, Head>) {
+                    using RTT = std::invoke_result_t<RT, Head>;
+                    if (hasValue() && arg.hasValue()) {
+                        if constexpr (std::is_void_v<RTT>) {
+                            std::invoke<RT>(value()(), std::forward<Head>(arg.value()));
+                            return Maybe<RTT>::Just();
+                        } else {
+                            return Maybe<RTT>::Just(std::invoke<RT>(value()(), std::forward<Head>(arg.value())));
+                        }
+                    } else {
+                        return Maybe<RTT>::Nothing();
                     }
                 } else {
-                    return Maybe<ReturnType>::Nothing();
+                    return Maybe<RT>::Nothing();
+                }
+            } else {
+                if (arg.hasValue() && hasValue()) {
+                    return Maybe<typename FunctionTraits<T>::PartialApplyFirst>::Just(
+                            [callable = value(), first = std::forward<Head>(arg.value())](auto&& ...args) {
+                                return std::apply(callable, std::tuple_cat(std::make_tuple(first), std::make_tuple(args...)));
+                            });
+                } else {
+                    return Maybe<typename FunctionTraits<T>::PartialApplyFirst>::Nothing();
                 }
             }
         } else {
-            if (var.hasValue() && this->hasValue()) {
-                return Maybe<typename FunctionTraits<T>::PartialApplyFirst>::Just([callable = value(), first = var.value()](auto&& ...args) {
-                    return std::apply(callable, std::tuple_cat(std::make_tuple(first), std::make_tuple(args...)));
-                });
-            } else {
-                return Maybe<typename FunctionTraits<T>::PartialApplyFirst>::Nothing();
-            }
+            return internal_apply_non_monad(std::forward<Arg>(arg));
         }
     }
 
     template<typename Head>
-    decltype(auto) internal_apply(Head&& arg) const {
+    decltype(auto) internal_apply_non_monad(Head&& arg) const {
         if constexpr (std::is_invocable_v<T, Head>) {
-            using ReturnType = std::remove_reference_t<std::invoke_result_t<T, Head>>;
-            if (!this->hasValue()) {
+            using ReturnType = yafl::function::remove_cvref_t<std::invoke_result_t<T, Head>>;
+            if (!hasValue()) {
                 return Maybe<ReturnType>::Nothing();
             } else {
                 if constexpr (std::is_void_v<ReturnType>) {
                     std::invoke<T>(value(), std::forward<Head>(arg));
                     return Maybe<ReturnType>::Just();
                 } else {
-                    return Maybe<ReturnType>::Just(std::invoke<T>(value(), std::forward<Head>(arg)));
+                    return Maybe<ReturnType>::Just(value()(std::forward<Head>(arg)));
                 }
             }
+        } else if constexpr (std::is_invocable_v<T>) {
+            using RT = std::invoke_result_t<T>;
+            if constexpr (std::is_invocable_v<RT, Head>) {
+                using RTT = std::invoke_result_t<RT, Head>;
+                if (hasValue()) {
+                    if constexpr (std::is_void_v<RTT>) {
+                        std::invoke<RT>(value()(), std::forward<Head>(arg));
+                        return Maybe<RTT>::Just();
+                    } else {
+                        return Maybe<RTT>::Just(std::invoke<RT>(value()(), std::forward<Head>(arg)));
+                    }
+                } else {
+                    return Maybe<RTT>::Nothing();
+                }
+            } else {
+                return Maybe<RT>::Nothing();
+            }
         } else {
-            if (this->hasValue()) {
-                return Maybe<typename FunctionTraits<T>::PartialApplyFirst>::Just([callable = value(), first = std::forward<Head>(arg)](auto&& ...args) {
-                    return std::apply(callable, std::tuple_cat(std::make_tuple(first), std::make_tuple(args...)));
-                });
+            if (hasValue()) {
+                return Maybe<typename FunctionTraits<T>::PartialApplyFirst>::Just(
+                        [callable = value(), first = std::forward<Head>(arg)](auto&& ...args) mutable {
+                            return callable(std::move(first), std::forward<decltype(args)>(args)...);
+                        });
             } else {
                 return Maybe<typename FunctionTraits<T>::PartialApplyFirst>::Nothing();
             }
         }
     }
 
-    template<typename std::enable_if<std::is_invocable_v<T>>* = nullptr>
     decltype(auto) internal_apply() const {
         using ReturnType = std::remove_reference_t<std::invoke_result_t<T>>;
-        if (!this->hasValue()) {
+        if (!hasValue()) {
             return Maybe<ReturnType>::Nothing();
         } else {
             if constexpr (std::is_void_v<ReturnType>) {
@@ -365,35 +433,38 @@ namespace maybe {
 /**
  * @ingroup Maybe
  * Function that helps build a Maybe with Nothing
- * @tparam T Maybe inner type
+ * @tparam ValueType Maybe inner type
  * @return maybe with nothing
  */
-template<typename ...T>
-Maybe<T...> Nothing() { return Maybe<T...>::Nothing(); }
-
-/**
- * @ingroup Maybe
- * Function that helps build a Maybe with a value
- * @tparam T Maybe inner type
- * @param args Argument to be wrapped
- * @return maybe with the value wrapped
- */
-template<typename ...T>
-Maybe<T...> Just(T &&...args) { return Maybe<T...>::Just(std::forward<T>(args)...); }
+template<typename ValueType>
+Maybe<std::remove_reference_t<ValueType>> Nothing() {
+    return Maybe<std::remove_reference_t<ValueType>>::Nothing();
+}
 
 /**
  * @ingroup Maybe
  * Function that helps build a Maybe with a void "value"
- * @tparam T Maybe inner type
+ * @tparam ValueType inner type defaulted to void
  * @return maybe with void value
  */
-template<typename = void>
+template<typename T = void>
 Maybe<void> Just() { return Maybe<void>::Just(); }
 
 /**
  * @ingroup Maybe
+ * Function that helps build a Maybe with a value
+ * @tparam ValueType Maybe inner type
+ * @param args Argument to be wrapped
+ * @return maybe with the value wrapped
+ */
+template<typename ValueType>
+Maybe<std::remove_reference_t<ValueType>> Just(ValueType&& args) {
+    return Maybe<std::remove_reference_t<ValueType>>::Just(std::forward<ValueType>(args));
+}
+
+/**
+ * @ingroup Maybe
  * Lift given callable into the given abstract monadic type
- * @tparam MonadType Abstract type to lift function to
  * @tparam Callable Callable type to lift
  * @param callable Callable to lift
  * @return callable lifted into the given abstract monadic type

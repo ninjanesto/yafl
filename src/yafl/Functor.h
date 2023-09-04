@@ -46,7 +46,7 @@ public:
  * @tparam T type to validate
  */
 template<typename T>
-struct IsFunctorBase {
+struct HasFunctorBase {
     ///boolean flag that states whether type T is a functor or not
     static constexpr bool value = false;
 };
@@ -59,7 +59,7 @@ struct IsFunctorBase {
  * @tparam Args functor type arguments
  */
 template<template<typename...> typename FunctorType, typename ...Args>
-struct IsFunctorBase<FunctorType<Args...>> {
+struct HasFunctorBase<FunctorType<Args...>> {
     /// Base type
     using BaseType = Functor<FunctorType, Args...>;
     /// Derived type
@@ -80,7 +80,7 @@ struct IsFunctorBase<FunctorType<Args...>> {
  */
 template<typename Callable, typename FunctorT>
 decltype(auto) fmap(Callable&& callable, const FunctorT& functor) {
-    static_assert(core::IsFunctorBase<FunctorT>::value, "FunctorT argument not a Functor");
+    static_assert(core::HasFunctorBase<FunctorT>::value, "FunctorT argument not a Functor");
     return functor.fmap(std::forward<Callable>(callable));
 }
 
@@ -89,15 +89,26 @@ decltype(auto) fmap(Callable&& callable, const FunctorT& functor) {
  * In this case the provided function is lifted to work at Functor level an so,
  * this function returns a new callable that receives a Functor as argument and returns
  * a Functor
+ * @tparam FunctorType Functor type
  * @tparam Callable callable type
  * @param callable function to be applied to the given functor
  * @return Function lifted to work at Functor level
  */
-template<typename Callable>
+template<template<typename...> typename FunctorType, typename Callable>
 decltype(auto) fmap(Callable&& callable) {
-    return [callable = std::forward<Callable>(callable)](const auto& functor) {
-        return functor.fmap(callable);
-    };
+    if constexpr (FunctionTraits<Callable>::ArgCount > 0) {
+        using FirstArg = typename FunctionTraits<Callable>::template ArgType<0>;
+
+        return [callable = std::forward<Callable>(callable)](const FunctorType<FirstArg> &functor) {
+            static_assert(core::HasFunctorBase<FunctorType<FirstArg>>::value, "Argument not a Functor");
+            return functor.fmap(callable);
+        };
+    } else {
+        return [callable = std::forward<Callable>(callable)](const FunctorType<void> &functor) {
+            static_assert(core::HasFunctorBase<FunctorType<void>>::value, "Argument not a Functor");
+            return functor.fmap(callable);
+        };
+    }
 }
 
 } // namespace yafl

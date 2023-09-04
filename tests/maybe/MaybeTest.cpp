@@ -40,13 +40,39 @@ TYPED_TEST(MaybeTest, assertJustCreateAValidMaybeForAnyType) {
     ASSERT_TRUE(maybe.hasValue());
 }
 
+TYPED_TEST(MaybeTest, assertCopyConstructor) {
+    const auto maybe = createMaybe<TypeParam>();
+    const Maybe destination(maybe);
+    ASSERT_EQ(maybe, destination);
+}
+
+TYPED_TEST(MaybeTest, assertAssignmentOperator) {
+    const auto maybe = createMaybe<TypeParam>();
+    auto destination = createMaybe<TypeParam>();
+    destination = maybe;
+    ASSERT_EQ(maybe, destination);
+}
+
+TYPED_TEST(MaybeTest, assertMoveConstructor) {
+    auto maybe = createMaybe<TypeParam>();
+    const auto destination(std::move(maybe));
+    EXPECT_TRUE(destination.hasValue());
+}
+
+TYPED_TEST(MaybeTest, MoveAssignment) {
+    auto maybe = createMaybe<TypeParam>();
+    auto destination = createMaybe<TypeParam>();
+    destination = std::move(maybe);
+    EXPECT_TRUE(destination.hasValue());
+}
+
 TYPED_TEST(MaybeTest, assertValueReturnsCorrectType) {
     const auto maybe = createMaybe<TypeParam>();
     if constexpr (!std::is_void_v<TypeParam>) {
         constexpr const auto areSameType = std::is_same_v<TypeParam, decltype(maybe.value())>;
         ASSERT_TRUE(areSameType);
     }
-    constexpr const auto areSameType = std::is_same_v<TypeParam, typename maybe::Details<decltype(maybe)>::ValueType>;
+    constexpr const auto areSameType = std::is_same_v<TypeParam, typename monad::Details<decltype(maybe)>::ValueType>;
     ASSERT_TRUE(areSameType);
 }
 
@@ -55,7 +81,7 @@ TYPED_TEST(MaybeTest, assertValueReturnsExceptionWhenisNothing) {
     if constexpr (!std::is_void_v<TypeParam>) {
         EXPECT_THAT([&maybe]() { std::ignore = maybe.value(); }, testing::Throws<std::runtime_error>());
     }
-    constexpr const auto areSameType = std::is_same_v<TypeParam, typename maybe::Details<decltype(maybe)>::ValueType>;
+    constexpr const auto areSameType = std::is_same_v<TypeParam, typename monad::Details<decltype(maybe)>::ValueType>;
     ASSERT_TRUE(areSameType);
 }
 
@@ -72,18 +98,18 @@ TYPED_TEST(MaybeTest, assertFmapComputesCorrectType) {
         {
             const auto maybe = createMaybe<TypeParam>();
             const auto resultVoid = maybe.fmap([](){});
-            ASSERT_TRUE(std::is_void_v<typename maybe::Details<decltype(resultVoid)>::ValueType>);
+            ASSERT_TRUE(std::is_void_v<typename monad::Details<decltype(resultVoid)>::ValueType>);
         }
         {
             const auto maybe = createMaybe<TypeParam>();
             const auto resultVoid = fmap([](){}, maybe);
-            ASSERT_TRUE(std::is_void_v<typename maybe::Details<decltype(resultVoid)>::ValueType>);
+            ASSERT_TRUE(std::is_void_v<typename monad::Details<decltype(resultVoid)>::ValueType>);
         }
         {
             const auto maybe = createMaybe<TypeParam>();
-            const auto f = fmap([](){});
+            const auto f = fmap<yafl::Maybe>([](){});
             const auto resultVoid = f(maybe);
-            ASSERT_TRUE(std::is_void_v<typename maybe::Details<decltype(resultVoid)>::ValueType>);
+            ASSERT_TRUE(std::is_void_v<typename monad::Details<decltype(resultVoid)>::ValueType>);
         }
         {
             const auto maybe = createMaybe<TypeParam>();
@@ -102,23 +128,23 @@ TYPED_TEST(MaybeTest, assertFmapComputesCorrectType) {
         {
             const auto maybe = createMaybe<TypeParam>();
             const auto resultVoid = maybe.fmap([](const TypeParam&){});
-            ASSERT_TRUE(std::is_void_v<typename maybe::Details<decltype(resultVoid)>::ValueType>);
+            ASSERT_TRUE(std::is_void_v<typename monad::Details<decltype(resultVoid)>::ValueType>);
         }
         {
             const auto maybe = createMaybe<TypeParam>();
             const auto resultVoid = fmap([](const TypeParam&){}, maybe);
-            ASSERT_TRUE(std::is_void_v<typename maybe::Details<decltype(resultVoid)>::ValueType>);
+            ASSERT_TRUE(std::is_void_v<typename monad::Details<decltype(resultVoid)>::ValueType>);
         }
         {
             const auto maybe = createMaybe<TypeParam>();
-            const auto f = fmap([](const TypeParam&){});
+            const auto f = fmap<yafl::Maybe>([](const TypeParam&){});
             const auto resultVoid = f(maybe);
-            ASSERT_TRUE(std::is_void_v<typename maybe::Details<decltype(resultVoid)>::ValueType>);
+            ASSERT_TRUE(std::is_void_v<typename monad::Details<decltype(resultVoid)>::ValueType>);
         }
         {
             const auto maybe = createMaybe<TypeParam>();
             const auto resultVoid = maybe.fmap([](TypeParam&&){});
-            ASSERT_TRUE(std::is_void_v<typename maybe::Details<decltype(resultVoid)>::ValueType>);
+            ASSERT_TRUE(std::is_void_v<typename monad::Details<decltype(resultVoid)>::ValueType>);
         }
         {
             const auto maybe = createMaybe<TypeParam>();
@@ -141,18 +167,18 @@ TYPED_TEST(MaybeTest, assertBindComputesCorrectType) {
         {
             const auto maybe = createMaybe<TypeParam>();
             const auto resultVoid = maybe.bind([](){ return Maybe<void>::Nothing();});
-            ASSERT_TRUE(std::is_void_v<typename maybe::Details<decltype(resultVoid)>::ValueType>);
+            ASSERT_TRUE(std::is_void_v<typename monad::Details<decltype(resultVoid)>::ValueType>);
         }
         {
             const auto maybe = createMaybe<TypeParam>();
-            const auto resultVoid = bind([](){ return Maybe<void>::Nothing();}, maybe);
-            ASSERT_TRUE(std::is_void_v<typename maybe::Details<decltype(resultVoid)>::ValueType>);
+            const auto resultVoid = monad::bind([](){ return Maybe<void>::Nothing();}, maybe);
+            ASSERT_TRUE(std::is_void_v<typename monad::Details<decltype(resultVoid)>::ValueType>);
         }
         {
             const auto maybe = createMaybe<TypeParam>();
-            const auto f = bind([](){ return Maybe<void>::Nothing();});
+            const auto f = monad::bind<yafl::Maybe>([](){ return Maybe<void>::Nothing();});
             const auto resultVoid = f(maybe);
-            ASSERT_TRUE(std::is_void_v<typename maybe::Details<decltype(resultVoid)>::ValueType>);
+            ASSERT_TRUE(std::is_void_v<typename monad::Details<decltype(resultVoid)>::ValueType>);
         }
         {
             const auto maybe = createMaybe<TypeParam>();
@@ -171,18 +197,18 @@ TYPED_TEST(MaybeTest, assertBindComputesCorrectType) {
         {
             const auto maybe = createMaybe<TypeParam>();
             const auto resultVoid = maybe.bind([](const TypeParam&){return Maybe<void>::Nothing();});
-            ASSERT_TRUE(std::is_void_v<typename maybe::Details<decltype(resultVoid)>::ValueType>);
+            ASSERT_TRUE(std::is_void_v<typename monad::Details<decltype(resultVoid)>::ValueType>);
         }
         {
             const auto maybe = createMaybe<TypeParam>();
-            const auto resultVoid = bind([](const TypeParam&){return Maybe<void>::Nothing();}, maybe);
-            ASSERT_TRUE(std::is_void_v<typename maybe::Details<decltype(resultVoid)>::ValueType>);
+            const auto resultVoid = monad::bind([](const TypeParam&){return Maybe<void>::Nothing();}, maybe);
+            ASSERT_TRUE(std::is_void_v<typename monad::Details<decltype(resultVoid)>::ValueType>);
         }
         {
             const auto maybe = createMaybe<TypeParam>();
-            const auto f = bind([](const TypeParam&){return Maybe<void>::Nothing();});
+            const auto f = monad::bind<yafl::Maybe>([](const TypeParam&){return Maybe<void>::Nothing();});
             const auto resultVoid = f(maybe);
-            ASSERT_TRUE(std::is_void_v<typename maybe::Details<decltype(resultVoid)>::ValueType>);
+            ASSERT_TRUE(std::is_void_v<typename monad::Details<decltype(resultVoid)>::ValueType>);
         }
         {
             const auto maybe = createMaybe<TypeParam>();
@@ -205,15 +231,22 @@ TEST(MaybeTest, assertApply) {
         const auto multBy42 = maybe::Just([](const int &x) { return x * 42; });
         const auto result = multBy42(maybe::Just(2));
         ASSERT_EQ(result.value(), 84);
+        ASSERT_EQ(apply(multBy42, maybe::Just(2)).value(), 84);
+        ASSERT_EQ(apply(multBy42)(maybe::Just(2)).value(), 84);
         const auto result2 = multBy42(2);
         ASSERT_EQ(result2.value(), 84);
+        ASSERT_EQ(apply(multBy42, 2).value(), 84);
+        ASSERT_EQ(apply(multBy42)(2).value(), 84);
         const auto result3 = multBy42(Maybe<int>::Nothing());
         ASSERT_FALSE(result3.hasValue());
+        ASSERT_FALSE(apply(multBy42, Maybe<int>::Nothing()).hasValue());
+        ASSERT_FALSE(apply(multBy42)(Maybe<int>::Nothing()).hasValue());
     }
     {
         const auto void42 = maybe::Just([]() { return 42; });
         const auto result = void42();
         ASSERT_EQ(result.value(), 42);
+        ASSERT_EQ(apply(void42)().value(), 42);
     }
     {
         const auto voidFunc = []() { return ;};
@@ -301,38 +334,92 @@ TEST(MaybeTest, assertApply) {
         const auto resultPartialJust = partialApply(2);
         ASSERT_TRUE(resultPartialJust.hasValue());
     }
+    {
+        const auto v = maybe::Just(42);
+        const auto ap = maybe::Just(&id<int>);
+        ASSERT_TRUE(ap(v).hasValue());
+        ASSERT_EQ(ap(v).value(), v.value());
+
+        ASSERT_TRUE(ap(Maybe(v)).hasValue());
+        ASSERT_EQ(ap(Maybe(v)).value(), v.value());
+
+        ASSERT_TRUE(ap(maybe::Just(42)).hasValue());
+        ASSERT_EQ(ap(maybe::Just(42)).value(), v.value());
+
+        ASSERT_TRUE(ap(42).hasValue());
+        ASSERT_EQ(ap(42).value(), v.value());
+    }
+    {
+        const auto lf = [](int i){ return 42 * i;};
+        const auto rf = [](int i){ return std::to_string(i);};
+        const auto ap = maybe::Just(&compose<decltype(lf), decltype(rf)>);
+        const auto result = ap(lf)(rf)(2);
+
+        const auto ap2 = maybe::Just(std::function(lf))(2);
+        const auto result2 = maybe::Just([](int i){ return std::to_string(i);})(ap2);
+
+        ASSERT_TRUE(result.hasValue());
+        ASSERT_TRUE(result2.hasValue());
+
+        ASSERT_EQ(result.value(), result2.value());
+    }
+    {
+        const auto ap = maybe::Just([](){return 42;});
+        ASSERT_FALSE(ap(2).hasValue());
+        ASSERT_FALSE(ap(maybe::Just(2)).hasValue());
+        ASSERT_FALSE(ap(maybe::Nothing<int>()).hasValue());
+        ASSERT_TRUE(ap().hasValue());
+
+        const auto ap2 = maybe::Nothing<std::function<int()>>();
+        ASSERT_FALSE(ap2(2).hasValue());
+        ASSERT_FALSE(ap2(maybe::Just(2)).hasValue());
+        ASSERT_FALSE(ap2(maybe::Nothing<int>()).hasValue());
+        ASSERT_FALSE(ap2().hasValue());
+    }
+    {
+        const auto ap = maybe::Just([](){return [](int i){return 42 * i;};});
+        ASSERT_TRUE(ap(2).hasValue());
+        ASSERT_TRUE(ap(maybe::Just(2)).hasValue());
+        ASSERT_FALSE(ap(maybe::Nothing<int>()).hasValue());
+
+        const auto func = [](){return [](int i){return 42 * i;};};
+        const auto apn = maybe::Nothing<decltype(func)>();
+        ASSERT_FALSE(apn(2).hasValue());
+        ASSERT_FALSE(apn(maybe::Just(2)).hasValue());
+        ASSERT_FALSE(apn(maybe::Nothing<int>()).hasValue());
+    }
+    {
+        const auto ap = maybe::Just([](){return [](int){return;};});
+        ASSERT_TRUE(ap(2).hasValue());
+        ASSERT_TRUE(ap(maybe::Just(2)).hasValue());
+        ASSERT_FALSE(ap(maybe::Nothing<int>()).hasValue());
+    }
 }
 
 TEST(MaybeTest, validate_kleisli_compose){
     {
-        const auto f1 = [](int i) { return maybe::Just(i*2);};
-        const auto f2 = [](int i) { return i * 2;};
-        const auto f = compose(f1, f2);
-        ASSERT_EQ(f(2).value(), 8);
-    }
-    {
-        const auto f1 = [](int i) { return maybe::Just(i*2);};
+        const auto f1 = [](int i) { return maybe::Just(i * 2);};
         const auto f2 = [](int i) { return maybe::Just(std::to_string(i * 2));};
         const auto f = compose(f1, f2);
         ASSERT_EQ(f(2).value(), "8");
     }
     {
-        const auto f1 = [](int) { return maybe::Just<void>();};
-        const auto f2 = []() { return 2;};
+        const auto f1 = [](const Maybe<int>& i) { return maybe::Just(i.value() * 2);};
+        const auto f2 = [](int i) { return maybe::Just(std::to_string(i * 2));};
         const auto f = compose(f1, f2);
-        ASSERT_EQ(f(2).value(), 2);
+        ASSERT_EQ(f(maybe::Just(2)).value(), "8");
     }
     {
-        const auto f1 = [](int) { return Maybe<void>::Just();};
-        const auto f2 = []() { return maybe::Just<std::string>("2");};
+        const auto f1 = [](int i) { return maybe::Just(i * 2);};
+        const auto f2 = [](const Maybe<int>& i) { return maybe::Just(std::to_string(i.value() * 2));};
         const auto f = compose(f1, f2);
-        ASSERT_EQ(f(2).value(), "2");
+        ASSERT_EQ(f(2).value(), "8");
     }
     {
-        const auto f1 = [](int) { return maybe::Nothing<int>();};
-        const auto f2 = [](int i) { return i * 2;};
+        const auto f1 = [](const Maybe<int>& i) { return maybe::Just(i.value() * 2);};
+        const auto f2 = [](const Maybe<int>& i) { return maybe::Just(std::to_string(i.value() * 2));};
         const auto f = compose(f1, f2);
-        ASSERT_FALSE(f(2).hasValue());
+        ASSERT_EQ(f(maybe::Just(2)).value(), "8");
     }
     {
         const auto f1 = [](int) { return maybe::Nothing<int>();};
@@ -348,72 +435,72 @@ TEST(MaybeTest, validate_kleisli_compose){
     }
     {
         const auto f1 = [](int) { return maybe::Nothing<void>();};
-        const auto f2 = []() { return 2;};
+        const auto f2 = []() { return maybe::Just<void>();};
         const auto f = compose(f1, f2);
         ASSERT_FALSE(f(2).hasValue());
     }
     {
-        const auto f1 = [](int) { return maybe::Nothing<void>();};
+        const auto f1 = [](int) { return maybe::Just<void>();};
         const auto f2 = []() { return maybe::Just<void>();};
         const auto f = compose(f1, f2);
-        ASSERT_FALSE(f(2).hasValue());
+        ASSERT_TRUE(f(2).hasValue());
     }
 }
 
 TEST(MaybeTest, validate_lift) {
     {
         const auto funcNoArgRetVoid = []() { return;};
-        const auto lifted = yafl::maybe::lift(funcNoArgRetVoid);
+        const auto lifted = maybe::lift(funcNoArgRetVoid);
         const auto result = lifted();
         ASSERT_TRUE(result.hasValue());
     }
     {
         const auto funcNoArgRetInt = []() { return 42;};
-        const auto lifted = yafl::maybe::lift(funcNoArgRetInt);
+        const auto lifted = maybe::lift(funcNoArgRetInt);
         const auto result = lifted();
         ASSERT_TRUE(result.hasValue());
         ASSERT_EQ(result.value(), 42);
     }
     {
         const auto funcOneArgRetVoid = [](int) { return;};
-        const auto lifted = yafl::maybe::lift(funcOneArgRetVoid);
-        const auto result = lifted(yafl::maybe::Just(2));
+        const auto lifted = maybe::lift(funcOneArgRetVoid);
+        const auto result = lifted(maybe::Just(2));
         ASSERT_TRUE(result.hasValue());
-        const auto result2 = lifted(yafl::maybe::Nothing<int>());
+        const auto result2 = lifted(maybe::Nothing<int>());
         ASSERT_FALSE(result2.hasValue());
     }
     {
         const auto funcOneArgRetInt = [](int i) { return 42 * i;};
-        const auto lifted = yafl::maybe::lift(funcOneArgRetInt);
-        const auto result = lifted(yafl::maybe::Just(1));
+        const auto lifted = maybe::lift(funcOneArgRetInt);
+        const auto result = lifted(maybe::Just(1));
         ASSERT_TRUE(result.hasValue());
         ASSERT_EQ(result.value(), 42);
-        const auto result2 = lifted(yafl::maybe::Nothing<int>());
+        const auto result2 = lifted(maybe::Nothing<int>());
         ASSERT_FALSE(result2.hasValue());
     }
     {
         const auto funcMultiArgRetVoid = [](int, float, const std::string&) { return;};
-        const auto lifted = yafl::maybe::lift(funcMultiArgRetVoid);
-        const auto result = lifted(yafl::maybe::Just(2), yafl::maybe::Just(4.2), yafl::maybe::Just<std::string>("dummy"));
+        const auto lifted = maybe::lift(funcMultiArgRetVoid);
+        const auto result = lifted(maybe::Just(2), maybe::Just(4.2), maybe::Just<std::string>("dummy"));
         ASSERT_TRUE(result.hasValue());
-        const auto result2 = lifted(yafl::maybe::Nothing<int>(), yafl::maybe::Just(4.2), yafl::maybe::Just<std::string>("dummy"));
+        const auto result2 = lifted(maybe::Nothing<int>(), maybe::Just(4.2), maybe::Just<std::string>("dummy"));
         ASSERT_FALSE(result2.hasValue());
-        const auto result3 = lifted(yafl::maybe::Just(1), yafl::maybe::Nothing<float>(), yafl::maybe::Just<std::string>("dummy"));
+        const auto result3 = lifted(maybe::Just(1), maybe::Nothing<float>(), maybe::Just<std::string>("dummy"));
         ASSERT_FALSE(result3.hasValue());
-        const auto result4 = lifted(yafl::maybe::Just(1), yafl::maybe::Just(4.2), yafl::maybe::Nothing<std::string>());
+        const auto result4 = lifted(maybe::Just(1), maybe::Just(4.2), maybe::Nothing<std::string>());
         ASSERT_FALSE(result4.hasValue());
     }
     {
         const auto funcMultiArgRetString = [](int i, int j, const std::string& s) { return s + std::to_string(i + j);};
-        const auto lifted = yafl::maybe::lift(funcMultiArgRetString);
-        const auto result = lifted(yafl::maybe::Just(2), yafl::maybe::Just(4), yafl::maybe::Just<std::string>("dummy"));
+        const auto lifted = maybe::lift(funcMultiArgRetString);
+        const auto result = lifted(maybe::Just(2), maybe::Just(4), maybe::Just<std::string>("dummy"));
         ASSERT_TRUE(result.hasValue());
         ASSERT_EQ(result.value(), "dummy6");
-        const auto result2 = lifted(yafl::maybe::Nothing<int>(), yafl::maybe::Just(4.2), yafl::maybe::Just<std::string>("dummy"));
+        const auto result2 = lifted(maybe::Nothing<int>(), maybe::Just(4.2), maybe::Just<std::string>("dummy"));
         ASSERT_FALSE(result2.hasValue());
-        const auto result3 = lifted(yafl::maybe::Just(1), yafl::maybe::Nothing<float>(), yafl::maybe::Just<std::string>("dummy"));
+        const auto result3 = lifted(maybe::Just(1), maybe::Nothing<float>(), maybe::Just<std::string>("dummy"));
         ASSERT_FALSE(result3.hasValue());
-        const auto result4 = lifted(yafl::maybe::Just(1), yafl::maybe::Just(4.2), yafl::maybe::Nothing<std::string>());
+        const auto result4 = lifted(maybe::Just(1), maybe::Just(4.2), maybe::Nothing<std::string>());
         ASSERT_FALSE(result4.hasValue());
     }
 }

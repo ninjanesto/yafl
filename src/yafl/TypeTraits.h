@@ -104,6 +104,22 @@ struct Traits<std::function<Ret (*)(Args...)>> : function::Details<Ret, Args...>
  * @tparam Callable Callable type to inspect
  */
 template<typename Callable>
-struct FunctionTraits : function::Traits<decltype(std::function{std::declval<Callable>()})>{};
+struct FunctionTraits : function::Traits<decltype(std::function{std::declval<function::remove_cvref_t<Callable>>()})>{};
+
+/**
+ * Specialization for STL function
+ * @tparam Ret function return type
+ * @tparam Args function argument types
+ */
+template<typename Ret, typename ...Args>
+struct FunctionTraits<std::function<Ret(Args...)>> : function::Traits<std::function<Ret(Args...)>>{};
+
+/**
+ * Helper struct that enables debugging by showing the information about the type T
+ * @tparam T type to show
+ * Note: This will make the compile to fail but will show information for the types
+ */
+template<typename T>
+struct WhatIsThis;
 
 } // namespace yafl

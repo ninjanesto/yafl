@@ -11,7 +11,7 @@ Functional Programming concepts implemented in C++17
 ## Introduction
 C++ is a multi paradigm programming language and functional programming concepts keep getting added to the C++ standard.
 
-Yafl is a header only library that implements some key FP concepts, such as curring / uncurring, partial application, function composition, kleisli arrows, and also the Maybe and Either monads (Functor, Applicative Functor and Monad).
+Yafl is a header only library that implements some key FP concepts, such as curring / uncurring, partial application, function composition, kleisli composition, and also the Maybe and Either monads (Functor, Applicative Functor and Monad).
 
 This library helps you in reducing code noise and boilerplate code. It can improve readability (if you are accustomed to FP) and it is really fun to use and learn functional concepts.
 
@@ -34,7 +34,6 @@ const auto f2 =[](int i) { return std::to_string(i);};
 const auto f3 =[](const std::string& s) { return Xpto{ s };};
 
 const auto comp_f1_f2 = yafl::compose(f1, f2);
-//Here we need to explicitly use the correct type
 const auto threeway = yafl::compose<std::function<std::string(int)>>(comp_f1_f2, f3);
 std::cout << threeway(1).value << std::endl;
 ```
@@ -137,27 +136,51 @@ const std::unique_ptr<yafl::core::Functor<yafl::Maybe, int>> functor =
         std::make_unique<yafl::Maybe<int>>(yafl::maybe::Just(420));
 functor->fmap([](int i){ std::cout << i << std::endl;});
 ```
-Functors are required to obey certain laws.
- - Functors must preserve identity morphisms
-    
-    *fmap id \<functor\> = id \<functor\>*
-```c++
-const auto m = yafl::maybe::Just(420);
 
-const auto r = yafl::fmap(yafl::id<int>, m);
-const auto r2 = yafl::id(m);
-std::cout << (r.value() == r2.value()) << std::endl;
+Functors are required to obey certain laws.
+##### Functors must preserve identity morphisms
+    
+*Functor(a).fmap(id) = id(Functor(a))*
+
+*fmap(id, Functor(a)) = id(Functor(a))*
+
+where:
+ - id is the identity function. This function has type _id: a -> a_
+ - a is any value type
+
+```c++
+const auto v = yafl::maybe::Just(420);
+const auto r2 = yafl::id(v);
+std::cout << (v.fmap(yafl::id<int>).value() == r2.value()) << std::endl;
+std::cout << (yafl::fmap(yafl::id<int>, v).value() == r2.value()) << std::endl;
 ```
 
- - Functors preserve composition of morphisms 
-    
-    *fmap (f . g) <functor> ==  fmap f . fmap g*
+##### Functors preserve composition of morphisms
+
+*fmap(compose(f, g), Functor(a)) ==  compose(fmap f, fmap g)(Functor(a))*
+
+*Functor(a).fmap(compose(f, g)) ==  compose(fmap f, fmap g)(Functor(a))*
+
+where:
+ - compose is the composition function. It has type _compose: (a -> b), (b -> c) -> (a -> c)_
+ - a is any value type
+
 ```c++
 const auto f1 = [](int i) { return std::to_string(i);};
 const auto f2 = [](const std::string& s) { return s + "dummy";};
 
+const auto m = yafl::maybe::Just(42);
+
 const auto compose = yafl::compose(f1, f2);
-std::cout << (m.fmap(compose).value() == m.fmap(f1).fmap(f2).value()) << std::endl;
+const auto fmap_compose = yafl::fmap<yafl::Maybe>(compose);
+
+const auto compose2 = yafl::compose(yafl::fmap<yafl::Maybe>(f1), yafl::fmap<yafl::Maybe>(f2));
+const auto result2 = compose2(m);
+
+std::cout << (fmap_compose(m).value() == result2.value()) << std::endl;
+std::cout << (m.fmap(compose).value() == result2.value()) << std::endl;
+std::cout << (yafl::fmap(compose, m).value() == result2.value()) << std::endl;
+std::cout << (m.fmap(f1).fmap(f2).value() == result2.value()) << std::endl;
 ```
 
 #### Applicative Functor
@@ -174,11 +197,27 @@ Applicative _apply_ applies a function inside a functor to a value also inside t
 
 We implemented the apply operation using C++ operator(). Our implementation of applicative functors can receive a function with any number of arguments, that can later be partially applied.
 
+It is represented in YAFL by the abstract class yafl::Applicative, which provides the method `operator()` to apply the given value to the wrapped function.
+
+```c++
+const std::unique_ptr<yafl::core::Applicative<yafl::Maybe, std::function<int(int)>>> applicative =
+std::make_unique<yafl::Maybe<std::function<int(int)>>>(yafl::maybe::Just<std::function<int(int)>>([](int i){ return i;}));
+(*applicative)(42);
+```
+
 Applicatives are required to satisfy four laws:
- - Identity
+##### Identity
+ 
+  *Applicative(id)(Value) = Value*
+
+where:
+ - id is the identity function. This function has type _id: a -> a_
+ - any value or a Functor with any wrapped value. It has type _Value: a_ or _Value: Functor a_. 
+
 ```c++
 const auto v = yafl::maybe::Just(42);
 const auto ap = yafl::maybe::Just(&yafl::id<int>);
+std::cout << (ap(v).value() == v.value()) << std::endl;
 std::cout << (ap(yafl::Maybe(v)).value() == v.value()) << std::endl;
 std::cout << (ap(yafl::maybe::Just(42)).value() == v.value()) << std::endl;
 
@@ -186,17 +225,112 @@ const auto ap2 = yafl::maybe::Just(&yafl::id<int>);
 std::cout << (ap2(42).value() == v.value()) << std::endl;
 ```
 
- - Composition
+##### Composition
+
+*Applicative(compose)(function_u)(function_v)(value_w) = function_v(function_u(value_w)))*
+
+where:
+ - compose is the composition function. It has type _compose: (a -> b), (b -> c) -> (a -> c)_
+ - function_u can be a callable objet or a Functor with a wrapped callable. It has type _function_u : a -> b_,
+ - function_v can be a callable objet or a Functor with a wrapped callable. It has type _function_v : b -> c_,
+ - value_w can be any value or a Functor with any value wrapped. It has type _value_w : a_ or _value_w : Functor a_
+
 ```c++
+const auto lf = [](int i){ return 42 * i;};
+const auto rf = [](int i){ return std::to_string(i);};
+const auto ap = yafl::maybe::Just(&yafl::compose<std::function<int(int)>, 
+                                                 std::function<std::string(int)>>);
+const auto ap_result = ap(lf)(rf)(2);
+const auto ap_result2 = ap(yafl::maybe::Just(std::function(lf)))
+                         (yafl::maybe::Just(std::function(rf)))
+                         (yafl::maybe::Just(2));
+
+const auto ap2 = yafl::maybe::Just(std::function(lf))(2);
+const auto ap2_result = yafl::maybe::Just(std::function(rf))(ap2);
+
+std::cout << (ap_result.value() == ap2_result.value()) << std::endl;
+std::cout << (ap_result2.value() == ap2_result.value()) << std::endl;
+```
+
+##### Homomorphism
+
+*Applicative(f)(Functor x) = Applicative(f (x))*
+where:
+ - f is a function that takes a value of x. It has type _f: a -> b_
+ - x is any value type. It has type x : _a_
+
+```c++
+const auto f = [](int i){ return 42 * i;};
+const auto ap = yafl::maybe::Just<std::function<int(int)>>(f);
+
+std::cout << (ap(2).value() == yafl::maybe::Just(f(2)).value()) << std::endl;
+std::cout << (ap(yafl::maybe::Just(2)).value() == yafl::maybe::Just(f(2)).value()) << std::endl;
 
 ```
 
+##### Interchange
+*Applicative(f)(Functor x) == Applicative(g)(Functor u)*
 
+where: 
+ - x is any value type. It has type _a_.
+ - f is a function that takes a value of x. It has type f: a -> b
+ - g is a function that takes a function and applies it to a value x. It has type g: (a -> b) -> b
+
+```c++
+const auto f = [](int i){ return 42 * i;};
+const auto ap = yafl::maybe::Just<std::function<int(int)>>(f);
+
+const auto ap2 = yafl::maybe::Just([](auto func){ return func(2);});
+
+std::cout << (ap(yafl::maybe::Just(2)).value() == ap2(f).value()) << std::endl;
+```
 
 #### Monad
+A monad is another higher-order abstraction that builds on top of functors and applicatives. 
+It encapsulates sequences of computation steps. Monads provide a way to chain operations together in a controlled manner, abstracting away the need for explicit sequencing and error handling. 
 
+We address Monads as a wrapper class for any value type, and we provide a method `bind`. This method is often used to flatten nested monadic structures while simultaneously applying a function to the values within these structures
+This bind method can also be referred as flatmap in other functional programming languages. The flatMap (or bind in our case) operation combines mapping and flattening, which can be quite useful for handling sequences of computations or values that are encapsulated within monads.
+It is represented in YAFL by the abstract class yafl::Monad.
 
+```c++
+const std::unique_ptr<yafl::core::Monad<yafl::Maybe, int>> monad =
+std::make_unique<yafl::Maybe<int>>(yafl::maybe::Just(420));
+monad->bind([](int i){ return yafl::Maybe<int>::Nothing();});
+```
+Monads must also adhere to certain laws.
 
+##### Left identity
+
+*Monad(a)  k = k a*
+```c++
+const auto func = [](int i){ return yafl::maybe::Just(i*2);};
+const auto v = yafl::maybe::Just(42);
+const auto result = v.bind(func);
+const auto result2 = func(42);
+std::cout << (result.value() == result2.value()) << std::endl;
+std::cout << (yafl::bind(func, v).value() == func(42).value()) << std::endl;
+```
+
+##### Right identity
+```c++
+const auto v = yafl::maybe::Just(42);
+const auto mreturn = [](int arg) {
+   return yafl::maybe::Just(arg);
+};
+std::cout << (v.bind(mreturn).value() == v.value()) << std::endl;
+```
+
+##### Associativity
+```c++
+const auto v = yafl::maybe::Just(42);
+const auto f = [](int i) { return yafl::maybe::Just(2 * i);};
+const auto g = [](int i) { return yafl::maybe::Just(6 + i);};
+
+const auto lresult = v.bind(f).bind(g).value();
+const auto rresult = v.bind([f,g](int i) { return f(i).bind(g);}).value();
+std::cout << (lresult == rresult) << std::endl;
+```
 
 ### Maybe
 

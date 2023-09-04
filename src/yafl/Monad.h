@@ -36,36 +36,19 @@ public:
     }
 };
 
-/**
- * @ingroup Core
- * Structure to validate if given type is derived from Monad. This class works as sinkhole for all
- * non monadic types and sets a value attribute as false
- *
- * @tparam T type to validate
- */
-template <typename T>
-struct IsMonadicBase {
-    ///boolean flag that states whether type T is a monad or not
-    static constexpr bool value = false;
-};
+} // namespace core
+
+namespace monad {
 
 /**
- * @ingroup Core
- * Structure to validate if given type is derived from Monad. This class validates if the given type
- * is derived from Monad and set the value attribute accordingly
- * @tparam MonadType monad type
- * @tparam Args monad type arguments
+ * @ingroup Monad
+ * Maybe monad traits
  */
-template <template <typename...> typename MonadType, typename ...Args>
-struct IsMonadicBase<MonadType<Args...>> {
-    /// Base type
-    using BaseType = Monad<MonadType, Args...>;
-    /// Derived type
-    using DerivedType = MonadType<Args...>;
+template<typename>
+struct Details {
     ///boolean flag that states whether type T is a monad or not
-    static constexpr bool value = std::is_base_of_v<BaseType, DerivedType>;
+    static constexpr bool hasMonadicBase = false;
 };
-} // namespace core
 
 /**
  * This function is used to bind (flatmap) a callable type to a value of type Monad
@@ -77,7 +60,7 @@ struct IsMonadicBase<MonadType<Args...>> {
  */
 template<typename Callable, typename MonadT>
 decltype(auto) bind(Callable&& callable, const MonadT& monad) {
-    static_assert(core::IsMonadicBase<MonadT>::value, "MonadT argument not a Monad");
+    static_assert(monad::Details<yafl::function::remove_cvref_t<MonadT>>::hasMonadicBase, "MonadT argument not a Monad");
     return monad.bind(std::forward<Callable>(callable));
 }
 
@@ -86,15 +69,27 @@ decltype(auto) bind(Callable&& callable, const MonadT& monad) {
  * In this case the provided function is lifted to work at Monad level an so,
  * this function returns a new callable that receives a Monad as argument and returns
  * a Monad
+ * @tparam MonadType monad type
  * @tparam Callable callable type
  * @param callable function to be applied to the given functor
  * @return Function lifted to work at Monad level
  */
-template<typename Callable>
+template<template<typename...> typename MonadType, typename Callable>
 decltype(auto) bind(Callable&& callable) {
-    return [callable = std::forward<Callable>(callable)](const auto& monad){
-        return monad.bind(callable);
-    };
+    if constexpr (FunctionTraits<Callable>::ArgCount > 0) {
+        using FirstArg = typename FunctionTraits<Callable>::template ArgType<0>;
+
+        return [callable = std::forward<Callable>(callable)](const MonadType<FirstArg> &monad) {
+            static_assert(monad::Details<MonadType<FirstArg>>::hasMonadicBase, "Argument not a Functor");
+            return monad.bind(callable);
+        };
+    } else {
+        return [callable = std::forward<Callable>(callable)](const MonadType<void> &monad) {
+            static_assert(monad::Details<MonadType<void>>::hasMonadicBase, "Argument not a Functor");
+            return monad.bind(callable);
+        };
+    }
 }
 
-} // namespace yafl::core
+} // namespace monad
+} // namespace yafl

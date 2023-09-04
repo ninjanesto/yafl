@@ -14,14 +14,14 @@ namespace yafl {
 
 namespace detail {
     template<typename Callable, typename Head>
-    decltype(auto) uncurry_impl(Callable&& f, Head&& value) {
-        return f(std::forward<Head>(value));
+    decltype(auto) uncurry_impl(Callable&& callable, Head&& value) {
+        return callable(std::forward<Head>(value));
     }
 
     template<typename Callable, typename Head, typename ...Tail>
-    decltype(auto) uncurry_impl(Callable&& f, Head&& value, Tail&&...ts) {
-        const auto f2 = f(std::forward<Head>(value));
-        return uncurry_impl(f2, std::forward<Tail>(ts)...);
+    decltype(auto) uncurry_impl(Callable&& callable, Head&& value, Tail&&...ts) {
+        const auto result = callable(std::forward<Head>(value));
+        return uncurry_impl(result, std::forward<Tail>(ts)...);
     }
 
     template<typename Predicate, typename ...Args>
@@ -55,14 +55,15 @@ template <typename TLeft, typename TRight>
 decltype(auto) function_compose(TLeft&& lhs, TRight&& rhs) {
     using LhsReturnType = typename yafl::FunctionTraits<TLeft>::ReturnType;
     if constexpr (yafl::FunctionTraits<TLeft>::ArgCount > 0) {
+        using InputArg = typename FunctionTraits<TLeft>::template ArgType<0>;
         if constexpr (std::is_void_v<LhsReturnType>) {
-            return [rhs = std::forward<TRight>(rhs), lhs = std::forward<TLeft>(lhs)](auto&& ...args) {
-                lhs(std::forward<decltype(args)>(args)...);
+            return [rhs = std::forward<TRight>(rhs), lhs = std::forward<TLeft>(lhs)](InputArg&& arg) {
+                lhs(std::move(arg));
                 return rhs();
             };
         } else {
-            return [rhs = std::forward<TRight>(rhs), lhs = std::forward<TLeft>(lhs)](auto&& ...args) {
-                return rhs(lhs(std::forward<decltype(args)>(args)...));
+            return [rhs = std::forward<TRight>(rhs), lhs = std::forward<TLeft>(lhs)](InputArg&& arg) {
+                return rhs(lhs(std::move(arg)));
             };
         }
     } else {
@@ -91,16 +92,30 @@ decltype(auto) function_compose(TLeft&& lhs, TRight&& rhs) {
  */
 template <typename TLeft, typename TRight>
 decltype(auto) kleisli_compose(TLeft&& lhs, TRight&& rhs) {
-    using RhsReturnType = typename yafl::FunctionTraits<TRight>::ReturnType;
-    if constexpr (core::IsMonadicBase<RhsReturnType>::value) {
-        return [rhs = std::forward<TRight>(rhs), lhs = std::forward<TLeft>(lhs)](auto&&... args) {
-            return lhs(std::forward<decltype(args)>(args)...).bind(rhs);
-        };
-    } else {
-        return [rhs = std::forward<TRight>(rhs), lhs = std::forward<TLeft>(lhs)](auto&&... args) {
-            return lhs(std::forward<decltype(args)>(args)...).fmap(rhs);
-        };
-    }
+    using FirstArg = typename FunctionTraits<TLeft>::template ArgType<0>;
+    using RhsReturnType = typename FunctionTraits<TRight>::ReturnType;
+
+    return [rhs = std::forward<TRight>(rhs), lhs = std::forward<TLeft>(lhs)](const FirstArg& arg) -> RhsReturnType {
+        using LhsReturnType = typename yafl::FunctionTraits<TLeft>::ReturnType;
+        const LhsReturnType intermediate_result = lhs(arg);
+
+        if constexpr (std::is_void_v<typename monad::Details<LhsReturnType>::ValueType>) {
+            if (!intermediate_result) {
+                return RhsReturnType::Nothing();
+            } else {
+                return rhs();
+            }
+        } else {
+            if constexpr (monad::Details<typename FunctionTraits<TRight>::template ArgType<0>>::hasMonadicBase) {
+                return rhs(intermediate_result);
+            } else {
+                if (!intermediate_result) {
+                    return RhsReturnType::Nothing();
+                }
+                return rhs(intermediate_result.value());
+            }
+        }
+    };
 }
 
 /**
@@ -115,7 +130,7 @@ decltype(auto) kleisli_compose(TLeft&& lhs, TRight&& rhs) {
 template <typename TLeft, typename TRight>
 decltype(auto) compose(TLeft&& lhs, TRight&& rhs) {
     using LhsReturnType = typename yafl::FunctionTraits<TLeft>::ReturnType;
-    if constexpr (core::IsMonadicBase<LhsReturnType>::value) {
+    if constexpr (monad::Details<LhsReturnType>::hasMonadicBase) {
         return kleisli_compose(std::forward<TLeft>(lhs), std::forward<TRight>(rhs));
     } else {
         return function_compose(std::forward<TLeft>(lhs), std::forward<TRight>(rhs));
@@ -125,20 +140,21 @@ decltype(auto) compose(TLeft&& lhs, TRight&& rhs) {
 /**
  * @ingroup HOF
  * Curry given callable
- * @tparam F type of callable
- * @param f function to execute
+ * @tparam Callable type of callable
+ * @param callable function to execute
  * @return curried function
  */
-template <typename F>
-decltype(auto) curry(F&& f) {
-    if constexpr (std::is_invocable_v<F>) {
-        return f();
+template <typename Callable>
+decltype(auto) curry(Callable&& callable) {
+    if constexpr (std::is_invocable_v<Callable>) {
+        return callable();
     } else {
-        return [f= std::forward<F>(f)](const typename FunctionTraits<F>::template ArgType<0>& arg) {
-            using ReturnFunType = typename FunctionTraits<F>::PartialApplyFirst;
+        using FirstArg = typename FunctionTraits<Callable>::template ArgType<0>;
+        return [callable = std::forward<Callable>(callable)](const FirstArg& arg) {
+            using ReturnFunType = typename FunctionTraits<Callable>::PartialApplyFirst;
 
-            const ReturnFunType inner_func = [f, arg = std::move(arg)](auto&& ...args) {
-                return std::apply(f, std::tuple_cat(std::make_tuple(arg), std::make_tuple(args...)));
+            const ReturnFunType inner_func = [callable, arg = std::move(arg)](auto&& ...args) {
+                return callable(std::move(arg), std::forward<decltype(args)>(args)...);
             };
 
             return curry(std::move(inner_func));
@@ -149,34 +165,34 @@ decltype(auto) curry(F&& f) {
 /**
  * @ingroup HOF
  * Uncurry given callable
- * @tparam F callable type
- * @param f callable to apply uncurry
+ * @tparam Callable callable type
+ * @param callable callable to apply uncurry
  * @return Uncurried version of the given function
  */
 template <typename Callable>
-decltype(auto) uncurry(Callable&& f) {
-    return [f = std::forward<Callable>(f)](auto&& ...args) {
-        return detail::uncurry_impl(f, std::forward<decltype(args)>(args)...);
+decltype(auto) uncurry(Callable&& callable) {
+    return [callable = std::forward<Callable>(callable)](auto&& ...args) {
+        return detail::uncurry_impl(callable, std::forward<decltype(args)>(args)...);
     };
 }
 
 /**
  * @ingroup HOF
  * Partial apply given function
- * @tparam F type of callable
+ * @tparam Callable type of callable
  * @tparam Args type of args
- * @param f function to partial apply given arguments
+ * @param callable function to partial apply given arguments
  * @param args argument for the provided function
  * @return partially applied function
  */
-template <typename F, typename ...Args>
-decltype(auto) partial(F&& f, Args&& ...args) {
-    if constexpr (std::is_invocable_v<F, Args...>) {
-        return std::invoke(f, std::forward<Args>(args)...);
+template <typename Callable, typename ...Args>
+decltype(auto) partial(Callable&& callable, Args&& ...args) {
+    if constexpr (std::is_invocable_v<Callable, Args...>) {
+        return std::invoke(callable, std::forward<Args>(args)...);
     } else {
-        return [f=std::forward<F>(f), vargs = std::make_tuple(std::forward<Args>(args) ...)](auto&& ...inner_args) {
-            return std::apply([f = std::move(f)](auto&& ...apply_args){
-                    return f(std::forward<decltype(apply_args)>(apply_args)...);
+        return [callable = std::forward<Callable>(callable), vargs = std::make_tuple(std::forward<Args>(args)...)](auto&& ...inner_args) {
+            return std::apply([callable = std::move(callable)](auto&& ...apply_args){
+                    return callable(std::forward<decltype(apply_args)>(apply_args)...);
                 },
                 std::tuple_cat(vargs, std::make_tuple(inner_args...)));
         };
