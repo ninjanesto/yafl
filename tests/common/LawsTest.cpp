@@ -200,10 +200,12 @@ TEST(LawsTest, validateApplicativeComposition) {
         const auto lf = [](int i){ return 42 * i;};
         const auto rf = [](int i){ return std::to_string(i);};
         const auto ap = yafl::maybe::Just(&yafl::compose<std::function<int(int)>,
-                std::function<std::string(int)>>);
+                                                         std::function<std::string(int)>>);
+        const auto ap_decl = yafl::maybe::Just(&yafl::compose<decltype(lf), decltype(rf)>);
+
         const auto ap_result = ap(lf)(rf)(2);
-        const auto ap_result2 = ap(yafl::maybe::Just(std::function(lf)))
-                                  (yafl::maybe::Just(std::function(rf)))
+        const auto ap_result2 = ap(yafl::maybe::Just(lf))
+                                  (yafl::maybe::Just(rf))
                                   (yafl::maybe::Just(2));
 
         const auto ap2 = yafl::maybe::Just(std::function(lf))(2);
@@ -211,6 +213,7 @@ TEST(LawsTest, validateApplicativeComposition) {
 
         ASSERT_EQ(ap_result, ap2_result);
         ASSERT_EQ(ap_result2, ap2_result);
+        ASSERT_EQ(ap_decl(lf)(rf)(2), ap2_result);
     }
     {
         const auto lf = [](int i){ return 42 * i;};

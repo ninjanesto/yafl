@@ -252,6 +252,9 @@ const auto lf = [](int i){ return 42 * i;};
 const auto rf = [](int i){ return std::to_string(i);};
 const auto ap = yafl::maybe::Just(&yafl::compose<std::function<int(int)>, 
                                                  std::function<std::string(int)>>);
+const auto ap_decl = yafl::maybe::Just(&yafl::compose<decltype(lf), decltype(rf)>);
+
+
 const auto ap_result = ap(lf)(rf)(2);
 const auto ap_result2 = ap(yafl::maybe::Just(std::function(lf)))
                          (yafl::maybe::Just(std::function(rf)))
@@ -262,6 +265,8 @@ const auto ap2_result = yafl::maybe::Just(std::function(rf))(ap2);
 
 std::cout << (ap_result.value() == ap2_result.value()) << std::endl;
 std::cout << (ap_result2.value() == ap2_result.value()) << std::endl;
+std::cout << (ap_decl(lf)(rf)(2).value() == ap2_result.value()) << std::endl;
+
 ```
 
 ##### Homomorphism
@@ -274,9 +279,13 @@ where:
 ```c++
 const auto f = [](int i){ return 42 * i;};
 const auto ap = yafl::maybe::Just<std::function<int(int)>>(f);
+const auto ap2 = yafl::maybe::Just(f);
 
 std::cout << (ap(2).value() == yafl::maybe::Just(f(2)).value()) << std::endl;
 std::cout << (ap(yafl::maybe::Just(2)).value() == yafl::maybe::Just(f(2)).value()) << std::endl;
+
+std::cout << (ap2(2).value() == yafl::maybe::Just(f(2)).value()) << std::endl;
+std::cout << (ap2(yafl::maybe::Just(2)).value() == yafl::maybe::Just(f(2)).value()) << std::endl;
 ```
 
 ##### Interchange
@@ -417,16 +426,70 @@ It provides a structured way to handle errors, compose computations, and ensure 
 - Improved Readability: Makes code more readable by explicitly handling success and failure cases.
 
 ### Function lift
+TODO
 
 ## Build
+Currently, YAFL supports CMake and Bazel build tools
+### CMake
+Create a build directory and navigate into it:
+```bash
+mkdir build
+cd build
+```
+Run CMake to generate build files. YAFL supports several CMake flags with different meanings
+ - `BUILD_YAFL_DOCS`: Enables building doxygen documentation. Requires doxygen to be installed
+ - `BUILD_YAFL_TESTS`: Enables building all tests. Requires GTest framework to be installed. Tests can be executed using CTest.
+ - `BUILD_YAFL_COVERAGE`: Enables building all tests with coverage support. Requires GTest framework, python3, lcov to be installed
+ - `BUILD_YAFL_EXAMPLE`: Enables building the example application.
 
-## Use / Install
+Example building and installing the library in Release build type
+```bash
+cmake .. -DCMAKE_INSTALL_PREFIX:PATH=<some path>
+
+cmake --build . --config Release --target install
+```
+Note that YAFL will be installed in 
+ - Header files will be installed in <PREFIX>/include
+ - Static/Shared library files will be installed in <PREFIX>/lib
+ - CMake target files will be installed in <PREFIX>/lib/cmake/Yafl
+
+Example building the tests and coverage using ninja
+```bash
+cmake .. -DBUILD_YAFL_TESTS=ON -DBUILD_YAFL_COVERAGE=ON -GNinja
+
+cmake --build . --config Debug
+cmake --build . --config Debug --target test 
+
+cmake --build . --config Debug --target coverage
+```
+
+Example building the example application
+```bash
+cmake .. -DBUILD_YAFL_EXAMPLE=ON
+
+cmake --build . --config Release
+```
+
+### Bazel
+TODO
 
 ## Example App
+A sample application is provided with YAFL that shows briefly how this library can be used. 
+It is a simple caesar cipher encoder/decoder application. 
+This application receives a file, a seed and the mechanism (encode / decode) and outputs another file that contains the application the cipher.
+The main function for this application executes the same operations several times, using different YAFL approaches, just to present YAFL use cases.
+
+It can be build using CMake flag -DBUILD_YAFL_EXAMPLE=ON, and it generates the binary `ACC` in `<cmake build directory>/example/`
+
+Usage: `./ACC <-e|-d> <seed> <filename>`
+
+Note: Seed can be a value between 0 and 255
 
 ## Future
- - CMake Install targets 
+ - Function Lift documentation
+ - Add BiFunctor implementation to Either type
+ - Add Reader Monad
+ - Add Continuation monad
  - Bazel input flags and install targets
  - Bazel github actions
- - Add BiFunctor implementation to Either type
- - Add Continuation monad
+ - Bump C++ version

@@ -34,18 +34,6 @@ jobs:
       run: |
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
 
-    - name: Install dependencies
-      shell: bash
-      run: |
-        wget https://github.com/google/googletest/archive/refs/tags/release-1.12.1.tar.gz -O googletest-release-1.12.1.tar.gz && \
-        tar zxf googletest-release-1.12.1.tar.gz && \
-        cd googletest-release-1.12.1 && \
-        mkdir build && \
-        cd build && \
-        cmake .. && \
-        make -j7 && sudo make install && \
-        cd ../.. && rm googletest* -rf
-
     - name: Configure CMake
       run: >
         cmake -B ${{ steps.strings.outputs.build-output-dir }}

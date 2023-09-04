@@ -123,6 +123,24 @@ TYPED_TEST(EitherTest, MoveAssignment) {
     }
 }
 
+TYPED_TEST(EitherTest, OperatorEquals) {
+    {
+        const auto maybe = createOk<typename TypeParam::Error, typename TypeParam::Ok>();
+        const auto maybe_other = createOk<typename TypeParam::Error, typename TypeParam::Ok>();
+        ASSERT_TRUE(maybe == maybe_other);
+    }
+    {
+        const auto maybe = createError<typename TypeParam::Error, typename TypeParam::Ok>();
+        const auto maybe_other = createError<typename TypeParam::Error, typename TypeParam::Ok>();
+        ASSERT_TRUE(maybe == maybe_other);
+    }
+    {
+        const auto maybe = createOk<typename TypeParam::Error, typename TypeParam::Ok>();
+        const auto maybe_other = createError<typename TypeParam::Error, typename TypeParam::Ok>();
+        ASSERT_FALSE(maybe == maybe_other);
+    }
+}
+
 TYPED_TEST(EitherTest, assertValueOr) {
     if constexpr (!std::is_void_v<typename TypeParam::Ok>) {
         Either<typename TypeParam::Error, typename TypeParam::Ok> eitherOk = createOk<typename TypeParam::Error, typename TypeParam::Ok>();

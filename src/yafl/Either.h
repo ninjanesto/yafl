@@ -607,8 +607,14 @@ public:
      * @param other instance of either to compare to
      * @return true if objects are equal and false otherwise
      */
-    bool operator==(const Either<ErrorType, ValueType>& other) const noexcept {
-        return _type == other._type && _value == other._value;
+    bool operator==(const Either<ErrorType, ValueType>& other) const {
+        if (isOk() && other.isOk()) {
+            return value() == other.value();
+        } else if (isError() && other.isError()) {
+            return error() == other.error();
+        } else {
+            return false;
+        }
     }
 
     /**

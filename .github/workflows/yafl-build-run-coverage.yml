@@ -36,14 +36,6 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install lcov python3
-        wget https://github.com/google/googletest/archive/refs/tags/release-1.12.1.tar.gz -O googletest-release-1.12.1.tar.gz && \
-        tar zxf googletest-release-1.12.1.tar.gz && \
-        cd googletest-release-1.12.1 && \
-        mkdir build && \
-        cd build && \
-        cmake .. && \
-        make -j7 && sudo make install && \
-        cd ../.. && rm googletest* -rf
 
     - name: Configure CMake
       run: >
@@ -60,6 +52,10 @@ jobs:
 
     - name: Build
       run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
+
+    - name: Run Tests
+      working-directory: ${{ steps.strings.outputs.build-output-dir }}
+      run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }} --target test
 
     - name: Coverage
       working-directory: ${{ steps.strings.outputs.build-output-dir }}

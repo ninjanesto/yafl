@@ -18,7 +18,6 @@ function(set_default_compile_flags)
             -Wold-style-cast
             -Woverloaded-virtual
             -Wshadow
-            -Wswitch-enum
             -Wunused-variable -Wunused-function -Wunused-parameter -Wuninitialized
             -Wreturn-type
             -Wformat=2 -Wformat-security -Werror=format-security

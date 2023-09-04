@@ -1,5 +1,5 @@
 add_unit_test(
     BASENAME HOFTest
-    LIBS Yafl::Yafl
+    VICTIM Yafl::Yafl
     SOURCES HOFTest.cpp
 )
