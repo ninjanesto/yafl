@@ -1,7 +1,8 @@
 /**
  * \brief       Yet Another Functional Library
  *
- * \copyright   Critical TechWorks SA
+ * \copyright   2023, Ernesto Festas.
+ *              Distributed under MIT license (See accompanying LICENSE file)
  * \defgroup HOF High Order Functions
  */
 #pragma once

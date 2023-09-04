@@ -1,7 +1,8 @@
 /**
  * \brief       Yet Another Functional Library
  *
- * \copyright   Critical TechWorks SA
+ * \copyright   2023, Ernesto Festas.
+ *              Distributed under MIT license (See accompanying LICENSE file)
  * \defgroup Either Either monad
  */
 #pragma once
@@ -198,6 +199,7 @@ public:
     /**
      * Extracts the wrapped value from the Either if exists or returns
      * te provided default value if either contains error
+     * @param defaultValue Default value
      * @return the value wrapped or default
      */
     [[nodiscard]] ValueType valueOr(const ValueType& defaultValue) const {
@@ -474,6 +476,7 @@ public:
     /**
      * Extracts the wrapped value from the Either if exists or returns
      * te provided default value if either contains error
+     * @param defaultValue Default value
      * @return the value wrapped or default
      */
     [[nodiscard]] ValueType valueOr(const ValueType& defaultValue) const {

@@ -1,7 +1,8 @@
 /**
  * \brief       CAPI Clients Factory
  *
- * \copyright   Critical TechWorks SA
+ * \copyright   2023, Ernesto Festas.
+ *              Distributed under MIT license (See accompanying LICENSE file)
  */
 
 #include <fstream>
