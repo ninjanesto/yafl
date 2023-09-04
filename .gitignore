@@ -1,0 +1,5 @@
+build/*
+cmake-build-*/*
+.idea/
+.tmp_clion/
+
