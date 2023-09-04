@@ -2,15 +2,17 @@
  * \brief       Yet Another Functional Library
  *
  * \copyright   Critical TechWorks SA
+ * \defgroup Core YAFL core
  */
 #pragma once
 
 #include <memory>
 #include <functional>
 
-namespace yafl {
+namespace yafl::core {
 
 /**
+ * @ingroup Core
  * Functional Monad class. Defines the bind function that receives a function from a -> M b and applies that function
  * to a given Monadic type, by unwrapping the value inside the monad and applying the function. Result type will depend
  * on the given function.
@@ -33,6 +35,7 @@ public:
 };
 
 /**
+ * @ingroup Core
  * Structure to validate if given type is derived from Monad. This class works as sinkhole for all
  * non monadic types and sets a value attribute as false
  *
@@ -45,6 +48,7 @@ struct IsMonadicBase {
 };
 
 /**
+ * @ingroup Core
  * Structure to validate if given type is derived from Monad. This class validates if the given type
  * is derived from Monad and set the value attribute accordingly
  * @tparam MonadType monad type
@@ -61,4 +65,4 @@ struct IsMonadicBase<MonadType<Args...>> {
 };
 
 
-} // namespace yafl
+} // namespace yafl::core

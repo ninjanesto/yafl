@@ -6,7 +6,7 @@
 
 #include <fstream>
 #include <iostream>
-#include "yafl/Compose.h"
+#include "yafl/HOF.h"
 #include "yafl/Either.h"
 #include "yafl/Maybe.h"
 
@@ -157,16 +157,16 @@ int main(int argc, char** argv) {
     {
         // lift
         const auto validate_filename = [](const std::string& fn) { return fn;};
-        const auto liftedMaybe = yafl::lift<yafl::Maybe>(validate_filename);
-        const auto fn = liftedMaybe(yafl::Just<std::string>(filename));
+        const auto liftedMaybe = yafl::maybe::lift(validate_filename);
+        const auto fn = liftedMaybe(yafl::maybe::Just<std::string>(filename));
 
         const auto result = validate_seed(seedString)
                 .bind(validate_operation(operation))
                 (fn.value());
         std::cout << result.isOk() << std::endl;
 
-        const auto liftedEither = yafl::lift<yafl::Either>(validate_filename);
-        const auto fn2 = liftedEither(yafl::Ok<void, std::string>(filename));
+        const auto liftedEither = yafl::either::lift(validate_filename);
+        const auto fn2 = liftedEither(yafl::either::Ok<void, std::string>(filename));
 
         const auto result2 = validate_seed(seedString)
                 .bind(validate_operation(operation))

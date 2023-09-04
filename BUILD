@@ -3,7 +3,7 @@ load("@rules_cc//cc:defs.bzl", "cc_library", "cc_binary", "cc_test")
 cc_library(
     name = "yafl-common",
     hdrs = ["src/yafl/Applicative.h",
-            "src/yafl/Compose.h",
+            "src/yafl/HOF.h",
             "src/yafl/Functor.h",
             "src/yafl/Monad.h",
             "src/yafl/TypeTraits.h"],

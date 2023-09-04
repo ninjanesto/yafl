@@ -2,6 +2,7 @@
  * \brief       Yet Another Functional Library
  *
  * \copyright   Critical TechWorks SA
+ * \defgroup HOF High Order Functions
  */
 #pragma once
 
@@ -40,6 +41,7 @@ namespace detail {
 }
 
 /**
+ * @ingroup HOF
  * Compose functions. Similar as piping shell commands. Output of first function is
  * piped as input to the second function, except when output is void
  * @tparam TLeft Left argument type
@@ -50,8 +52,8 @@ namespace detail {
  */
 template <typename TLeft, typename TRight>
 decltype(auto) function_compose(const TLeft& lhs, const TRight& rhs) {
-    using LhsReturnType = typename yafl::function_traits<TLeft>::ReturnType;
-    if constexpr (yafl::function_traits<TLeft>::ArgCount > 0) {
+    using LhsReturnType = typename yafl::FunctionTraits<TLeft>::ReturnType;
+    if constexpr (yafl::FunctionTraits<TLeft>::ArgCount > 0) {
         if constexpr (std::is_void_v<LhsReturnType>) {
             return [&rhs, &lhs](auto&& ...args) {
                 lhs(args ...);
@@ -77,6 +79,7 @@ decltype(auto) function_compose(const TLeft& lhs, const TRight& rhs) {
 }
 
 /**
+ * @ingroup HOF
  * Compose functions that return Monadic values. Similar as piping shell commands. Output of first function is
  * piped as input to the second function, except when output is void
  * @tparam TLeft Left argument type
@@ -87,8 +90,8 @@ decltype(auto) function_compose(const TLeft& lhs, const TRight& rhs) {
  */
 template <typename TLeft, typename TRight>
 decltype(auto) kleisli_compose(const TLeft& lhs, const TRight& rhs) {
-    using RhsReturnType = typename yafl::function_traits<TRight>::ReturnType;
-    if constexpr (IsMonadicBase<RhsReturnType>::value) {
+    using RhsReturnType = typename yafl::FunctionTraits<TRight>::ReturnType;
+    if constexpr (core::IsMonadicBase<RhsReturnType>::value) {
         return [&rhs, &lhs](auto&&... args) {
             return lhs(args...).bind(rhs);
         };
@@ -100,6 +103,7 @@ decltype(auto) kleisli_compose(const TLeft& lhs, const TRight& rhs) {
 }
 
 /**
+ * @ingroup HOF
  * Generic composition. It can perform either function or monadic function (kleisli) composition
  * @tparam TLeft Left argument type
  * @tparam TRight Right argument type
@@ -109,8 +113,8 @@ decltype(auto) kleisli_compose(const TLeft& lhs, const TRight& rhs) {
  */
 template <typename TLeft, typename TRight>
 decltype(auto) compose(const TLeft& lhs, const TRight& rhs) {
-    using LhsReturnType = typename yafl::function_traits<TLeft>::ReturnType;
-    if constexpr (IsMonadicBase<LhsReturnType>::value) {
+    using LhsReturnType = typename yafl::FunctionTraits<TLeft>::ReturnType;
+    if constexpr (core::IsMonadicBase<LhsReturnType>::value) {
         return kleisli_compose(lhs, rhs);
     } else {
         return function_compose(lhs, rhs);
@@ -118,6 +122,7 @@ decltype(auto) compose(const TLeft& lhs, const TRight& rhs) {
 }
 
 /**
+ * @ingroup HOF
  * Curry given callable
  * @tparam F type of callable
  * @param f function to execute
@@ -128,10 +133,10 @@ decltype(auto) curry(const F& f) {
     if constexpr (std::is_invocable_v<F>) {
         return f();
     } else {
-        using FirstArg = typename function_traits<F>::template ArgType<0>;
+        using FirstArg = typename FunctionTraits<F>::template ArgType<0>;
 
         return [f= std::move(f)](const FirstArg& arg) {
-            using ReturnFunType = typename function_traits<F>::PartialApplyFirst;
+            using ReturnFunType = typename FunctionTraits<F>::PartialApplyFirst;
 
             const ReturnFunType inner_func = [f, arg = std::move(arg)](auto&& ...args) {
                 return std::apply(f, std::tuple_cat(std::make_tuple(arg), std::make_tuple(args...)));
@@ -141,7 +146,9 @@ decltype(auto) curry(const F& f) {
         };
     }
 }
+
 /**
+ * @ingroup HOF
  * Uncurry given callable
  * @tparam F callable type
  * @param f callable to apply uncurry
@@ -155,6 +162,7 @@ decltype(auto) uncurry(Callable&& f) {
 }
 
 /**
+ * @ingroup HOF
  * Partial apply given function
  * @tparam F type of callable
  * @tparam Args type of args
@@ -174,6 +182,7 @@ decltype(auto) partial(F&& f, Args&& ...args) {
 }
 
 /**
+ * @ingroup HOF
  * Identity function
  * @tparam Arg Type of argument
  * @param arg argument

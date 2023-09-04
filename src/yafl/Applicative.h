@@ -2,15 +2,17 @@
  * \brief       Yet Another Functional Library
  *
  * \copyright   Critical TechWorks SA
+ * \defgroup Core YAFL core
  */
 #pragma once
 
 #include <memory>
 #include <functional>
 
-namespace yafl {
+namespace yafl::core {
 
 /**
+ * @ingroup Core
  * Functional Applicative Functor class. Defines the apply function that performs a partial function application
  * of the received argument to the callable object of the Applicative Functor. The apply method receives a type A(a), unwraps
  * its value and performs a partial apply to the A (a->b) function. Result type will depend on the given function.
@@ -60,4 +62,4 @@ public:
     }
 };
 
-} // namespace yafl
+} // namespace yafl::core

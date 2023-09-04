@@ -299,7 +299,7 @@ MARKDOWN_SUPPORT       = YES
 # globally by setting AUTOLINK_SUPPORT to NO.
 # The default value is: YES.
 
-AUTOLINK_SUPPORT       = "@GEN_DOC_AUTOLINK_SUPPORT@"
+AUTOLINK_SUPPORT       = YES
 
 # If you use STL classes (i.e. std::string, std::vector, etc.) but do not want
 # to include (a tag file for) the STL sources as input, then you should set this
@@ -368,7 +368,7 @@ SUBGROUPING            = YES
 # SEPARATE_MEMBER_PAGES.
 # The default value is: NO.
 
-INLINE_GROUPED_CLASSES = NO
+INLINE_GROUPED_CLASSES = YES
 
 # When the INLINE_SIMPLE_STRUCTS tag is set to YES, structs, classes, and unions
 # with only public data fields or simple typedef fields will be shown inline in
@@ -442,7 +442,7 @@ EXTRACT_STATIC         = YES
 # for Java sources.
 # The default value is: YES.
 
-EXTRACT_LOCAL_CLASSES  = YES
+EXTRACT_LOCAL_CLASSES  = NO
 
 # This flag is only useful for Objective-C code. If set to YES, local methods,
 # which are defined in the implementation section but not in the interface are
@@ -467,7 +467,7 @@ EXTRACT_ANON_NSPACES   = NO
 # section is generated. This option has no effect if EXTRACT_ALL is enabled.
 # The default value is: NO.
 
-HIDE_UNDOC_MEMBERS     = NO
+HIDE_UNDOC_MEMBERS     = YES
 
 # If the HIDE_UNDOC_CLASSES tag is set to YES, doxygen will hide all
 # undocumented classes that are normally visible in the class hierarchy. If set
@@ -629,7 +629,7 @@ GENERATE_DEPRECATEDLIST= YES
 # sections, marked by \if <section_label> ... \endif and \cond <section_label>
 # ... \endcond blocks.
 
-ENABLED_SECTIONS       = "@GEN_DOC_ENABLED_SECTIONS@"
+ENABLED_SECTIONS       = "MainPageEnabled"
 
 # The MAX_INITIALIZER_LINES tag determines the maximum number of lines that the
 # initial value of a variable or macro / define can have for it to appear in the
@@ -705,7 +705,7 @@ CITE_BIB_FILES         =
 # messages are off.
 # The default value is: NO.
 
-QUIET                  = "@GEN_DOC_QUIET@"
+QUIET                  = NO
 
 # The WARNINGS tag can be used to turn on/off the warning messages that are
 # generated to standard error (stderr) by doxygen. If WARNINGS is set to YES

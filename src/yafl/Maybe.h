@@ -2,6 +2,7 @@
  * \brief       Yet Another Functional Library
  *
  * \copyright   Critical TechWorks SA
+ * \defgroup Maybe Maybe monad
  */
 #pragma once
 
@@ -16,33 +17,40 @@
 
 namespace yafl {
 
+namespace maybe {
 /**
+ * @ingroup Maybe
  * Maybe monad traits
  */
-template <typename>
-struct MaybeDetails;
+template<typename>
+struct Details;
 
 /**
+ * @ingroup Maybe
  * Maybe monad traits specialization that enable getting the inner type
  * @tparam MaybeT Maybe monad type
  * @tparam Inner Inner type
 */
-template <template <typename> typename MaybeT, typename Inner>
-struct MaybeDetails<MaybeT<Inner>> {
+template<template<typename> typename MaybeT, typename Inner>
+struct Details<MaybeT<Inner>> {
     using ValueType = Inner;
 };
 
 /**
+ * @ingroup Maybe
  * Maybe monad traits specialization for const types that enable getting the inner type
  * @tparam Maybe Maybe monad type
  * @tparam Inner Inner type
  */
-template <template <typename> typename MaybeT, typename Inner>
-struct MaybeDetails<const MaybeT<Inner>> {
+template<template<typename> typename MaybeT, typename Inner>
+struct Details<const MaybeT<Inner>> {
     using ValueType = Inner;
 };
 
+} // namespace maybe
+
 /**
+ * @ingroup Maybe
  * Maybe class. This class implements the Maybe type by realizing concepts from functional programming
  * such as Functor, Applicative and Monad. The implementation for maybe class was based on Haskell Maybe
  * type as defined in https://hackage.haskell.org/package/base-4.18.0.0/docs/Data-Maybe.html
@@ -51,13 +59,14 @@ template <typename>
 class Maybe;
 
 /**
+ * @ingroup Maybe
  * Specialization of the Maybe class for void type
  */
 template<>
-class Maybe<void> : public Functor<Maybe,void>,
-                    public Monad<Maybe,void> {
-    friend class Functor<Maybe,void>;
-    friend class Monad<Maybe,void>;
+class Maybe<void> : public core::Functor<Maybe,void>,
+                    public core::Monad<Maybe,void> {
+    friend class core::Functor<Maybe,void>;
+    friend class core::Monad<Maybe,void>;
 private:
     explicit Maybe(bool v) : _value(v) {}
 
@@ -118,15 +127,16 @@ private:
 };
 
 /**
+ * @ingroup Maybe
  * Generalization of the Maybe class for any type other than void
  */
 template <typename T>
-class Maybe : public Functor<Maybe, T>,
-              public Applicative<Maybe, T>,
-              public Monad<Maybe, T> {
-    friend class Functor<Maybe, T>;
-    friend class Applicative<Maybe, T>;
-    friend class Monad<Maybe, T>;
+class Maybe : public core::Functor<Maybe, T>,
+              public core::Applicative<Maybe, T>,
+              public core::Monad<Maybe, T> {
+    friend class core::Functor<Maybe, T>;
+    friend class core::Applicative<Maybe, T>;
+    friend class core::Monad<Maybe, T>;
 
     static_assert(!std::is_reference_v<T>, "Maybe class cannot store reference to value");
 
@@ -227,11 +237,11 @@ private:
             }
         } else {
             if (var.hasValue() && this->hasValue()) {
-                return Maybe<typename function_traits<T>::PartialApplyFirst>::Just([callable = value(), first = var.value()](auto&& ...args) {
+                return Maybe<typename FunctionTraits<T>::PartialApplyFirst>::Just([callable = value(), first = var.value()](auto&& ...args) {
                     return std::apply(callable, std::tuple_cat(std::make_tuple(first), std::make_tuple(args...)));
                 });
             } else {
-                return Maybe<typename function_traits<T>::PartialApplyFirst>::Nothing();
+                return Maybe<typename FunctionTraits<T>::PartialApplyFirst>::Nothing();
             }
         }
     }
@@ -252,11 +262,11 @@ private:
             }
         } else {
             if (this->hasValue()) {
-                return Maybe<typename function_traits<T>::PartialApplyFirst>::Just([callable = value(), first = std::forward<Head>(arg)](auto&& ...args) {
+                return Maybe<typename FunctionTraits<T>::PartialApplyFirst>::Just([callable = value(), first = std::forward<Head>(arg)](auto&& ...args) {
                     return std::apply(callable, std::tuple_cat(std::make_tuple(first), std::make_tuple(args...)));
                 });
             } else {
-                return Maybe<typename function_traits<T>::PartialApplyFirst>::Nothing();
+                return Maybe<typename FunctionTraits<T>::PartialApplyFirst>::Nothing();
             }
         }
     }
@@ -280,7 +290,10 @@ private:
     std::unique_ptr<T> _value;
 };
 
+namespace maybe {
+
 /**
+ * @ingroup Maybe
  * Function that helps build a Maybe with Nothing
  * @tparam T Maybe inner type
  * @return maybe with nothing
@@ -289,15 +302,17 @@ template<typename ...T>
 Maybe<T...> Nothing() { return Maybe<T...>::Nothing(); }
 
 /**
+ * @ingroup Maybe
  * Function that helps build a Maybe with a value
  * @tparam T Maybe inner type
  * @param args Argument to be wrapped
  * @return maybe with the value wrapped
  */
 template<typename ...T>
-Maybe<T...> Just(T&& ...args) { return Maybe<T...>::Just(std::forward<T>(args)...); }
+Maybe<T...> Just(T &&...args) { return Maybe<T...>::Just(std::forward<T>(args)...); }
 
 /**
+ * @ingroup Maybe
  * Function that helps build a Maybe with a void "value"
  * @tparam T Maybe inner type
  * @return maybe with void value
@@ -306,44 +321,47 @@ template<typename = void>
 Maybe<void> Just() { return Maybe<void>::Just(); }
 
 /**
+ * @ingroup Maybe
  * Lift given callable into the given abstract monadic type
  * @tparam MonadType Abstract type to lift function to
  * @tparam Callable Callable type to lift
  * @param callable Callable to lift
  * @return callable lifted into the given abstract monadic type
  */
-template<template <typename> typename MonadType, typename Callable, typename = std::enable_if_t<std::is_same_v<yafl::Maybe<void>, MonadType<void>> && IsMonadicBase<MonadType<void>>::value, void>>
-decltype(auto) lift(Callable&& callable) {
+template<typename Callable>
+decltype(auto) lift(Callable &&callable) {
     if constexpr (std::is_invocable_v<Callable>) {
         using ReturnType = std::remove_reference_t<std::invoke_result_t<Callable>>;
         if constexpr (std::is_void_v<ReturnType>) {
-            return [callable = std::forward<Callable>(callable)](){
+            return [callable = std::forward<Callable>(callable)]() {
                 callable();
-                return MonadType<ReturnType>::Just();
+                return Maybe<ReturnType>::Just();
             };
         } else {
-            return [callable = std::forward<Callable>(callable)](){
-                return MonadType<ReturnType>::Just(callable());
+            return [callable = std::forward<Callable>(callable)]() {
+                return Maybe<ReturnType>::Just(callable());
             };
         }
     } else {
-        using ReturnType = typename yafl::function_traits<Callable>::ReturnType;
+        using ReturnType = typename yafl::FunctionTraits<Callable>::ReturnType;
 
-        return [callable = std::forward<Callable>(callable)](auto ...args) -> MonadType<ReturnType> {
-            if (detail::all_true([](auto&& v){ return v.hasValue();}, args...)) {
-                const auto tp = detail::map_tuple_append([](auto&& arg){ return arg.value();}, std::make_tuple(), args...);
+        return [callable = std::forward<Callable>(callable)](auto ...args) -> Maybe<ReturnType> {
+            if (detail::all_true([](auto &&v) { return v.hasValue(); }, args...)) {
+                const auto tp = detail::map_tuple_append([](auto &&arg) { return arg.value(); }, std::make_tuple(),
+                                                         args...);
 
                 if constexpr (std::is_void_v<ReturnType>) {
                     std::apply(callable, tp);
-                    return MonadType<ReturnType>::Just();
+                    return Maybe<ReturnType>::Just();
                 } else {
-                    return MonadType<ReturnType>::Just(std::apply(callable, tp));
+                    return Maybe<ReturnType>::Just(std::apply(callable, tp));
                 }
             } else {
-                return MonadType<ReturnType>::Nothing();
+                return Maybe<ReturnType>::Nothing();
             }
         };
     }
 }
 
+} // namespace maybe
 } // namespace yafl

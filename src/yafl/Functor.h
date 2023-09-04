@@ -2,6 +2,7 @@
  * \brief       Yet Another Functional Library
  *
  * \copyright   Critical TechWorks SA
+ * \defgroup Core YAFL core
  */
 #pragma once
 
@@ -9,9 +10,10 @@
 #include <functional>
 #include "TypeTraits.h"
 
-namespace yafl {
+namespace yafl::core {
 
 /**
+ * @ingroup Core
  * Functional Functor class. Defines the fmap function that receives a function from a -> b and applies that function
  * to a given Functor by unwrapping the value inside the functor and applying the function. Result type will depend
  * on the given function
@@ -34,4 +36,4 @@ public:
 };
 
 
-} // namespace yafl
+} // namespace yafl::core

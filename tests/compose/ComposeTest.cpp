@@ -4,7 +4,7 @@
  * \copyright   Critical TechWorks SA
  */
 
-#include "yafl/Compose.h"
+#include "yafl/HOF.h"
 #include <string>
 #include <gtest/gtest.h>
 
