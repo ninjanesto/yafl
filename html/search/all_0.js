@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['abasetype_0',['ABaseType',['../group__Type.html#a8300cf456688c048b6a3b600aad0c15f',1,'yafl::type::details::DomainDetailsImpl&lt; Either&lt; InnerError, InnerValue &gt; &gt;::ABaseType()'],['../group__Type.html#a4f3919bee9f8e6a4a0786b6127a35e03',1,'yafl::type::details::DomainDetailsImpl&lt; Maybe&lt; Inner &gt; &gt;::ABaseType()']]],
+  ['abasetype_0',['ABaseType',['../structyafl_1_1type_1_1details_1_1DomainDetailsImpl_3_01Either_3_01InnerError_00_01InnerValue_01_4_01_4.html#a8300cf456688c048b6a3b600aad0c15f',1,'yafl::type::details::DomainDetailsImpl&lt; Either&lt; InnerError, InnerValue &gt; &gt;::ABaseType()'],['../structyafl_1_1type_1_1details_1_1DomainDetailsImpl_3_01Maybe_3_01Inner_01_4_01_4.html#a4f3919bee9f8e6a4a0786b6127a35e03',1,'yafl::type::details::DomainDetailsImpl&lt; Maybe&lt; Inner &gt; &gt;::ABaseType()']]],
   ['all_5ftrue_1',['all_true',['../group__HOF.html#ga3805a64bc19cdbc827589b4e2e4f19b9',1,'yafl']]],
   ['applicative_2',['Applicative',['../group__Core.html#classyafl_1_1core_1_1Applicative',1,'yafl::core']]],
   ['applicative_3c_20either_2c_20errortype_2c_20valuetype_20_3e_3',['Applicative&lt; Either, ErrorType, ValueType &gt;',['../group__Core.html',1,'yafl::core']]],

@@ -30,8 +30,8 @@ var hierarchy =
     [ "yafl::tuple::details::CreateSubsetTupleFromIndex< Index, Tuple, SubsetTuple, IsValid >", "structyafl_1_1tuple_1_1details_1_1CreateSubsetTupleFromIndex.html", null ],
     [ "yafl::tuple::details::CreateSubsetTupleFromIndex< Index, Tuple, SubsetTuple, false >", "structyafl_1_1tuple_1_1details_1_1CreateSubsetTupleFromIndex_3_01Index_00_01Tuple_00_01SubsetTuple_00_01false_01_4.html", null ],
     [ "yafl::type::details::DomainDetailsImpl< typename >", "structyafl_1_1type_1_1details_1_1DomainDetailsImpl.html", null ],
-    [ "yafl::type::details::DomainDetailsImpl< Either< InnerError, InnerValue > >", "group__Type.html#structyafl_1_1type_1_1details_1_1DomainDetailsImpl_3_01Either_3_01InnerError_00_01InnerValue_01_4_01_4", null ],
-    [ "yafl::type::details::DomainDetailsImpl< Maybe< Inner > >", "group__Type.html#structyafl_1_1type_1_1details_1_1DomainDetailsImpl_3_01Maybe_3_01Inner_01_4_01_4", null ],
+    [ "yafl::type::details::DomainDetailsImpl< Either< InnerError, InnerValue > >", "structyafl_1_1type_1_1details_1_1DomainDetailsImpl_3_01Either_3_01InnerError_00_01InnerValue_01_4_01_4.html", null ],
+    [ "yafl::type::details::DomainDetailsImpl< Maybe< Inner > >", "structyafl_1_1type_1_1details_1_1DomainDetailsImpl_3_01Maybe_3_01Inner_01_4_01_4.html", null ],
     [ "yafl::type::details::DomainDetailsImpl< std::decay_t< T > >", "structyafl_1_1type_1_1details_1_1DomainDetailsImpl.html", [
       [ "yafl::type::DomainTypeInfo< T >", "group__Type.html#structyafl_1_1type_1_1DomainTypeInfo", null ]
     ] ],

@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['fbasetype_43',['FBaseType',['../group__Type.html#ac6edebc664450186093185af5558906e',1,'yafl::type::details::DomainDetailsImpl&lt; Either&lt; InnerError, InnerValue &gt; &gt;::FBaseType()'],['../group__Type.html#aea4016d7c36e36a789951ba609eb99b0',1,'yafl::type::details::DomainDetailsImpl&lt; Maybe&lt; Inner &gt; &gt;::FBaseType()']]],
+  ['fbasetype_43',['FBaseType',['../structyafl_1_1type_1_1details_1_1DomainDetailsImpl_3_01Either_3_01InnerError_00_01InnerValue_01_4_01_4.html#ac6edebc664450186093185af5558906e',1,'yafl::type::details::DomainDetailsImpl&lt; Either&lt; InnerError, InnerValue &gt; &gt;::FBaseType()'],['../structyafl_1_1type_1_1details_1_1DomainDetailsImpl_3_01Maybe_3_01Inner_01_4_01_4.html#aea4016d7c36e36a789951ba609eb99b0',1,'yafl::type::details::DomainDetailsImpl&lt; Maybe&lt; Inner &gt; &gt;::FBaseType()']]],
   ['fixederrortype_44',['FixedErrorType',['../structyafl_1_1type_1_1FixedErrorType.html',1,'yafl::type']]],
   ['fmap_45',['fmap',['../group__Core.html#a922307990f2f6aedff882acfc4d9abef',1,'yafl::core::Functor']]],
   ['function_20type_20traits_46',['Function type traits',['../group__Function.html',1,'']]],
