@@ -38,7 +38,7 @@ decltype(auto) all_true(Predicate&& predicate, Args&& ...args) {
  */
 template <typename TLeft, typename TRight>
 decltype(auto) function_compose(TLeft&& lhs, TRight&& rhs) {
-    using LhsReturnType = typename function::Details<TLeft>::ReturnType;
+    using LhsReturnType = typename function::Info<TLeft>::ReturnType;
     if constexpr (std::is_invocable_v<TLeft>) {
         if constexpr (std::is_void_v<LhsReturnType>) {
             return [rhs = std::forward<TRight>(rhs), lhs = std::forward<TLeft>(lhs)]() {
@@ -51,7 +51,7 @@ decltype(auto) function_compose(TLeft&& lhs, TRight&& rhs) {
             };
         }
     } else {
-        using InputArg = typename function::Details<TLeft>::template ArgType<0>;
+        using InputArg = typename function::Info<TLeft>::template ArgType<0>;
         if constexpr (std::is_void_v<LhsReturnType>) {
             return [rhs = std::forward<TRight>(rhs), lhs = std::forward<TLeft>(lhs)](InputArg&& arg) {
                 lhs(std::move(arg));
@@ -77,26 +77,26 @@ decltype(auto) function_compose(TLeft&& lhs, TRight&& rhs) {
  */
 template <typename TLeft, typename TRight>
 decltype(auto) kleisli_compose(TLeft&& lhs, TRight&& rhs) {
-    using FirstArg = typename function::Details<TLeft>::template ArgType<0>;
-    using RhsReturnType = typename function::Details<TRight>::ReturnType;
-    static_assert(type::Details<RhsReturnType>::hasMonadicBase, "Right hand side needs to have Monadic base");
+    using FirstArg = typename function::Info<TLeft>::template ArgType<0>;
+    using RhsReturnType = typename function::Info<TRight>::ReturnType;
+    static_assert(type::DomainTypeInfo<RhsReturnType>::hasMonadicBase, "Right hand side needs to have Monadic base");
 
     return [rhs = std::forward<TRight>(rhs), lhs = std::forward<TLeft>(lhs)](const FirstArg& arg) -> RhsReturnType {
-        using LhsReturnType = typename function::Details<TLeft>::ReturnType;
+        using LhsReturnType = typename function::Info<TLeft>::ReturnType;
         const LhsReturnType intermediate_result = lhs(arg);
 
-        if constexpr (std::is_void_v<typename type::Details<LhsReturnType>::ValueType>) {
+        if constexpr (std::is_void_v<typename type::DomainTypeInfo<LhsReturnType>::ValueType>) {
             if (!intermediate_result) {
-                return type::Details<RhsReturnType>::handleError(intermediate_result);
+                return type::DomainTypeInfo<RhsReturnType>::handleError(intermediate_result);
             } else {
                 return rhs();
             }
         } else {
-            if constexpr (type::Details<typename function::Details<TRight>::template ArgType<0>>::hasMonadicBase) {
+            if constexpr (type::DomainTypeInfo<typename function::Info<TRight>::template ArgType<0>>::hasMonadicBase) {
                 return rhs(intermediate_result);
             } else {
                 if (!intermediate_result) {
-                    return type::Details<RhsReturnType>::handleError(intermediate_result);
+                    return type::DomainTypeInfo<RhsReturnType>::handleError(intermediate_result);
                 }
                 return rhs(intermediate_result.value());
             }
@@ -115,8 +115,8 @@ decltype(auto) kleisli_compose(TLeft&& lhs, TRight&& rhs) {
  */
 template <typename TLeft, typename TRight>
 decltype(auto) compose(TLeft&& lhs, TRight&& rhs) {
-    using LhsReturnType = typename function::Details<TLeft>::ReturnType;
-    if constexpr (type::Details<LhsReturnType>::hasMonadicBase) {
+    using LhsReturnType = typename function::Info<TLeft>::ReturnType;
+    if constexpr (type::DomainTypeInfo<LhsReturnType>::hasMonadicBase) {
         return kleisli_compose(std::forward<TLeft>(lhs), std::forward<TRight>(rhs));
     } else {
         return function_compose(std::forward<TLeft>(lhs), std::forward<TRight>(rhs));
@@ -135,9 +135,9 @@ decltype(auto) curry(Callable&& callable) {
     if constexpr (std::is_invocable_v<std::decay_t<Callable>>) {
         return callable();
     } else {
-        using FirstArg = typename function::Details<Callable>::template ArgType<0>;
+        using FirstArg = typename function::Info<Callable>::template ArgType<0>;
         return [callable = std::forward<Callable>(callable)](const FirstArg& arg) {
-            using ReturnFunType = typename function::Details<Callable>::PartialApplyFirst;
+            using ReturnFunType = typename function::Info<Callable>::PartialApplyFirst;
 
             const ReturnFunType inner_func = [callable, arg = std::move(arg)](auto&& ...args) {
                 return callable(std::move(arg), std::forward<decltype(args)>(args)...);
@@ -186,15 +186,15 @@ decltype(auto) uncurry(Callable&& callable) {
  */
 template <typename Callable, typename ...Args>
 decltype(auto) partial(Callable&& callable, Args&& ...args) {
-    using IsTupleSubset = tuple::IsTupleSubset<typename function::Details<Callable>::ArgTypes, std::tuple<Args...>>;
+    using IsTupleSubset = tuple::IsTupleSubset<typename function::Info<Callable>::ArgTypes, std::tuple<Args...>>;
     static_assert(IsTupleSubset::value, "Input arguments are not a subset of the Callable arguments");
 
     if constexpr (std::is_invocable_v<std::decay_t<Callable>, std::decay_t<Args>...>) {
         return std::invoke(callable, std::forward<Args>(args)...);
     } else {
 
-        using RemainingArgsTuple = tuple::TupleSubset<IsTupleSubset::index, typename function::Details<Callable>::ArgTypes>;
-        using ReturnType = function::FunctionFromTuple<typename function::Details<Callable>::ReturnType, RemainingArgsTuple>;
+        using RemainingArgsTuple = tuple::TupleSubset<IsTupleSubset::index, typename function::Info<Callable>::ArgTypes>;
+        using ReturnType = function::FunctionFromTuple<typename function::Info<Callable>::ReturnType, RemainingArgsTuple>;
 
         const ReturnType f = [callable = std::forward<Callable>(callable), vargs = std::make_tuple(std::forward<Args>(args)...)](auto&& ...inner_args) {
             return std::apply([callable = std::move(callable)](auto&& ...apply_args){

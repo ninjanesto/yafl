@@ -27,16 +27,16 @@ namespace yafl {
  */
 template <typename>
 class Maybe;
-
-namespace {
+namespace type{
+namespace details {
 
 /**
- * @ingroup Type
+ * @ingroup Details
  * Maybe monad traits specialization that enable getting the inner type
  * @tparam Inner Inner type
 */
 template<typename Inner>
-struct DetailsImpl<Maybe<Inner>> {
+struct DomainDetailsImpl<Maybe<Inner>> {
     /// Functor Base type
     using FBaseType = core::Functor<Maybe, Inner>;
     /// Applicative Base type
@@ -58,8 +58,8 @@ struct DetailsImpl<Maybe<Inner>> {
         return DerivedType::Nothing();
     };
 };
-
-} // namespace
+} // namespace details
+} // namespace type
 
 /**
  * @ingroup Maybe
@@ -308,16 +308,16 @@ private:
     template <typename Arg>
     decltype(auto) internal_apply(Arg&& arg) const {
         static_assert(!std::is_invocable_v<std::decay_t<T>>, "Function that takes 0 arguments cannot be called with arguments");
-        if constexpr (type::Details<Arg>::hasMonadicBase) {
+        if constexpr (type::DomainTypeInfo<Arg>::hasMonadicBase) {
             if (arg.hasValue()) {
                 return internal_apply_non_monad(arg.value());
             } else {
-                using ArgInnerType = std::remove_reference_t<typename type::Details<Arg>::ValueType>;
+                using ArgInnerType = std::remove_reference_t<typename type::DomainTypeInfo<Arg>::ValueType>;
                 if constexpr (std::is_invocable_v<std::decay_t<T>, std::decay_t<ArgInnerType>>) {
                     using ReturnType = std::remove_reference_t<std::invoke_result_t<std::decay_t<T>, std::decay_t<ArgInnerType>>>;
                     return Maybe<ReturnType>::Nothing();
                 } else {
-                    using ReturnType = std::remove_reference_t<typename function::Details<T>::PartialApplyFirst>;
+                    using ReturnType = std::remove_reference_t<typename function::Info<T>::PartialApplyFirst>;
                     return Maybe<ReturnType>::Nothing();
                 }
             }
@@ -342,7 +342,7 @@ private:
                 }
             }
         } else {
-            using PartialFunctionType = std::remove_reference_t<typename function::Details<T>::PartialApplyFirst>;
+            using PartialFunctionType = std::remove_reference_t<typename function::Info<T>::PartialApplyFirst>;
 
             if (hasValue()) {
                 return Maybe<PartialFunctionType>::Just(
@@ -429,8 +429,8 @@ decltype(auto) lift(Callable &&callable) {
             };
         }
     } else {
-        using ReturnType = typename function::Details<Callable>::ReturnType;
-        using ReturnFunctionType = typename function::Details<Callable>::template LiftedSignature<Maybe>;
+        using ReturnType = typename function::Info<Callable>::ReturnType;
+        using ReturnFunctionType = typename function::Info<Callable>::template LiftedSignature<Maybe>;
 
         const ReturnFunctionType function = [callable = std::forward<Callable>(callable)](auto&& ...args) -> Maybe<ReturnType> {
             if (all_true([](auto&& v) { return v.hasValue(); }, args...)) {

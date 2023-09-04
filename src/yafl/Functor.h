@@ -52,7 +52,7 @@ namespace functor {
  */
 template<typename Callable, typename FunctorT>
 decltype(auto) fmap(Callable&& callable, const FunctorT& functor) {
-    static_assert(type::Details<FunctorT>::hasFunctorBase, "FunctorT argument not a Functor");
+    static_assert(type::DomainTypeInfo<FunctorT>::hasFunctorBase, "FunctorT argument not a Functor");
     return functor.fmap(std::forward<Callable>(callable));
 }
 
@@ -71,14 +71,14 @@ template<template<typename...> typename FunctorType, typename Callable>
 decltype(auto) fmap(Callable&& callable) {
     if constexpr (std::is_invocable_v<Callable>) {
         return [callable = std::forward<Callable>(callable)](const FunctorType<void>& functor) {
-            static_assert(type::Details<FunctorType<void>>::hasFunctorBase, "Argument not a Functor");
+            static_assert(type::DomainTypeInfo<FunctorType<void>>::hasFunctorBase, "Argument not a Functor");
             return functor.fmap(callable);
         };
     } else {
-        using FirstArg = typename function::Details<Callable>::template ArgType<0>;
+        using FirstArg = typename function::Info<Callable>::template ArgType<0>;
 
         return [callable = std::forward<Callable>(callable)](const FunctorType<FirstArg>& functor) {
-            static_assert(type::Details<FunctorType<FirstArg>>::hasFunctorBase, "Argument not a Functor");
+            static_assert(type::DomainTypeInfo<FunctorType<FirstArg>>::hasFunctorBase, "Argument not a Functor");
             return functor.fmap(callable);
         };
     }

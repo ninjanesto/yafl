@@ -488,8 +488,7 @@ Note: Seed can be a value between 0 and 255
 ## Future
  - Function Lift documentation
  - Add BiFunctor implementation to Either type
- - Add Reader Monad
- - Add Continuation monad
+ - Add other monads (Reader, Writer, State, Continuation, ...)
  - Bazel input flags and install targets
  - Bazel github actions
  - Bump C++ version

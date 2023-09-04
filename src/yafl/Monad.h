@@ -51,7 +51,7 @@ namespace monad {
  */
 template<typename Callable, typename MonadT>
 decltype(auto) bind(Callable&& callable, const MonadT& monad) {
-    static_assert(type::Details<std::decay_t<MonadT>>::hasMonadicBase, "MonadT argument not a Monad");
+    static_assert(type::DomainTypeInfo<std::decay_t<MonadT>>::hasMonadicBase, "MonadT argument not a Monad");
     return monad.bind(std::forward<Callable>(callable));
 }
 
@@ -70,14 +70,14 @@ template<template<typename...> typename MonadType, typename Callable>
 decltype(auto) bind(Callable&& callable) {
     if constexpr (std::is_invocable_v<Callable>) {
         return [callable = std::forward<Callable>(callable)](const MonadType<void> &monad) {
-            static_assert(type::Details<MonadType<void>>::hasMonadicBase, "Argument not a Functor");
+            static_assert(type::DomainTypeInfo<MonadType<void>>::hasMonadicBase, "Argument not a Functor");
             return monad.bind(callable);
         };
     } else {
-        using FirstArg = typename function::Details<Callable>::template ArgType<0>;
+        using FirstArg = typename function::Info<Callable>::template ArgType<0>;
 
         return [callable = std::forward<Callable>(callable)](const MonadType<FirstArg> &monad) {
-            static_assert(type::Details<MonadType<FirstArg>>::hasMonadicBase, "Argument not a Functor");
+            static_assert(type::DomainTypeInfo<MonadType<FirstArg>>::hasMonadicBase, "Argument not a Functor");
             return monad.bind(callable);
         };
     }

@@ -81,7 +81,7 @@ namespace applicative {
  */
 template<typename ApplicableT, typename ApplicableArg>
 decltype(auto) apply(ApplicableT&& callable, const ApplicableArg& applicative) {
-    static_assert(type::Details<ApplicableT>::hasApplicativeBase, "ApplicableT argument not a Applicative");
+    static_assert(type::DomainTypeInfo<ApplicableT>::hasApplicativeBase, "ApplicableT argument not a Applicative");
     return callable(applicative);
 }
 
@@ -96,7 +96,7 @@ decltype(auto) apply(ApplicableT&& callable, const ApplicableArg& applicative) {
 template<typename ApplicableT>
 decltype(auto) apply(ApplicableT&& callable) {
     return [callable = std::forward<ApplicableT>(callable)](auto&& ...args) {
-        static_assert(type::Details<ApplicableT>::hasApplicativeBase, "ApplicableT argument not a Applicative");
+        static_assert(type::DomainTypeInfo<ApplicableT>::hasApplicativeBase, "ApplicableT argument not a Applicative");
         return callable(std::forward<decltype(args)>(args)...);
     };
 }
