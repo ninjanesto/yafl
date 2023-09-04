@@ -97,16 +97,19 @@ decltype(auto) compose(const TLeft& lhs, const TRight& rhs) {
  * @return curried function
  */
 template <typename F>
-constexpr decltype(auto) curry(F&& f) {
-    if constexpr (std::is_invocable<F>{}) {
+constexpr decltype(auto) curry(const F& f) {
+    if constexpr (std::is_invocable<F>()) {
         return f();
     } else {
-        return [f=std::forward<F>(f)](auto&& arg) {
-            return curry(
-                [f, arg = std::forward<decltype(arg)>(arg)](auto&& ...args) {
-                    return std::apply(f, std::tuple_cat(std::make_tuple(arg), std::make_tuple(args...)));
-                }
-            );
+        using ReturnFunType = typename function_traits<F>::PartialApplyFirst;
+        using FirstArg = typename function_traits<F>::template ArgType<0>;
+
+        return [f= std::move(f)](FirstArg&& arg) {
+            const ReturnFunType inner_func = [f, arg = std::move(arg)](auto&& ...args) {
+                return std::apply(f, std::tuple_cat(std::make_tuple(arg), std::make_tuple(args...)));
+            };
+
+            return curry(std::move(inner_func));
         };
     }
 }

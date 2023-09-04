@@ -16,7 +16,8 @@ constexpr auto START_IDX=0;
 constexpr auto END_IDX=255;
 
 template<typename T>
-using Result = yafl::Maybe<T>;
+using Result = yafl::Either<void, T>;
+//using Result = yafl::Maybe<T>;
 
 /**
  * Caesar Cypher encode/decode function. Receives the operation and applies to the entire file
@@ -41,7 +42,8 @@ Result<void> encode_decode(F&& operation, int seed, const std::string& filename)
          counter++;
     }
 
-    return Result<void>::Just();
+    //return Result<void>::Just();
+    return Result<void>::Ok();
 }
 
 /**
@@ -54,13 +56,16 @@ Result<int> validate_seed(const std::string& seed) {
     try{
         _seed = std::stoi(seed);
     } catch(const std::runtime_error& ex) {
-        return Result<int>::Nothing();
+        //return Result<int>::Nothing();
+        return Result<int>::Error();
     }
 
     if (_seed >= START_IDX && _seed <= END_IDX) {
-        return Result<int>::Just(_seed);
+        //return Result<int>::Just(_seed);
+        return Result<int>::Ok(_seed);
     }
-    return Result<int>::Nothing();
+    //return Result<int>::Nothing();
+    return Result<int>::Error();
 }
 
 
@@ -82,9 +87,11 @@ Result<OperationType> validate_operation(const std::string& op) {
     };
 
     if (const auto result = operationMap.find(op); result != operationMap.end()) {
-        return Result<OperationType>::Just(result->second);
+        //return Result<OperationType>::Just(result->second);
+        return Result<OperationType>::Ok(result->second);
     }
-    return Result<OperationType>::Nothing();
+    //return Result<OperationType>::Nothing();
+    return Result<OperationType>::Error();
 }
 
 
@@ -105,6 +112,7 @@ int main(int argc, char** argv) {
                 (validate_seed(seedString))
                 (filename)
                 .bind(yafl::id<Result<void>>);
+        std::cout << result.isOk() << std::endl;
     }
 
     {
@@ -112,6 +120,7 @@ int main(int argc, char** argv) {
         const auto result = validate_seed(seedString)
                 .bind(validate_operation(operation))
                 .fmap([&filename](auto&& f){ f(filename);});
+        std::cout << result.isOk() << std::endl;
     }
 
     {
@@ -120,17 +129,17 @@ int main(int argc, char** argv) {
                 .bind(validate_operation(operation))
                 (filename)
                 .bind(yafl::id<Result<void>>);
+        std::cout << result.isOk() << std::endl;
     }
 
-//    {
-//         // Method 4
-//         const auto result = validate_operation(operation).fmap(yafl::curry<OperationType>);
-//         const auto curried_func = result.value();
-//
-//         // TODO
-//         yafl::compose(yafl::id<int>, curried_func);
-//         curried_func(seedString)(filename);
-//    }
+    {
+        // Method 4
+        const auto op = validate_operation(operation).value();
+        const auto curried_op = yafl::curry<decltype(op)>(op);
+        const auto caesar_cypher = yafl::compose(validate_seed, curried_op);
+        const auto result = caesar_cypher(seedString)(filename);
+        std::cout << result.isOk() << std::endl;
+    }
 
     return 0;
 }
