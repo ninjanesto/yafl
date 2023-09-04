@@ -64,7 +64,7 @@ struct FixedErrorType {
 template<typename T>
 using NoErrorEither = Either<void, T>;
 
-TYPED_TEST_SUITE(EitherTest, EitherTypes);
+TYPED_TEST_SUITE(EitherTest, EitherTypes,);
 
 TYPED_TEST(EitherTest, assertErrorCreateAValidEitherForAnyType) {
     Either<typename TypeParam::Error, typename TypeParam::Ok> either = createError<typename TypeParam::Error, typename TypeParam::Ok>();
@@ -74,6 +74,62 @@ TYPED_TEST(EitherTest, assertErrorCreateAValidEitherForAnyType) {
 TYPED_TEST(EitherTest, assertOkCreateAValidEitherForAnyType) {
     Either<typename TypeParam::Error, typename TypeParam::Ok> either = createOk<typename TypeParam::Error, typename TypeParam::Ok>();
     ASSERT_TRUE(either.isOk());
+}
+
+TYPED_TEST(EitherTest, assertCopyConstructor) {
+    {
+        const auto maybe = createOk<typename TypeParam::Error, typename TypeParam::Ok>();
+        const Either destination(maybe);
+        ASSERT_EQ(maybe, destination);
+    }
+    {
+        const auto maybe = createError<typename TypeParam::Error, typename TypeParam::Ok>();
+        const Either destination(maybe);
+        ASSERT_EQ(maybe, destination);
+    }
+}
+
+TYPED_TEST(EitherTest, assertAssignmentOperator) {
+    {
+        const auto maybe = createOk<typename TypeParam::Error, typename TypeParam::Ok>();
+        auto destination = createError<typename TypeParam::Error, typename TypeParam::Ok>();
+        destination = maybe;
+        ASSERT_EQ(maybe, destination);
+    }
+    {
+        const auto maybe = createError<typename TypeParam::Error, typename TypeParam::Ok>();
+        auto destination = createOk<typename TypeParam::Error, typename TypeParam::Ok>();
+        destination = maybe;
+        ASSERT_EQ(maybe, destination);
+    }
+}
+
+TYPED_TEST(EitherTest, assertMoveConstructor) {
+    {
+        auto maybe = createOk<typename TypeParam::Error, typename TypeParam::Ok>();
+        const auto destination(std::move(maybe));
+        EXPECT_TRUE(destination.isOk());
+    }
+    {
+        auto maybe = createError<typename TypeParam::Error, typename TypeParam::Ok>();
+        const auto destination(std::move(maybe));
+        EXPECT_TRUE(destination.isError());
+    }
+}
+
+TYPED_TEST(EitherTest, MoveAssignment) {
+    {
+        auto maybe = createOk<typename TypeParam::Error, typename TypeParam::Ok>();
+        auto destination = createError<typename TypeParam::Error, typename TypeParam::Ok>();
+        destination = std::move(maybe);
+        EXPECT_TRUE(destination.isOk());
+    }
+    {
+        auto maybe = createError<typename TypeParam::Error, typename TypeParam::Ok>();
+        auto destination = createOk<typename TypeParam::Error, typename TypeParam::Ok>();
+        destination = std::move(maybe);
+        EXPECT_TRUE(destination.isError());
+    }
 }
 
 TYPED_TEST(EitherTest, assertValueOr) {

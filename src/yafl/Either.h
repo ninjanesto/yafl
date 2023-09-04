@@ -60,11 +60,12 @@ struct Details<Either<InnerError, InnerValue>> {
     static constexpr bool hasMonadicBase = std::is_base_of_v<MBaseType, DerivedType>;
 
     ///Callback responsible for handling errors
-    static constexpr auto handleError = [](const auto& arg) {
-        if constexpr (std::is_void_v<typename type::Details<yafl::function::remove_cvref_t<decltype(arg)>>::ErrorType>) {
+    static constexpr auto handleError = []([[maybe_unused]] auto&& ...args) {
+        static_assert(std::is_same_v<typename type::Details<yafl::function::remove_cvref_t<decltype(args)>...>::ErrorType, ErrorType>, "Error types should match");
+        if constexpr (std::is_void_v<ErrorType>) {
             return DerivedType::Error();
         } else {
-            return DerivedType::Error(arg.error());
+            return DerivedType::Error(args.error()...);
         }
     };
 };
@@ -101,11 +102,12 @@ struct Details<const Either<InnerError, InnerValue>> {
     static constexpr bool hasMonadicBase = std::is_base_of_v<MBaseType, DerivedType>;
 
     ///Callback responsible for handling errors
-    static constexpr auto handleError = [](const auto& arg) {
-        if constexpr (std::is_void_v<typename type::Details<yafl::function::remove_cvref_t<decltype(arg)>>::ErrorType>) {
+    static constexpr auto handleError = []([[maybe_unused]] auto&& ...args) {
+        static_assert(std::is_same_v<typename type::Details<yafl::function::remove_cvref_t<decltype(args)>...>::ErrorType, ErrorType>, "Error types should match");
+        if constexpr (std::is_void_v<ErrorType>) {
             return DerivedType::Error();
         } else {
-            return DerivedType::Error(arg.error());
+            return DerivedType::Error(args.error()...);
         }
     };
 };

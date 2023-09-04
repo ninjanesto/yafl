@@ -5,8 +5,14 @@ Functional Programming concepts implemented in C++17
 
 # Table of Contents
 1. [Introduction](#introduction)
-2. [Usage](#usage)
-3. [Build](#build)
+2. [High Order Functions (HOF)](#high-order-functions-hof)
+3. [Functor, Applicative Functor and Monad](#functor-applicative-functor-and-monad)
+4. [Maybe](#maybe)
+5. [Either](#either)
+6. [Function Lift](#function-lift)
+7. [Build](#build)
+8. [Example](#example)
+9. [Future](#future)
 
 ## Introduction
 C++ is a multi paradigm programming language and functional programming concepts keep getting added to the C++ standard.
@@ -16,8 +22,6 @@ Yafl is a header only library that implements some key FP concepts, such as curr
 This library helps you in reducing code noise and boilerplate code. It can improve readability (if you are accustomed to FP) and it is really fun to use and learn functional concepts.
 
 Most of the concepts present in this library were inspired in some Haskell features, which is a really cool functional programming language
-
-## Examples
 
 ### High Order Functions (HOF)
 Higher order functions are functions that take one or more functions as arguments, and/or return a function as their result.
@@ -79,7 +83,7 @@ std::cout << result2 << std::endl;
 
 Currying consists in the transformation of a function that takes multiple arguments into a sequence of functions, each takes a single argument.
 
-Uncurring is the reverse process. It takes a function that takes one argument and whose return value is another function and yields a new function that takes two arguments (one from each function) and returns as result the application of the first function with using the first argument and using its result with the second argument.
+Uncurrying is the reverse process. It takes a function that takes one argument and whose return value is another function and yields a new function that takes two arguments (one from each function) and returns as result the application of the first function with using the first argument and using its result with the second argument.
 
 Note: we only referred two arguments , but we support multiple argument functions as shown in the following examples
 
@@ -332,9 +336,82 @@ std::cout << (lresult == rresult) << std::endl;
 ```
 
 ### Maybe
+The Maybe Monad is a concept commonly used in functional programming languages, to handle computations that may or may not produce a value.
+It's particularly useful for situations where the result of a computation could be null or undefined. 
+The Maybe Monad provides a structured way to handle such cases without resorting to explicit null checks or throwing exceptions.
 
-### Either 
+#### Motivation
+The Maybe Monad addresses the problem of null values or undefined behavior. In languages like C++, null pointers can lead to runtime errors and crashes. 
+The Maybe Monad offers a type-safe way to represent optional values while avoiding these issues.
+
+#### Structure
+The Maybe Monad consists of two possible states:
+ - Just(value): Represents a valid value.
+ - Nothing: Represents the absence of a value.
+
+For each state it provides the functions `fmap`, `bind` and `operator()`, `hasValue`
+Supports the retrieval of the wrapped value via the `value` and `valueOr` functions. 
+Note: These functions are not visible if type void is used.
+
+#### Implementation
+In our implementation, the Maybe class implements the abstract classes Functor, Applicative and Monad.
+We support both void and any value types.
+Instead of returning null or throwing exceptions, functions `fmap`, `bind` and `operator()` return a Maybe monad instance.
+Chaining operations is central to the Maybe Monad's utility. One can compose operations that work on optional values.
+If any step in the chain encounters a Nothing, the rest of the chain short-circuits, avoiding unnecessary computations.
+The Maybe Monad provides a structured way to handle errors without using exceptions.
+Instead of throwing exceptions, a computation that fails returns a Nothing, and the chain of operations can continue or stop gracefully.
+
+#### Benefits:
+ - Safe Handling of Optionals: Prevents null pointer exceptions by encapsulating optional values
+ - Functional Composition: Supports chaining of operations on optional values
+ - Improved Code Readability: Enhances code readability by eliminating nested null checks. Expresses intent by using monadic operations.
+ - Predictable Behavior: Simplifies error handling and edge cases
+ - Reduced Error Surfaces: Makes code more robust and resilient
+ - Type Safety: Ensures type safety by encapsulating optional values in a monad
+
+### Either
+The Either Monad is a monadic structure that encapsulates two possible values, typically referred to as "left" and "right". 
+It's used to represent computations that might fail or have two distinct outcomes. 
+Is often used for error handling, where the "left" value represents an error or failure, and the "right" value represents a successful computation.
+
+#### Motivation
+The Either Monad is designed to handle computations that might have two distinct outcomes, such as success and failure. 
+It provides a structured way to manage these outcomes while ensuring composability and type safety.
+
+#### Structure
+The Either Monad consists of two possible states:
+- Error(value): Represents an error value
+- Ok(value): Represents a valid value
+
+Our implementation uses Error and Ok to represent the "left" and "right" values. 
+For each state it also provides the functions `fmap`, `bind`, `operator()`, `isError`, `isOk`
+Supports the retrieval of the wrapped error or value via the `value`, `valueOr`, `error`, `errorOr` functions.
+Note: These functions are not visible if type void is used.
+
+#### Implementation
+In our implementation, the Either class implements the abstract classes Functor, Applicative and Monad.
+We support both void and any value types.
+Instead of returning null or throwing exceptions, functions `fmap`, `bind` and `operator()` return an Either monad instance.
+The Either monad supports composability, allowing you to chain computations together and handle errors gracefully. 
+This makes it suitable for scenarios where one needs to perform a sequence of computations that might fail at any point.
+If any step in the chain encounters an Error, the rest of the chain short-circuits, avoiding unnecessary computations and the error is propagated.
+The Either monad is a powerful tool for managing computations with two distinct outcomes, such as success and failure. 
+It provides a structured way to handle errors, compose computations, and ensure a clear separation between successful and unsuccessful outcomes.
+
+#### Benefits:
+- Handling Success and Failure: Represents computations that can have either a successful result (Ok) or an error (Error)
+- Improved Error Handling: Offers a consistent error-handling mechanism across different parts of the code
+- Clear Separation of Concerns: Separates the handling of successful and failed computations.
+- Functional Composition: Enables chaining of operations while dealing with potential errors
+- Predictable Behavior: Ensures that every computation returns an Either value, indicating success or failure.
+- Flexible Error Reporting: Enables capturing additional information about failures using Left values.
+- Improved Readability: Makes code more readable by explicitly handling success and failure cases.
 
 ### Function lift
 
 ## Build
+
+## Example
+
+## Future

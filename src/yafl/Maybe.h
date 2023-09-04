@@ -58,7 +58,7 @@ struct Details<Maybe<Inner>> {
     static constexpr bool hasMonadicBase = std::is_base_of_v<MBaseType, DerivedType>;
 
     ///Callback responsible for handling errors
-    static constexpr auto handleError = [](const auto&) {
+    static constexpr auto handleError = [](auto&& ...) {
         return DerivedType::Nothing();
     };
 };
@@ -91,7 +91,7 @@ struct Details<const Maybe<Inner>> {
     static constexpr bool hasMonadicBase = std::is_base_of_v<MBaseType, DerivedType>;
 
     ///Callback responsible for handling errors
-    static constexpr auto handleError = [](const auto&) {
+    static constexpr auto handleError = [](auto&& ...) {
         return DerivedType::Nothing();
     };
 };

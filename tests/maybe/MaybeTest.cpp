@@ -28,7 +28,7 @@ class MaybeTest : public ::testing::Test {};
 
 using MaybeParamTypes = ::testing::Types<void, int, std::string>;
 
-TYPED_TEST_SUITE(MaybeTest, MaybeParamTypes);
+TYPED_TEST_SUITE(MaybeTest, MaybeParamTypes, );
 
 TYPED_TEST(MaybeTest, assertNothingCreateAValidMaybeForAnyType) {
     Maybe<TypeParam> nothingMaybe = Maybe<TypeParam>::Nothing();
