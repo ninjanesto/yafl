@@ -18,15 +18,15 @@
 namespace yafl {
 
 template <typename T>
-struct EitherTraits;
+struct EitherDetails;
 
 template <template <typename, typename> typename Either, typename InnerError, typename InnerValue>
-struct EitherTraits<Either<InnerError, InnerValue>> {
+struct EitherDetails<Either<InnerError, InnerValue>> {
     using ErrorType = InnerError;
     using ValueType = InnerValue;
 };
 template <template <typename, typename> typename Either, typename InnerError, typename InnerValue>
-struct EitherTraits<const Either<InnerError, InnerValue>> {
+struct EitherDetails<const Either<InnerError, InnerValue>> {
     using ErrorType = InnerError;
     using ValueType = InnerValue;
 };
@@ -35,14 +35,15 @@ struct EitherTraits<const Either<InnerError, InnerValue>> {
 template<typename Error, typename Value>
 class Either;
 
-
 template<>
 class Either<void, void> : public Functor<Either, void, void>
                          , public Monad<Either, void, void> {
     friend class Functor<Either, void, void>;
     friend class Monad<Either, void, void>;
+
 private:
     explicit Either(bool v) : _value(v) {}
+
 public:
     static Either<void, void> Error() {
         return Either<void, void>(false);
@@ -60,7 +61,7 @@ private:
     template <typename Callable>
     decltype(auto) internal_fmap(Callable&& callable) const {
         static_assert(std::is_invocable_v<Callable>, "Input argument is not invocable");
-        using ReturnType = std::invoke_result_t<Callable>;
+        using ReturnType = std::remove_reference_t<std::invoke_result_t<Callable>>;
         if (this->isOk()) {
             if constexpr (std::is_void_v<ReturnType>) {
                 callable();
@@ -76,16 +77,17 @@ private:
     template <typename Callable>
     decltype(auto) internal_bind(Callable&& callable) const {
         static_assert(std::is_invocable_v<Callable>, "Input argument is not invocable");
-        using ReturnType = std::invoke_result_t<Callable>;
-        using InnerTypeError = typename EitherTraits<ReturnType>::ErrorType;
+        using ReturnType = std::remove_reference_t<std::invoke_result_t<Callable>>;
+        using InnerTypeError = typename EitherDetails<ReturnType>::ErrorType;
         static_assert(std::is_same_v<void, InnerTypeError>, "Error type does not match");
-        using InnerTypeOK = typename EitherTraits<ReturnType>::ValueType;
+        using InnerTypeOK = typename EitherDetails<ReturnType>::ValueType;
         if (this->isOk()) {
             return callable();
         } else {
             return Either<InnerTypeError, InnerTypeOK>::Error();
         }
     }
+
 private:
     bool _value;
 };
@@ -100,6 +102,7 @@ class Either<void, ValueType> : public Functor<Either, void, ValueType>
 
 private:
     explicit Either(bool isError) : _isError{isError} {}
+
 public:
     static Either<void, ValueType> Error() {
         return Either<void, ValueType>(true);
@@ -119,11 +122,12 @@ public:
         if (!_isError) return *(_right.get());
         throw std::runtime_error("Ok not defined");
     }
+
 private:
     template <typename Callable>
     decltype(auto) internal_fmap(Callable&& callable) const {
         static_assert(std::is_invocable_v<Callable, ValueType>, "Input argument is not invocable");
-        using ReturnType = std::invoke_result_t<Callable, ValueType>;
+        using ReturnType = std::remove_reference_t<std::invoke_result_t<Callable, ValueType>>;
         if (this->isOk()) {
             if constexpr (std::is_void_v<ReturnType>) {
                 callable(value());
@@ -139,10 +143,10 @@ private:
     template <typename Callable>
     decltype(auto) internal_bind(Callable&& callable) const {
         static_assert(std::is_invocable_v<Callable, ValueType>, "Input argument is not invocable");
-        using ReturnType = std::invoke_result_t<Callable, ValueType>;
-        using InnerTypeError = typename EitherTraits<ReturnType>::ErrorType;
+        using ReturnType = std::remove_reference_t<std::invoke_result_t<Callable, ValueType>>;
+        using InnerTypeError = typename EitherDetails<ReturnType>::ErrorType;
         static_assert(std::is_same_v<void, InnerTypeError>, "Error type does not match");
-        using InnerTypeOK = typename EitherTraits<ReturnType>::ValueType;
+        using InnerTypeOK = typename EitherDetails<ReturnType>::ValueType;
         if (this->isOk()) {
             return callable(this->value());
         } else {
@@ -151,37 +155,63 @@ private:
     }
 
     template<typename Head>
-    decltype(auto) internal_apply(const Either<void, Head>& arg) const {
-        if constexpr (function_traits<ValueType>::ArgCount > 1) {
-            if (arg.isOk() && this->isOk()) {
-                return Either<void, typename function_traits<ValueType>::PartialApplyFirst>::Ok([callable = value(), first = arg.value()](const auto& ...args) {
-                    return callable(first, args...);
-                });
-            } else {
-                return Either<void, typename function_traits<ValueType>::PartialApplyFirst>::Error();
-            }
-        } else {
-            using ReturnType = std::invoke_result_t<ValueType, Head>;
+    decltype(auto) internal_apply(Either<void, Head>&& arg) const {
+        const auto var{std::move(arg)};
+        if constexpr (std::is_invocable_v<ValueType, Head>) {
+            using ReturnType = std::remove_reference_t<std::invoke_result_t<ValueType, Head>>;
             if (this->isError()) {
                 return Either<void, ReturnType>::Error();
             } else {
-                if (arg.isOk()) {
+                if (var.isOk()) {
                     if constexpr (std::is_void_v<ReturnType>) {
-                        value()(arg.value());
+                        value()(var.value());
                         return Either<void, ReturnType>::Ok();
                     } else {
-                        return Either<void, ReturnType>::Ok(value()(arg.value()));
+                        return Either<void, ReturnType>::Ok(value()(var.value()));
                     }
                 } else {
                     return Either<void, ReturnType>::Error();
                 }
+            }
+        } else {
+            if (var.isOk() && this->isOk()) {
+                return Either<void, typename function_traits<ValueType>::PartialApplyFirst>::Ok([callable = value(), first = var.value()](auto&& ...args) {
+                    return std::apply(callable, std::tuple_cat(std::make_tuple(first), std::make_tuple(args...)));
+                });
+            } else {
+                return Either<void, typename function_traits<ValueType>::PartialApplyFirst>::Error();
+            }
+        }
+    }
+
+    template<typename Head>
+    decltype(auto) internal_apply(Head&& arg) const {
+        if constexpr (std::is_invocable_v<ValueType, Head>) {
+            using ReturnType = std::remove_reference_t<std::invoke_result_t<ValueType, Head>>;
+            if (this->isError()) {
+                return Either<void, ReturnType>::Error();
+            } else {
+                if constexpr (std::is_void_v<ReturnType>) {
+                    value()(std::forward<Head>(arg));
+                    return Either<void, ReturnType>::Ok();
+                } else {
+                    return Either<void, ReturnType>::Ok(value()(std::forward<Head>(arg)));
+                }
+            }
+        } else {
+            if (this->isOk()) {
+                return Either<void, typename function_traits<ValueType>::PartialApplyFirst>::Ok([callable = value(), first = std::forward<Head>(arg)](auto&& ...args) {
+                    return std::apply(callable, std::tuple_cat(std::make_tuple(first), std::make_tuple(args...)));
+                });
+            } else {
+                return Either<void, typename function_traits<ValueType>::PartialApplyFirst>::Error();
             }
         }
     }
 
     template<typename std::enable_if<std::is_invocable_v<ValueType>>* = nullptr>
     decltype(auto) internal_apply() const {
-        using ReturnType = std::invoke_result_t<ValueType>;
+        using ReturnType = std::remove_reference_t<std::invoke_result_t<ValueType>>;
         if (this->isError()) {
             return Either<void, ReturnType>::Error();
         } else {
@@ -193,6 +223,7 @@ private:
             }
         }
     }
+
 private:
     std::unique_ptr<ValueType> _right{nullptr};
     bool _isError;
@@ -204,8 +235,10 @@ class Either<ErrorType, void> : public Functor<Either, ErrorType, void>
                               , public Monad<Either, ErrorType, void> {
     friend class Functor<Either, ErrorType, void>;
     friend class Monad<Either, ErrorType, void>;
+
 private:
     explicit Either(bool isError) : _isError{isError} {}
+
 public:
     static Either<ErrorType, void> Ok() {
         return Either<ErrorType, void>(false);
@@ -225,11 +258,12 @@ public:
         if (_isError) return *(_left.get());
         throw std::runtime_error("Ok not defined");
     }
+
 private:
     template <typename Callable>
     decltype(auto) internal_fmap(Callable&& callable) const {
         static_assert(std::is_invocable_v<Callable>, "Input argument is not invocable");
-        using ReturnType = std::invoke_result_t<Callable>;
+        using ReturnType = std::remove_reference_t<std::invoke_result_t<Callable>>;
         if (this->isOk()) {
             if constexpr (std::is_void_v<ReturnType>) {
                 callable();
@@ -245,10 +279,10 @@ private:
     template <typename Callable>
     decltype(auto) internal_bind(Callable&& callable) const {
         static_assert(std::is_invocable_v<Callable>, "Input argument is not invocable");
-        using ReturnType = std::invoke_result_t<Callable>;
-        using InnerTypeError = typename EitherTraits<ReturnType>::ErrorType;
+        using ReturnType = std::remove_reference_t<std::invoke_result_t<Callable>>;
+        using InnerTypeError = typename EitherDetails<ReturnType>::ErrorType;
         static_assert(std::is_same_v<ErrorType, InnerTypeError>, "Error type does not match");
-        using InnerTypeOK = typename EitherTraits<ReturnType>::ValueType;
+        using InnerTypeOK = typename EitherDetails<ReturnType>::ValueType;
         if (this->isOk()) {
             return callable();
         } else {
@@ -268,8 +302,10 @@ class Either : public Functor<Either, ErrorType, ValueType>
     friend class Functor<Either, ErrorType, ValueType>;
     friend class Applicative<Either, ErrorType, ValueType>;
     friend class Monad<Either, ErrorType, ValueType>;
+
 private:
     explicit Either(bool isError): _isError{isError}{}
+
 public:
     static Either<ErrorType, ValueType> Error(const ErrorType& value) {
         Either<ErrorType, ValueType> result{true};
@@ -296,11 +332,12 @@ public:
         if (isOk()) return std::get<1>(_value);
         throw std::runtime_error("Ok not defined");
     }
+
 private:
     template <typename Callable>
     decltype(auto) internal_fmap(Callable&& callable) const {
         static_assert(std::is_invocable_v<Callable, ValueType>, "Input argument is not invocable");
-        using ReturnType = std::invoke_result_t<Callable, ValueType>;
+        using ReturnType = std::remove_reference_t<std::invoke_result_t<Callable, ValueType>>;
         if (this->isOk()) {
             if constexpr (std::is_void_v<ReturnType>) {
                 callable(value());
@@ -316,10 +353,10 @@ private:
     template <typename Callable>
     decltype(auto) internal_bind(Callable&& callable) const {
         static_assert(std::is_invocable_v<Callable, ValueType>, "Input argument is not invocable");
-        using ReturnType = std::invoke_result_t<Callable, ValueType>;
-        using InnerTypeError = typename EitherTraits<ReturnType>::ErrorType;
+        using ReturnType = std::remove_reference_t<std::invoke_result_t<Callable, ValueType>>;
+        using InnerTypeError = typename EitherDetails<ReturnType>::ErrorType;
         static_assert(std::is_same_v<ErrorType, InnerTypeError>, "Error type does not match");
-        using InnerTypeOK = typename EitherTraits<ReturnType>::ValueType;
+        using InnerTypeOK = typename EitherDetails<ReturnType>::ValueType;
         if (this->isOk()) {
             return callable(this->value());
         } else {
@@ -328,41 +365,67 @@ private:
     }
 
     template<typename Head>
-    decltype(auto) internal_apply(const Either<ErrorType, Head>& arg) const {
-        if constexpr (function_traits<ValueType>::ArgCount > 1) {
+    decltype(auto) internal_apply(Either<ErrorType, Head>&& arg) const {
+        const auto var{std::move(arg)};
+        if constexpr (std::is_invocable_v<ValueType, Head>) {
+            using ReturnType = std::remove_reference_t<std::invoke_result_t<ValueType, Head>>;
+            if (this->isError()) {
+                return Either<ErrorType, ReturnType>::Error(this->error());
+            } else {
+                if (var.isOk()) {
+                    if constexpr (std::is_void_v<ReturnType>) {
+                        value()(var.value());
+                        return Either<ErrorType, ReturnType>::Ok();
+                    } else {
+                        return Either<ErrorType, ReturnType>::Ok(value()(var.value()));
+                    }
+                } else {
+                    return Either<ErrorType, ReturnType>::Error(var.error());
+                }
+            }
+        } else {
             if (this->isOk()) {
-                if (arg.isOk()) {
-                    return Either<ErrorType, typename function_traits<ValueType>::PartialApplyFirst>::Ok([callable = value(), first = arg.value()](const auto& ...args) {
-                        return callable(first, args...);
+                if (var.isOk()) {
+                    return Either<ErrorType, typename function_traits<ValueType>::PartialApplyFirst>::Ok([callable = value(), first = var.value()](auto&& ...args) {
+                        return std::apply(callable, std::tuple_cat(std::make_tuple(first), std::make_tuple(args...)));
                     });
                 } else {
-                    return Either<ErrorType, typename function_traits<ValueType>::PartialApplyFirst>::Error(arg.error());
+                    return Either<ErrorType, typename function_traits<ValueType>::PartialApplyFirst>::Error(var.error());
                 }
             } else {
                 return Either<ErrorType, typename function_traits<ValueType>::PartialApplyFirst>::Error(this->error());
             }
-        } else {
-            using ReturnType = std::invoke_result_t<ValueType, Head>;
+        }
+    }
+
+    template<typename Head>
+    decltype(auto) internal_apply(Head&& arg) const {
+        if constexpr (std::is_invocable_v<ValueType, Head>) {
+            using ReturnType = std::remove_reference_t<std::invoke_result_t<ValueType, Head>>;
             if (this->isError()) {
                 return Either<ErrorType, ReturnType>::Error(this->error());
             } else {
-                if (arg.isOk()) {
-                    if constexpr (std::is_void_v<ReturnType>) {
-                        value()(arg.value());
-                        return Either<ErrorType, ReturnType>::Ok();
-                    } else {
-                        return Either<ErrorType, ReturnType>::Ok(value()(arg.value()));
-                    }
+                if constexpr (std::is_void_v<ReturnType>) {
+                    value()(std::forward<Head>(arg));
+                    return Either<ErrorType, ReturnType>::Ok();
                 } else {
-                    return Either<ErrorType, ReturnType>::Error(arg.error());
+                    return Either<ErrorType, ReturnType>::Ok(value()(std::forward<Head>(arg)));
                 }
+            }
+        } else {
+            if (this->isOk()) {
+                return Either<ErrorType, typename function_traits<ValueType>::PartialApplyFirst>::Ok([callable = value(), first = std::forward<Head>(arg)](auto&& ...args) {
+                    return std::apply(callable, std::tuple_cat(std::make_tuple(first), std::make_tuple(args...)));
+                });
+            } else {
+                return Either<ErrorType, typename function_traits<ValueType>::PartialApplyFirst>::Error(this->error());
             }
         }
     }
 
     template<typename std::enable_if<std::is_invocable_v<ValueType>>* = nullptr>
     decltype(auto) internal_apply() const {
-        using ReturnType = std::invoke_result_t<ValueType>;
+        using ReturnType = std::remove_reference_t<std::invoke_result_t<ValueType>>;
         if (this->isError()) {
             return Either<ErrorType, ReturnType>::Error();
         } else {

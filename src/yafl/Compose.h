@@ -61,7 +61,7 @@ decltype(auto) function_compose(const TLeft& lhs, const TRight& rhs) {
 template <typename TLeft, typename TRight>
 decltype(auto) kleisli_compose(const TLeft& lhs, const TRight& rhs) {
     using RhsReturnType = typename yafl::function_traits<TRight>::ReturnType;
-    if constexpr (IsMonadType<RhsReturnType>::value) {
+    if constexpr (IsMonadBase<RhsReturnType>::value) {
         return [&rhs, &lhs](auto&&... args) {
             return lhs(args...).bind(rhs);
         };
@@ -83,7 +83,7 @@ decltype(auto) kleisli_compose(const TLeft& lhs, const TRight& rhs) {
 template <typename TLeft, typename TRight>
 decltype(auto) compose(const TLeft& lhs, const TRight& rhs) {
     using LhsReturnType = typename yafl::function_traits<TLeft>::ReturnType;
-    if constexpr (IsMonadType<LhsReturnType>::value) {
+    if constexpr (IsMonadBase<LhsReturnType>::value) {
         return kleisli_compose(lhs, rhs);
     } else {
         return function_compose(lhs, rhs);

@@ -12,12 +12,6 @@
 
 namespace yafl {
 
-template <typename T>
-struct IsMonadType : public std::false_type {};
-
-template <template <typename...> typename MonadType, typename ...Args>
-struct IsMonadType<MonadType<Args...>> : public std::true_type {};
-
 //mreturn :: a -> M a
 //bind :: (a -> M b) -> M a -> M b
 /**
@@ -41,5 +35,20 @@ public:
         return static_cast<const TDerivedMonad<Args...>*>(this)->internal_bind(std::forward<Callable>(callable));
     }
 };
+
+template <typename T>
+struct IsMonadBase {
+    static constexpr bool value = false;
+};
+
+template <template <typename...> typename MonadType, typename ...Args>
+struct IsMonadBase<MonadType<Args...>> {
+    using BaseType = Monad<MonadType, Args...>;
+    using DerivedType = MonadType<Args...>;
+    using ArgTypes = std::tuple<yafl::detail::remove_cvref_t<Args>...>;
+    using ArgType = std::tuple_element_t<0, ArgTypes>;
+    static constexpr bool value = std::is_base_of_v<BaseType, DerivedType>;
+};
+
 
 } // namespace yafl

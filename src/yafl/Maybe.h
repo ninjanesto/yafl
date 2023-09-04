@@ -19,14 +19,14 @@
 namespace yafl {
 
 template <typename T>
-struct MaybeTraits;
+struct MaybeDetails;
 
 template <template <typename> typename Maybe, typename Inner>
-struct MaybeTraits<Maybe<Inner>> {
+struct MaybeDetails<Maybe<Inner>> {
     using ValueType = Inner;
 };
 template <template <typename> typename Maybe, typename Inner>
-struct MaybeTraits<const Maybe<Inner>> {
+struct MaybeDetails<const Maybe<Inner>> {
     using ValueType = Inner;
 };
 
