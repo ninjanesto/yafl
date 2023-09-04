@@ -6,7 +6,7 @@
  * \copyright   Critical TechWorks SA
  */
 
-#include "Maybe.h"
+#include "yafl/Maybe.h"
 #include <string>
 #include <tuple>
 #include <gtest/gtest.h>

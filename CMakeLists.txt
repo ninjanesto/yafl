@@ -18,16 +18,14 @@ if(CMAKE_BUILD_TYPE STREQUAL VALGRIND)
     include(ValgrindTarget)
 endif()
 
-if(BUILD_YAFL_COVERAGE)
-    set(COVERAGE_INCLUDES
-        ${CMAKE_SOURCE_DIR}/src
-    )
-    include(CoverageUtils)
-endif()
-
 add_subdirectory(src)
 
 if(BUILD_YAFL_TESTS OR BUILD_YAFL_COVERAGE)
+    if(BUILD_YAFL_COVERAGE)
+        set(COVERAGE_INCLUDES ${CMAKE_SOURCE_DIR}/src)
+        include(CoverageUtils)
+    endif()
+
     include(TestUtils)
     setup_testing()
     enable_testing()

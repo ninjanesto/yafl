@@ -4,10 +4,10 @@
 #include <memory>
 #include <functional>
 #include <type_traits>
-#include "Functor.h"
-#include "Applicative.h"
-#include "Monad.h"
-#include "TypeTraits.h"
+#include "yafl/Functor.h"
+#include "yafl/Applicative.h"
+#include "yafl/Monad.h"
+#include "yafl/TypeTraits.h"
 
 namespace yafl {
 

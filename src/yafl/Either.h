@@ -4,8 +4,8 @@
 #include <memory>
 #include <functional>
 #include <variant>
-#include "Functor.h"
-#include "Monad.h"
+#include "yafl/Functor.h"
+#include "yafl/Monad.h"
 
 namespace yafl {
 
@@ -27,11 +27,14 @@ struct EitherTraits<const Either<InnerError, InnerValue>> {
 template<typename Error, typename Value>
 class Either;
 
+
+/// TODO Applicative implementation
 template<>
 class Either<void, void> : public Functor<Either, void, void>
-                 //, public Applicative<Maybe>
+                         //, public Applicative<Maybe>
                          , public Monad<Either, void, void> {
     friend class Functor<Either, void, void>;
+    friend class Monad<Either, void, void>;
 private:
     explicit Either(bool v) : _value(v) {}
 public:
@@ -82,8 +85,10 @@ private:
 };
 
 template <typename ValueType>
-class Either<void, ValueType> : public Functor<Either, void, ValueType> {
+class Either<void, ValueType> : public Functor<Either, void, ValueType>
+                              , public Monad<Either, void, ValueType> {
     friend class Functor<Either, void, ValueType>;
+    friend class Monad<Either, void, ValueType>;
 private:
     explicit Either(bool isError) : _right{nullptr}, _isError{isError} {}
 public:
@@ -142,8 +147,10 @@ private:
 
 
 template <typename ErrorType>
-class Either<ErrorType, void> : public Functor<Either, ErrorType, void> {
+class Either<ErrorType, void> : public Functor<Either, ErrorType, void>
+                              , public Monad<Either, ErrorType, void> {
     friend class Functor<Either, ErrorType, void>;
+    friend class Monad<Either, ErrorType, void>;
 private:
     explicit Either(bool isError) : _left{nullptr}, _isError{isError} {}
 public:
@@ -201,8 +208,10 @@ private:
 };
 
 template <typename ErrorType, typename ValueType>
-class Either : public Functor<Either, ErrorType, ValueType> {
+class Either : public Functor<Either, ErrorType, ValueType>
+             , public Monad<Either, ErrorType, ValueType> {
     friend class Functor<Either, ErrorType, ValueType>;
+    friend class Monad<Either, ErrorType, ValueType>;
 private:
     explicit Either(bool isError): _isError{isError}{}
 public:
@@ -267,34 +276,37 @@ private:
     bool _isError;
 };
 
-template<typename ValueType>
-std::enable_if_t<!std::is_void_v<ValueType>, Either<void, ValueType>>
+
+template<typename ErrorType, typename ValueType>
+std::enable_if_t<std::is_void_v<ValueType> && std::is_void_v<ErrorType>, Either<void, void>>
+Ok() { return Either<void, void>::Ok(); }
+
+template<typename ErrorType, typename ValueType>
+std::enable_if_t<(!std::is_void_v<ErrorType>) && std::is_void_v<ValueType>, Either<ErrorType, void>>
+Ok() { return Either<ErrorType, void>::Ok(); }
+
+template<typename ErrorType, typename ValueType>
+std::enable_if_t<!std::is_void_v<ErrorType> && !std::is_void_v<ValueType>, Either<ErrorType, ValueType>>
+Ok(const ValueType& arg) { return Either<ErrorType, ValueType>::Ok(arg); }
+
+template<typename ErrorType, typename ValueType>
+std::enable_if_t<std::is_void_v<ErrorType> && !std::is_void_v<ValueType>, Either<void, ValueType>>
 Ok(const ValueType& arg) { return Either<void, ValueType>::Ok(arg); }
 
-template<typename ValueType>
-std::enable_if_t<(std::is_void_v<ValueType>), Either<void, void>>
-Ok() { return Either<void, void>::Ok(); }
-
 template<typename ErrorType, typename ValueType>
 std::enable_if_t<std::is_void_v<ErrorType> && std::is_void_v<ValueType>, Either<void, void>>
-Ok() { return Either<void, void>::Ok(); }
+Error() { return Either<void, void>::Error(); }
 
 template<typename ErrorType, typename ValueType>
-Either<ErrorType, ValueType> Ok(const ValueType& arg) { return Either<ErrorType, ValueType>::Ok(arg); }
-
-template<typename ErrorType>
-std::enable_if_t<!std::is_void_v<ErrorType>, Either<ErrorType, void>>
+std::enable_if_t<!std::is_void_v<ErrorType> && std::is_void_v<ValueType>, Either<ErrorType, void>>
 Error(const ErrorType& arg) { return Either<ErrorType, void>::Error(arg); }
 
-template<typename ErrorType>
-std::enable_if_t<(std::is_void_v<ErrorType>), Either<void, void>>
-Error() { return Either<void, void>::Error(); }
+template<typename ErrorType, typename ValueType>
+std::enable_if_t<!std::is_void_v<ErrorType> && !std::is_void_v<ValueType>, Either<ErrorType, ValueType>>
+Error(const ErrorType& arg) { return Either<ErrorType, ValueType>::Error(arg); }
 
 template<typename ErrorType, typename ValueType>
-std::enable_if_t<std::is_void_v<ErrorType> && std::is_void_v<ValueType>, Either<void, void>>
-Error() { return Either<void, void>::Error(); }
-
-template<typename ErrorType, typename R>
-Either<ErrorType, R> Error(const ErrorType& arg) { return Either<ErrorType, R>::Error(arg); }
+std::enable_if_t<std::is_void_v<ErrorType> && !std::is_void_v<ValueType>, Either<void, ValueType>>
+Error() { return Either<void, ValueType>::Error(); }
 
 } // namespace yafl

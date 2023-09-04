@@ -2,11 +2,11 @@ load("@rules_cc//cc:defs.bzl", "cc_library", "cc_binary", "cc_test")
 
 cc_library(
     name = "yafl-common",
-    hdrs = ["src/Applicative.h",
-            "src/Compose.h",
-            "src/Functor.h",
-            "src/Monad.h",
-            "src/TypeTraits.h"],
+    hdrs = ["src/yafl/Applicative.h",
+            "src/yafl/Compose.h",
+            "src/yafl/Functor.h",
+            "src/yafl/Monad.h",
+            "src/yafl/TypeTraits.h"],
     visibility = ["//visibility:public",],
     strip_include_prefix = "src",
 
@@ -14,7 +14,7 @@ cc_library(
 
 cc_library(
     name = "yafl-maybe",
-    hdrs = ["src/Maybe.h"],
+    hdrs = ["src/yafl/Maybe.h"],
     strip_include_prefix = "src",
     deps = ["//:yafl-common"],
     visibility = ["//visibility:public",],
@@ -22,7 +22,7 @@ cc_library(
 
 cc_library(
     name = "yafl-either",
-    hdrs = ["src/Either.h"],
+    hdrs = ["src/yafl/Either.h"],
     strip_include_prefix = "src",
     deps = ["//:yafl-common"],
     visibility = ["//visibility:public",],

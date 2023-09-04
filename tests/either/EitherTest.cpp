@@ -1,4 +1,4 @@
-#include "Either.h"
+#include "yafl/Either.h"
 #include <gtest/gtest.h>
 
 
@@ -55,22 +55,19 @@ TYPED_TEST(EitherTest, assertErrorCreateAValidEitherForAnyType) {
 }
 
 TYPED_TEST(EitherTest, assertOkCreateAValidEitherForAnyType) {
-    Either<typename TypeParam::Error, typename TypeParam::Ok> either = createOk<typename TypeParam::Error,
-                                                                                typename TypeParam::Ok>();
+    Either<typename TypeParam::Error, typename TypeParam::Ok> either = createOk<typename TypeParam::Error, typename TypeParam::Ok>();
     ASSERT_TRUE(either.isOk());
 }
 
 TYPED_TEST(EitherTest, assertFmapComputesCorrectType) {
     if constexpr (std::is_void_v<typename TypeParam::Ok>) {
         {
-            const auto either = createOk<typename TypeParam::Error,
-                                         typename TypeParam::Ok>();
+            const auto either = createOk<typename TypeParam::Error, typename TypeParam::Ok>();
             const auto resultVoid = either.fmap([](){});
             ASSERT_TRUE(resultVoid.isOk());
         }
         {
-            const auto either = createOk<typename TypeParam::Error,
-                                         typename TypeParam::Ok>();
+            const auto either = createOk<typename TypeParam::Error, typename TypeParam::Ok>();
             const auto resultType = either.fmap([](){return std::to_string(42);});
             ASSERT_TRUE(resultType.isOk());
             constexpr const auto areSameType = std::is_same_v<std::string, decltype(resultType.value())>;
@@ -79,14 +76,12 @@ TYPED_TEST(EitherTest, assertFmapComputesCorrectType) {
         }
     } else {
         {
-            const auto either = createOk<typename TypeParam::Error,
-                                         typename TypeParam::Ok>();
+            const auto either = createOk<typename TypeParam::Error, typename TypeParam::Ok>();
             const auto resultVoid = either.fmap([](const typename TypeParam::Ok&){});
             ASSERT_TRUE(resultVoid.isOk());
         }
         {
-            const auto either = createOk<typename TypeParam::Error,
-                                         typename TypeParam::Ok>();
+            const auto either = createOk<typename TypeParam::Error, typename TypeParam::Ok>();
             const auto resultType = either.fmap([](const typename TypeParam::Ok&){return std::to_string(42);});
             constexpr const auto areSameType = std::is_same_v<std::string, decltype(resultType.value())>;
             ASSERT_TRUE(areSameType);
@@ -95,13 +90,11 @@ TYPED_TEST(EitherTest, assertFmapComputesCorrectType) {
 
     if constexpr (std::is_void_v<typename TypeParam::Error>) {
         if constexpr (std::is_void_v<typename TypeParam::Ok>) {
-            const auto either = createError<typename TypeParam::Error,
-                                            typename TypeParam::Ok>();
+            const auto either = createError<typename TypeParam::Error, typename TypeParam::Ok>();
             const auto resultVoid = either.fmap([](){});
             ASSERT_TRUE(resultVoid.isError());
         } else {
-            const auto either = createError<typename TypeParam::Error,
-                                            typename TypeParam::Ok>();
+            const auto either = createError<typename TypeParam::Error, typename TypeParam::Ok>();
             const auto resultType = either.fmap([](const typename TypeParam::Ok&){return std::to_string(42);});
             ASSERT_TRUE(resultType.isError());
             constexpr const auto areSameType = std::is_same_v<std::string, decltype(resultType.value())>;
@@ -109,17 +102,141 @@ TYPED_TEST(EitherTest, assertFmapComputesCorrectType) {
         }
     } else {
         if constexpr (std::is_void_v<typename TypeParam::Ok>) {
-            const auto either = createError<typename TypeParam::Error,
-                                            typename TypeParam::Ok>();
+            const auto either = createError<typename TypeParam::Error, typename TypeParam::Ok>();
             const auto resultVoid = either.fmap([](){});
             ASSERT_TRUE(resultVoid.isError());
         } else {
-            const auto either = createError<typename TypeParam::Error,
-                                            typename TypeParam::Ok>();
+            const auto either = createError<typename TypeParam::Error, typename TypeParam::Ok>();
             const auto resultType = either.fmap([](const typename TypeParam::Ok&){return std::to_string(42);});
             ASSERT_TRUE(resultType.isError());
             constexpr const auto areSameType = std::is_same_v<std::string, decltype(resultType.value())>;
             ASSERT_TRUE(areSameType);
         }
+    }
+}
+
+TYPED_TEST(EitherTest, assertBindComputesCorrectType) {
+    if constexpr (std::is_void_v<typename TypeParam::Ok> && std::is_void_v<typename TypeParam::Error>) {
+        {
+            const auto either = createOk<void, void>();
+            const auto resultOk = either.bind([]() { return Ok<void, void>(); });
+            ASSERT_TRUE(resultOk.isOk());
+        }
+        {
+            const auto either = createOk<void, void>();
+            const auto resultError = either.bind([]() { return Error<void, void>(); });
+            ASSERT_TRUE(resultError.isError());
+        }
+        {
+            const auto either = createError<void, void>();
+            const auto resultError = either.bind([]() { return Ok<void, void>(); });
+            ASSERT_TRUE(resultError.isError());
+        }
+
+        {
+            const auto either = createError<void, void>();
+            const auto resultError = either.bind([]() { return Error<void, void>(); });
+            ASSERT_TRUE(resultError.isError());
+        }
+    }
+
+    if constexpr (std::is_void_v<typename TypeParam::Ok> && !std::is_void_v<typename TypeParam::Error>) {
+        {
+            const auto either = createOk<typename TypeParam::Error, void>();
+            const auto resultOk = either.bind([]() { return Ok<typename TypeParam::Error, void>(); });
+            ASSERT_TRUE(resultOk.isOk());
+        }
+        {
+            const auto either = createOk<typename TypeParam::Error, void>();
+            const auto resultError = either.bind([]() { return Error<typename TypeParam::Error, void>(42); });
+            ASSERT_TRUE(resultError.isError());
+        }
+        {
+            const auto either = createError<typename TypeParam::Error, void>();
+            const auto resultError = either.bind([]() { return Ok<typename TypeParam::Error, void>(); });
+            ASSERT_TRUE(resultError.isError());
+        }
+        {
+            const auto either = createError<typename TypeParam::Error, void>();
+            const auto resultError = either.bind([]() { return Error<typename TypeParam::Error, void>(42); });
+            ASSERT_TRUE(resultError.isError());
+        }
+    }
+
+    if constexpr (!std::is_void_v<typename TypeParam::Ok> && std::is_void_v<typename TypeParam::Error>) {
+        {
+            const auto either = createOk<void, typename TypeParam::Ok>();
+            const auto resultOk = either.bind([](const typename TypeParam::Ok &) { return Ok<void, std::string>("42"); });
+            ASSERT_TRUE(resultOk.isOk());
+            constexpr const auto areSameType = std::is_same_v<std::string, decltype(resultOk.value())>;
+            ASSERT_TRUE(areSameType);
+        }
+        {
+            const auto either = createOk<void, typename TypeParam::Ok>();
+            const auto resultError = either.bind([](const typename TypeParam::Ok &) { return Error<void, std::string>(); });
+            ASSERT_TRUE(resultError.isError());
+            constexpr const auto areSameType = std::is_same_v<std::string, decltype(resultError.value())>;
+            ASSERT_TRUE(areSameType);
+        }
+        {
+            const auto either = createError<void, typename TypeParam::Ok>();
+            const auto resultError = either.bind([](const typename TypeParam::Ok &) { return Ok<void, std::string>("42"); });
+            ASSERT_TRUE(resultError.isError());
+            constexpr const auto areSameType = std::is_same_v<std::string, decltype(resultError.value())>;
+            ASSERT_TRUE(areSameType);
+        }
+        {
+            const auto either = createError<void, typename TypeParam::Ok>();
+            const auto resultError = either.bind([](const typename TypeParam::Ok &) { return Error<void, std::string>(); });
+            ASSERT_TRUE(resultError.isError());
+            constexpr const auto areSameType = std::is_same_v<std::string, decltype(resultError.value())>;
+            ASSERT_TRUE(areSameType);
+        }
+    }
+
+    if constexpr (!std::is_void_v<typename TypeParam::Ok> && !std::is_void_v<typename TypeParam::Error>) {
+        {
+            const auto either = createOk<typename TypeParam::Error, typename TypeParam::Ok>();
+            const auto resultOk = either.bind([](const typename TypeParam::Ok&){ return Ok<typename TypeParam::Error, std::string>(std::string("42")); });
+            ASSERT_TRUE(resultOk.isOk());
+            constexpr const auto areSameType = std::is_same_v<std::string, decltype(resultOk.value())>;
+            ASSERT_TRUE(areSameType);
+        }
+        {
+            const auto either = createOk<typename TypeParam::Error, typename TypeParam::Ok>();
+            const auto resultError = either.bind([](const typename TypeParam::Ok &) { return Error<typename TypeParam::Error, std::string>(29); });
+            ASSERT_TRUE(resultError.isError());
+            constexpr const auto areSameType = std::is_same_v<std::string, decltype(resultError.value())>;
+            ASSERT_TRUE(areSameType);
+        }
+        {
+            const auto either = createError<typename TypeParam::Error, typename TypeParam::Ok>();
+            const auto resultError = either.bind([](const typename TypeParam::Ok &) { return Ok<typename TypeParam::Error, std::string>("29"); });
+            ASSERT_TRUE(resultError.isError());
+            constexpr const auto areSameType = std::is_same_v<std::string, decltype(resultError.value())>;
+            ASSERT_TRUE(areSameType);
+        }
+        {
+            const auto either = createError<typename TypeParam::Error, typename TypeParam::Ok>();
+            const auto resultError = either.bind([](const typename TypeParam::Ok &) { return Error<typename TypeParam::Error, std::string>(29);
+            });
+            ASSERT_TRUE(resultError.isError());
+            constexpr const auto areSameType = std::is_same_v<std::string, decltype(resultError.value())>;
+            ASSERT_TRUE(areSameType);
+        }
+    }
+}
+
+TYPED_TEST(EitherTest, validateValueThrowsExceptionWhenEitherIsError) {
+    if constexpr (!std::is_void_v<typename TypeParam::Ok>) {
+        const auto either = createError<typename TypeParam::Error, typename TypeParam::Ok>();
+        EXPECT_THROW({either.value();}, std::runtime_error );
+    }
+}
+
+TYPED_TEST(EitherTest, validateErrorThrowsExceptionWhenEitherIsValue) {
+    if constexpr (!std::is_void_v<typename TypeParam::Error>) {
+        const auto either = createOk<typename TypeParam::Error, typename TypeParam::Ok>();
+        EXPECT_THROW({either.error();}, std::runtime_error );
     }
 }
