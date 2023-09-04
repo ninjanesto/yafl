@@ -1,6 +1,14 @@
+/**
+ * \file
+ * \brief       Yet Another Functional Library
+ *
+ * \project     Critical TechWorks SA
+ * \copyright   Critical TechWorks SA
+ */
+
+#include "yafl/Compose.h"
 #include "yafl/Either.h"
 #include <gtest/gtest.h>
-
 
 template<typename T>
 class EitherTest : public ::testing::Test {};
@@ -290,11 +298,69 @@ TEST(EitherTest, assertApply) {
         ASSERT_TRUE(result3.isError());
     }
     {
-        const auto func = [](const std::string &s, float f) {return std::string();};
+        const auto func = [](const std::string&, float) {return std::string();};
         const auto applmultBy42 = Error<int, decltype(func)>(2);
         const auto result = applmultBy42(Ok<int, std::string>("OlaOla"));
         ASSERT_TRUE(result.isError());
         const auto result2 = result(Ok<int, float>(2.2));
         ASSERT_TRUE(result2.isError());
+    }
+}
+
+
+TEST(MaybeTest, validate_kleisli_compose){
+    {
+        const auto f1 = [](int i) { return Ok<int>(i*2);};
+        const auto f2 = [](int i) { return i * 2;};
+        const auto f = compose(f1, f2);
+        ASSERT_EQ(f(2).value(), 8);
+    }
+    {
+        const auto f1 = [](int i) { return Ok<int>(i*2);};
+        const auto f2 = [](int i) { return Ok<int>(std::to_string(i * 2));};
+        const auto f = compose(f1, f2);
+        ASSERT_EQ(f(2).value(), "8");
+    }
+    {
+        const auto f1 = [](int) { return Ok<std::string, void>();};
+        const auto f2 = []() { return 2;};
+        const auto f = compose(f1, f2);
+        ASSERT_EQ(f(2).value(), 2);
+    }
+    {
+        const auto f1 = [](int) { return Ok<std::string, void>();};
+        const auto f2 = []() { return Ok<std::string, std::string>("2");};
+        const auto f = compose(f1, f2);
+        ASSERT_EQ(f(2).value(), "2");
+    }
+    {
+        const auto f1 = [](int) { return Error<int, int>(2);};
+        const auto f2 = [](int i) { return i * 2;};
+        const auto f = compose(f1, f2);
+        ASSERT_FALSE(f(2).isOk());
+    }
+    {
+        const auto f1 = [](int) { return Error<std::string, int>("2");};
+        const auto f2 = [](int i) { return Ok<std::string, int>(i * 2);};
+        const auto f = compose(f1, f2);
+        ASSERT_FALSE(f(2).isOk());
+    }
+    {
+        const auto f1 = [](int i) { return Ok<void, int>(i * 2);};
+        const auto f2 = [](int) { return Error<void, int>();};
+        const auto f = compose(f1, f2);
+        ASSERT_FALSE(f(2).isOk());
+    }
+    {
+        const auto f1 = [](int) { return Error<void, void>();};
+        const auto f2 = []() { return 2;};
+        const auto f = compose(f1, f2);
+        ASSERT_FALSE(f(2).isOk());
+    }
+    {
+        const auto f1 = [](int) { return Error<void, void>();};
+        const auto f2 = []() { return Ok<void, void>();};
+        const auto f = compose(f1, f2);
+        ASSERT_FALSE(f(2).isOk());
     }
 }

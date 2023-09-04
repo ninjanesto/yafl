@@ -1,3 +1,10 @@
+/**
+ * \file
+ * \brief       Yet Another Functional Library
+ *
+ * \project     Critical TechWorks SA
+ * \copyright   Critical TechWorks SA
+ */
 #pragma once
 
 #include <iostream>

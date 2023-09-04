@@ -1,11 +1,12 @@
 /**
  * \file
- * \brief       CAPI Clients Factory
+ * \brief       Yet Another Functional Library
  *
- * \project     BMW Platform Software
+ * \project     Critical TechWorks SA
  * \copyright   Critical TechWorks SA
  */
 
+#include "yafl/Compose.h"
 #include "yafl/Maybe.h"
 #include <string>
 #include <tuple>
@@ -252,5 +253,62 @@ TEST(MaybeTest, assertApply) {
         const auto partialApply = Just([](int){ return;});
         const auto resultPartialJust = partialApply(2);
         ASSERT_TRUE(resultPartialJust.hasValue());
+    }
+}
+
+TEST(MaybeTest, validate_kleisli_compose){
+    {
+        const auto f1 = [](int i) { return Just(i*2);};
+        const auto f2 = [](int i) { return i * 2;};
+        const auto f = compose(f1, f2);
+        ASSERT_EQ(f(2).value(), 8);
+    }
+    {
+        const auto f1 = [](int i) { return Just(i*2);};
+        const auto f2 = [](int i) { return Just(std::to_string(i * 2));};
+        const auto f = compose(f1, f2);
+        ASSERT_EQ(f(2).value(), "8");
+    }
+    {
+        const auto f1 = [](int) { return Just<void>();};
+        const auto f2 = []() { return 2;};
+        const auto f = compose(f1, f2);
+        ASSERT_EQ(f(2).value(), 2);
+    }
+    {
+        const auto f1 = [](int) { return Maybe<void>::Just();};
+        const auto f2 = []() { return Just<std::string>("2");};
+        const auto f = compose(f1, f2);
+        ASSERT_EQ(f(2).value(), "2");
+    }
+    {
+        const auto f1 = [](int) { return Nothing<int>();};
+        const auto f2 = [](int i) { return i * 2;};
+        const auto f = compose(f1, f2);
+        ASSERT_FALSE(f(2).hasValue());
+    }
+    {
+        const auto f1 = [](int) { return Nothing<int>();};
+        const auto f2 = [](int i) { return Just(i * 2);};
+        const auto f = compose(f1, f2);
+        ASSERT_FALSE(f(2).hasValue());
+    }
+    {
+        const auto f1 = [](int i) { return Just(i * 2);};
+        const auto f2 = [](int) { return Nothing<int>();};
+        const auto f = compose(f1, f2);
+        ASSERT_FALSE(f(2).hasValue());
+    }
+    {
+        const auto f1 = [](int) { return Nothing<void>();};
+        const auto f2 = []() { return 2;};
+        const auto f = compose(f1, f2);
+        ASSERT_FALSE(f(2).hasValue());
+    }
+    {
+        const auto f1 = [](int) { return Nothing<void>();};
+        const auto f2 = []() { return Just<void>();};
+        const auto f = compose(f1, f2);
+        ASSERT_FALSE(f(2).hasValue());
     }
 }

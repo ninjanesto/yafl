@@ -1,8 +1,8 @@
 /**
  * \file
- * \brief       CAPI Clients Factory
+ * \brief       Yet Another Functional Library
  *
- * \project     BMW Platform Software
+ * \project     Critical TechWorks SA
  * \copyright   Critical TechWorks SA
  */
 

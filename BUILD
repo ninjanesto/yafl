@@ -9,7 +9,6 @@ cc_library(
             "src/yafl/TypeTraits.h"],
     visibility = ["//visibility:public",],
     strip_include_prefix = "src",
-
 )
 
 cc_library(
@@ -36,10 +35,19 @@ cc_library(
 )
 
 cc_test(
+    name = "yafl-compose-test",
+    srcs = ["tests/compose/ComposeTest.cpp",],
+    deps = ["@gtest//:gtest",
+            "@gtest//:gtest_main",
+            "//:yafl-common",],
+)
+
+cc_test(
     name = "yafl-maybe-test",
     srcs = ["tests/maybe/MaybeTest.cpp",],
     deps = ["@gtest//:gtest",
             "@gtest//:gtest_main",
+            "//:yafl-common",
             "//:yafl-maybe",],
 )
 
@@ -48,5 +56,6 @@ cc_test(
     srcs = ["tests/either/EitherTest.cpp",],
     deps = ["@gtest//:gtest",
             "@gtest//:gtest_main",
+            "//:yafl-common",
             "//:yafl-either",],
 )

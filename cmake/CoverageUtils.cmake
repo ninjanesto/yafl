@@ -23,7 +23,7 @@ find_package_handle_standard_args(Coverage
 mark_as_advanced(PYTHON3 GENHTML_EXECUTABLE)
 
 # Set options and locations
-set(COVERAGE_BRANCH_COVERAGE 0)
+set(COVERAGE_BRANCH_COVERAGE 1)
 set(COVERAGE_WORKING_DIR ${CMAKE_CURRENT_BINARY_DIR})
 set(COVERAGE_REPORT_DIR "${COVERAGE_WORKING_DIR}/coverage_report")
 
@@ -46,6 +46,7 @@ add_custom_command(TARGET coverage POST_BUILD
     --search-directory ${COVERAGE_WORKING_DIR}
     --compiler-directory ${COVERAGE_WORKING_DIR}
     --zerocounters
+    --branch-coverage
     --quiet
 
     # Execute all automated tests
@@ -56,6 +57,7 @@ add_custom_command(TARGET coverage POST_BUILD
     --search-directory ${COVERAGE_WORKING_DIR}
     --compiler-directory ${COVERAGE_WORKING_DIR}
     --include ${COVERAGE_INCLUDES}
+    --branch-coverage
     --lcov
     --output ${COVERAGE_WORKING_DIR}/coverage.lcov
     --quiet

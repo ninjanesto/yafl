@@ -1,9 +1,23 @@
+/**
+ * \file
+ * \brief       Yet Another Functional Library
+ *
+ * \project     Critical TechWorks SA
+ * \copyright   Critical TechWorks SA
+ */
 #pragma once
 
 #include <memory>
 #include <functional>
 
 namespace yafl {
+
+template <typename T>
+struct MonadTraits : public std::false_type {};
+
+template <template <typename...> typename MonadType, typename ...Args>
+struct MonadTraits<MonadType<Args...>> : public std::true_type {};
+
 //mreturn :: a -> M a
 //bind :: (a -> M b) -> M a -> M b
 /**
