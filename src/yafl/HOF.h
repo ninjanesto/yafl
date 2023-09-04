@@ -14,13 +14,13 @@ namespace yafl {
 
 namespace detail {
     template<typename Callable, typename Head>
-    decltype(auto) uncurry_impl(Callable&& f, const Head& value) {
-        return f(value);
+    decltype(auto) uncurry_impl(Callable&& f, Head&& value) {
+        return f(std::forward<Head>(value));
     }
 
     template<typename Callable, typename Head, typename ...Tail>
-    decltype(auto) uncurry_impl(Callable&& f, const Head& value, Tail&&...ts) {
-        const auto f2 = f(value);
+    decltype(auto) uncurry_impl(Callable&& f, Head&& value, Tail&&...ts) {
+        const auto f2 = f(std::forward<Head>(value));
         return uncurry_impl(f2, std::forward<Tail>(ts)...);
     }
 
@@ -57,12 +57,12 @@ decltype(auto) function_compose(TLeft&& lhs, TRight&& rhs) {
     if constexpr (yafl::FunctionTraits<TLeft>::ArgCount > 0) {
         if constexpr (std::is_void_v<LhsReturnType>) {
             return [rhs = std::forward<TRight>(rhs), lhs = std::forward<TLeft>(lhs)](auto&& ...args) {
-                std::apply(lhs, std::make_tuple(args...));
+                lhs(std::forward<decltype(args)>(args)...);
                 return rhs();
             };
         } else {
             return [rhs = std::forward<TRight>(rhs), lhs = std::forward<TLeft>(lhs)](auto&& ...args) {
-                return rhs(std::apply(lhs, std::make_tuple(args...)));
+                return rhs(lhs(std::forward<decltype(args)>(args)...));
             };
         }
     } else {
@@ -94,11 +94,11 @@ decltype(auto) kleisli_compose(TLeft&& lhs, TRight&& rhs) {
     using RhsReturnType = typename yafl::FunctionTraits<TRight>::ReturnType;
     if constexpr (core::IsMonadicBase<RhsReturnType>::value) {
         return [rhs = std::forward<TRight>(rhs), lhs = std::forward<TLeft>(lhs)](auto&&... args) {
-            return lhs(args...).bind(rhs);
+            return lhs(std::forward<decltype(args)>(args)...).bind(rhs);
         };
     } else {
         return [rhs = std::forward<TRight>(rhs), lhs = std::forward<TLeft>(lhs)](auto&&... args) {
-            return lhs(args...).fmap(rhs);
+            return lhs(std::forward<decltype(args)>(args)...).fmap(rhs);
         };
     }
 }
@@ -130,13 +130,11 @@ decltype(auto) compose(TLeft&& lhs, TRight&& rhs) {
  * @return curried function
  */
 template <typename F>
-decltype(auto) curry(const F& f) {
+decltype(auto) curry(F&& f) {
     if constexpr (std::is_invocable_v<F>) {
         return f();
     } else {
-        using FirstArg = typename FunctionTraits<F>::template ArgType<0>;
-
-        return [f= std::move(f)](const FirstArg& arg) {
+        return [f= std::forward<F>(f)](const typename FunctionTraits<F>::template ArgType<0>& arg) {
             using ReturnFunType = typename FunctionTraits<F>::PartialApplyFirst;
 
             const ReturnFunType inner_func = [f, arg = std::move(arg)](auto&& ...args) {
@@ -158,7 +156,7 @@ decltype(auto) curry(const F& f) {
 template <typename Callable>
 decltype(auto) uncurry(Callable&& f) {
     return [f = std::forward<Callable>(f)](auto&& ...args) {
-            return detail::uncurry_impl(f, std::forward<decltype(args)>(args)...);
+        return detail::uncurry_impl(f, std::forward<decltype(args)>(args)...);
     };
 }
 
@@ -173,11 +171,14 @@ decltype(auto) uncurry(Callable&& f) {
  */
 template <typename F, typename ...Args>
 decltype(auto) partial(F&& f, Args&& ...args) {
-    if constexpr (std::is_invocable_v<F>) {
-        return f();
+    if constexpr (std::is_invocable_v<F, Args...>) {
+        return std::invoke(f, std::forward<Args>(args)...);
     } else {
         return [f=std::forward<F>(f), vargs = std::make_tuple(std::forward<Args>(args) ...)](auto&& ...inner_args) {
-            return std::apply(f, std::tuple_cat(vargs, std::make_tuple(inner_args...)));
+            return std::apply([f = std::move(f)](auto&& ...apply_args){
+                    return f(std::forward<decltype(apply_args)>(apply_args)...);
+                },
+                std::tuple_cat(vargs, std::make_tuple(inner_args...)));
         };
     }
 }
@@ -190,8 +191,8 @@ decltype(auto) partial(F&& f, Args&& ...args) {
  * @return argument
  */
 template<typename Arg>
-Arg id(const Arg& arg) {
-    return arg;
+Arg id(Arg&& arg) {
+    return std::forward<Arg>(arg);
 }
 
 /**

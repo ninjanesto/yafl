@@ -95,7 +95,7 @@ decltype(auto) fmap(Callable&& callable, const FunctorT& functor) {
  */
 template<typename Callable>
 decltype(auto) fmap(Callable&& callable) {
-    return [callable = std::forward<Callable>(callable)](const auto& functor){
+    return [callable = std::forward<Callable>(callable)](const auto& functor) {
         return functor.fmap(callable);
     };
 }

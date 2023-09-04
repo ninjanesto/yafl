@@ -149,12 +149,12 @@ TEST(HOFTest, validate_partial_application) {
     }
     {
         const auto partial3 = yafl::partial(func, 2, 4, "ola");
-        ASSERT_EQ(partial3(), "ola8");
+        ASSERT_EQ(partial3, "ola8");
     }
     {
         const std::function<std::string(int, const std::string&)> partial1 = yafl::partial(func, 2);
         const auto partial3 = yafl::partial(partial1, 4, "ola");
-        ASSERT_EQ(partial3(), "ola8");
+        ASSERT_EQ(partial3, "ola8");
     }
     {
         const auto func2 = [](){ return 42; };

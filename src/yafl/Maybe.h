@@ -9,6 +9,7 @@
 
 #include <iostream>
 #include <memory>
+#include <optional>
 #include <functional>
 #include <type_traits>
 #include "yafl/Functor.h"
@@ -72,6 +73,38 @@ private:
     explicit Maybe(bool v) : _value(v) {}
 
 public:
+    /**
+     * Copy constructor
+     * @param maybe argument to be copied
+     */
+    Maybe(const Maybe& maybe) : _value{maybe._value} {}
+
+    /**
+     * Move constructor
+     * @param maybe arguent to be moved
+     */
+    Maybe(Maybe&& maybe) noexcept : _value(maybe._value) {}
+
+    /**
+     * Copy operator
+     * @param other argument to be copied
+     * @return Maybe with the value copied
+     */
+    Maybe& operator=(const Maybe& other) {
+        _value = other._value;
+        return *this;
+    }
+
+    /**
+     * Move operator
+     * @param other argument to be moved
+     * @return Mayb with the value moved
+     */
+    Maybe& operator=(Maybe&& other) noexcept {
+        _value = other._value;
+        return *this;
+    }
+
     /**
      * Constructs a Maybe type that has Nothing
      * @return maybe nothing
@@ -142,9 +175,45 @@ class Maybe : public core::Functor<Maybe, T>,
     static_assert(!std::is_reference_v<T>, "Maybe class cannot store reference to value");
 
 private:
-    Maybe() : _value{nullptr}{}
-    explicit Maybe(const T& value) :_value{std::make_unique<T>(value)}{}
+    Maybe() : _value{}{}
+    explicit Maybe(const T& value) :_value{value}{}
 public:
+    /**
+     * Copy constructor
+     * @param maybe argument to be copied
+     */
+    Maybe(const Maybe<T>& maybe) : _value{} {
+        if (maybe._value) {
+            _value = maybe.value();
+        }
+    }
+
+    /**
+     * Move constructor
+     * @param maybe arguent to be moved
+     */
+    Maybe(Maybe<T>&& maybe) noexcept : _value{std::move(maybe._value)}{};
+
+    /**
+     * Copy operator
+     * @param other argument to be copied
+     * @return Maybe with the value copied
+     */
+    Maybe<T>& operator=(const Maybe<T>& other) noexcept {
+        _value = other._value;
+        return *this;
+    }
+
+    /**
+     * Move operator
+     * @param other argument to be moved
+     * @return Mayb with the value moved
+     */
+    Maybe<T>& operator=(Maybe<T>&& other) noexcept {
+        _value = std::move(other._value);
+        return *this;
+    }
+
     /**
      * Constructs a Maybe type that has Nothing
      * @return maybe nothing
@@ -176,7 +245,7 @@ public:
      * @throws std::runtime_error when maybe contains nothing
      */
     [[nodiscard]] T value() const {
-        if (_value) return *(_value.get());
+        if (_value) return _value.value();
         throw std::runtime_error("Nothing");
     }
 
@@ -288,7 +357,7 @@ private:
     }
 
 private:
-    std::unique_ptr<T> _value;
+    std::optional<T> _value;
 };
 
 namespace maybe {

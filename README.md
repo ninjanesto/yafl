@@ -39,7 +39,7 @@ const auto threeway = yafl::compose<std::function<std::string(int)>>(comp_f1_f2,
 std::cout << threeway(1).value << std::endl;
 ```
 
-In mathmatics, function composition is associative. 
+In mathematics, function composition is associative. 
 
 f . (g . h) = (f . g) . h
 
@@ -121,12 +121,87 @@ ff(1,"",3);
 ```
 
 ## Functor, Applicative Functor and Monad
-### Maybe monad
+The following *Functor*, *Applicative Functor* and *Monad* classes are part of YAFL core and are not meant to be used as is but if needed, it is possible to do so.
+Each description contains a brief example of a possible usage.
 
-### Either monad
+We provide two implementations for all these functional "interfaces", the [Maybe](###maybe) and [Either](###either) classes
+
+#### Functor
+In mathematics a functor is a mapping between categories (collection of objects linked by morphisms).
+
+We address Functor as a wrapper class for any value type, that allows a transformation to the underlying values, by relying on the application of a given function.
+It is represented in YAFL by the abstract class yafl::Functor, which provides the method `fmap` to apply the given transformation to the wrapped value.
+
+```c++
+const std::unique_ptr<yafl::core::Functor<yafl::Maybe, int>> functor =
+        std::make_unique<yafl::Maybe<int>>(yafl::maybe::Just(420));
+functor->fmap([](int i){ std::cout << i << std::endl;});
+```
+Functors are required to obey certain laws.
+ - Functors must preserve identity morphisms
+    
+    *fmap id \<functor\> = id \<functor\>*
+```c++
+const auto m = yafl::maybe::Just(420);
+
+const auto r = yafl::fmap(yafl::id<int>, m);
+const auto r2 = yafl::id(m);
+std::cout << (r.value() == r2.value()) << std::endl;
+```
+
+ - Functors preserve composition of morphisms 
+    
+    *fmap (f . g) <functor> ==  fmap f . fmap g*
+```c++
+const auto f1 = [](int i) { return std::to_string(i);};
+const auto f2 = [](const std::string& s) { return s + "dummy";};
+
+const auto compose = yafl::compose(f1, f2);
+std::cout << (m.fmap(compose).value() == m.fmap(f1).fmap(f2).value()) << std::endl;
+```
+
+#### Applicative Functor
+Applicative functors are functors on steroids (with extra laws and operations). They are an intermediate class between Functor and Monad.
+They allow function application to be chained across multiple instances of the structure.
+
+Functor _fmap_ applies a function to a value inside a functor:
+
+ *fmap :: (a -> b) -> f a -> f b*
+
+Applicative _apply_ applies a function inside a functor to a value also inside the functor
+
+ *apply :: f (a -> b) -> f a -> f b*
+
+We implemented the apply operation using C++ operator(). Our implementation of applicative functors can receive a function with any number of arguments, that can later be partially applied.
+
+Applicatives are required to satisfy four laws:
+ - Identity
+```c++
+const auto v = yafl::maybe::Just(42);
+const auto ap = yafl::maybe::Just(&yafl::id<int>);
+std::cout << (ap(yafl::Maybe(v)).value() == v.value()) << std::endl;
+std::cout << (ap(yafl::maybe::Just(42)).value() == v.value()) << std::endl;
+
+const auto ap2 = yafl::maybe::Just(&yafl::id<int>);
+std::cout << (ap2(42).value() == v.value()) << std::endl;
+```
+
+ - Composition
+```c++
+
+```
+
+
+
+#### Monad
+
+
+
+
+### Maybe
+
+### Either 
 
 ### Function lift
-
-
 
 ## Build
