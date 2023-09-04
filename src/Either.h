@@ -7,6 +7,7 @@
 #include "Functor.h"
 #include "Monad.h"
 
+namespace yafl {
 
 template <typename T>
 struct EitherTraits;
@@ -54,7 +55,7 @@ private:
         if (this->isOk()) {
             if constexpr (std::is_void_v<ReturnType>) {
                 callable();
-                return Either<void, void>::Ok();
+                return Either<void, ReturnType>::Ok();
             } else {
                 return Either<void, ReturnType>::Ok(callable());
             }
@@ -112,7 +113,7 @@ private:
         if (this->isOk()) {
             if constexpr (std::is_void_v<ReturnType>) {
                 callable(value());
-                return Either<void, void>::Ok();
+                return Either<void, ReturnType>::Ok();
             } else {
                 return Either<void, ReturnType>::Ok(callable(value()));
             }
@@ -172,7 +173,7 @@ private:
         if (this->isOk()) {
             if constexpr (std::is_void_v<ReturnType>) {
                 callable();
-                return Either<ErrorType, void>::Ok();
+                return Either<ErrorType, ReturnType>::Ok();
             } else {
                 return Either<ErrorType, ReturnType>::Ok(callable());
             }
@@ -238,7 +239,7 @@ private:
         if (this->isOk()) {
             if constexpr (std::is_void_v<ReturnType>) {
                 callable(value());
-                return Either<ErrorType, void>::Ok();
+                return Either<ErrorType, ReturnType>::Ok();
             } else {
                 return Either<ErrorType, ReturnType>::Ok(callable(value()));
             }
@@ -295,3 +296,5 @@ Error() { return Either<void, void>::Error(); }
 
 template<typename ErrorType, typename R>
 Either<ErrorType, R> Error(const ErrorType& arg) { return Either<ErrorType, R>::Error(arg); }
+
+} // namespace yafl

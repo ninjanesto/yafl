@@ -1,5 +1,7 @@
 #pragma once
 
+namespace yafl {
+
 /**
  * Compose functions. Similar as piping shell commands
  * @tparam TLeft Left argument type
@@ -17,3 +19,5 @@ decltype(auto) operator|(const TLeft& lhs, const TRight& rhs) {
         return rhs (lhs (std::forward<Args>(args)...));
     };
 }
+
+} // namespace yafl

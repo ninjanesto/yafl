@@ -25,6 +25,8 @@ struct VoidInt {
     using Ok = int;
 };
 
+using namespace yafl;
+
 template <typename E, typename V>
 Either<E, V> createError() {
     if constexpr (std::is_void_v<E>) {

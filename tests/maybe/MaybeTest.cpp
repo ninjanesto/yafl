@@ -12,6 +12,7 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
+using namespace yafl;
 
 template <typename T>
 Maybe<T> createMaybe() {

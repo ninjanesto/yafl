@@ -9,6 +9,8 @@
 #include "Monad.h"
 #include "TypeTraits.h"
 
+namespace yafl {
+
 template <typename T>
 struct MaybeTraits;
 
@@ -127,7 +129,7 @@ private:
         if (this->hasValue()) {
             if constexpr (std::is_void_v<ReturnType>) {
                 callable(this->value());
-                return Maybe<void>::Just();
+                return Maybe<ReturnType>::Just();
             } else {
                 return Maybe<ReturnType>::Just(callable(this->value()));
             }
@@ -154,7 +156,7 @@ private:
                 if (arg.hasValue()) {
                     if constexpr (std::is_void_v<ReturnType>) {
                         value()(arg.value());
-                        return Maybe<void>::Just();
+                        return Maybe<ReturnType>::Just();
                     } else {
                         return Maybe<ReturnType>::Just(value()(arg.value()));
                     }
@@ -173,7 +175,7 @@ private:
         } else {
             if constexpr (std::is_void_v<ReturnType>) {
                 value()();
-                return Maybe<void>::Just();
+                return Maybe<ReturnType>::Just();
             } else {
                 return Maybe<ReturnType>::Just(value()());
             }
@@ -206,3 +208,5 @@ Maybe<T...> Nothing() { return Maybe<T...>::Nothing(); }
 
 template<typename ...T>
 Maybe<T...> Just(T&& ...args) { return Maybe<T...>::Just(std::forward<T...>(args)...); }
+
+} // namespace yafl

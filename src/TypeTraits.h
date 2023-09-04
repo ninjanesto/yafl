@@ -3,7 +3,7 @@
 #include <type_traits>
 #include <cstddef>
 #include <functional>
-
+namespace yafl {
 namespace detail {
 
 /**
@@ -25,7 +25,7 @@ struct function_traits< Ret,  FirstArg, Args...> {
     using Signature = std::function<Ret(FirstArg, Args...)>;
     using PartialApplyFirst = std::function<Ret(Args...)>;
     using ReturnType = Ret;
-    using ArgTypes = std::tuple<FirstArg, remove_cvref_t<Args>...>;
+    using ArgTypes = std::tuple<remove_cvref_t<FirstArg>, remove_cvref_t<Args>...>;
     static constexpr std::size_t ArgCount = sizeof...(Args) + 1;
     template <std::size_t idx>
     using ArgType = std::tuple_element_t<idx, ArgTypes>;
@@ -64,3 +64,5 @@ struct function_traits<Ret (&)(Args...)> : detail::function_traits<Ret, Args...>
 
 template <typename Ret, typename... Args>
 struct function_traits<Ret (Args...)> : detail::function_traits<Ret, Args...>{};
+
+} // namespace yafl

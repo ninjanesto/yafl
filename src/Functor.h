@@ -4,6 +4,8 @@
 #include <functional>
 #include "TypeTraits.h"
 
+namespace yafl {
+
 //fmap :: (a -> b) -> F a -> F b
 //lift :: (a -> b) -> (F a -> F b)
 //fmap :: ((a->c) -> b) -> F (a->c) -> F b
@@ -65,3 +67,5 @@ decltype(auto) lift(Callable&& callable) {
         return value.fmap(std::forward<Callable>(callable));
     };
 }
+
+} // namespace yafl

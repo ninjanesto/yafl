@@ -3,6 +3,7 @@
 #include <memory>
 #include <functional>
 
+namespace yafl {
 //mreturn :: a -> M a
 //bind :: (a -> M b) -> M a -> M b
 /**
@@ -26,3 +27,5 @@ public:
         return static_cast<const TDerivedMonad<Args...>*>(this)->internal_bind(std::forward<Callable>(callable));
     }
 };
+
+} // namespace yafl
