@@ -38,11 +38,5 @@ public:
     }
 };
 
-//fmap function
-template<typename Callable, template <typename...> typename T, typename ...Args>
-decltype(auto) fmap(Callable&& callable, const Functor<T, Args...>& value) {
-    return value.fmap(std::forward<Callable>(callable));
-}
-
 
 } // namespace yafl

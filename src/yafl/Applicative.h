@@ -63,9 +63,4 @@ public:
     }
 };
 
-template<template <typename...> typename T, typename Callable, typename ...Args>
-decltype(auto) apply(const Applicative<T, Callable>& applicative, const Applicative<T, Args...>& value) {
-    return applicative.apply(value);
-}
-
 } // namespace yafl
