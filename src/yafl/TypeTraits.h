@@ -45,6 +45,9 @@ template<typename Ret, typename FirstArg, typename... Args>
 struct TraitDetails<Ret, FirstArg, Args...> {
     ///Function Signature
     using Signature = std::function<Ret(FirstArg, Args...)>;
+    ///Function Signature lifted to TLift
+    template<template<typename...> typename TLift>
+    using LiftedSignature = std::function<TLift<Ret>(const TLift<remove_cvref_t<FirstArg>>&, const TLift<remove_cvref_t<Args>>&...)>;
     ///Function Signature after applying first argument
     using PartialApplyFirst = std::function<Ret(Args...)>;
     ///Return type
@@ -148,6 +151,24 @@ struct Details {
     static constexpr bool hasApplicativeBase = false;
     ///boolean flag that states whether type T is a Monad or not
     static constexpr bool hasMonadicBase = false;
+};
+
+/**
+ * @ingroup Type
+ * Helper class that introspects whether a type T is a Callable or not
+ * @tparam T Type to check
+ */
+template <typename T>
+struct IsCallable {
+private:
+    template <typename U>
+    static auto test(int) -> decltype(void(std::declval<U>()()), std::true_type{});
+
+    template <typename>
+    static auto test(...) -> std::false_type;
+
+public:
+    static constexpr bool value = decltype(test<T>(0))::value;
 };
 
 } // namespace type

@@ -12,12 +12,6 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-template <typename E>
-struct FixedErrorType {
-    template <typename T>
-    using Type = yafl::Either<E, T>;
-};
-
 TEST(LawsTest, validateFunctionCompositionIsAssociative) {
     struct Xpto {
         std::string value;
@@ -153,10 +147,10 @@ TEST(LawsTest, validateFunctorsPreserveCompositionOfMorphisms) {
         const auto m = yafl::either::Ok<std::string>(42);
 
         const auto compose = yafl::compose(f1, f2);
-        const auto fmap_compose = yafl::functor::fmap<FixedErrorType<std::string>::template Type>(compose);
+        const auto fmap_compose = yafl::functor::fmap<yafl::type::FixedErrorType<std::string>::template Type>(compose);
 
-        const auto compose2 = yafl::compose(yafl::functor::fmap<FixedErrorType<std::string>::template Type>(f1),
-                                            yafl::functor::fmap<FixedErrorType<std::string>::template Type>(f2));
+        const auto compose2 = yafl::compose(yafl::functor::fmap<yafl::type::FixedErrorType<std::string>::template Type>(f1),
+                                            yafl::functor::fmap<yafl::type::FixedErrorType<std::string>::template Type>(f2));
         const auto result2 = compose2(m);
 
         ASSERT_EQ(fmap_compose(m), result2);

@@ -343,47 +343,14 @@ private:
 
     template <typename Arg>
     decltype(auto) internal_apply(Arg&& arg) const {
+        static_assert(!std::is_invocable_v<T>, "Function that takes 0 arguments cannot be called with arguments");
         if constexpr (type::Details<yafl::function::remove_cvref_t<Arg>>::hasMonadicBase) {
-            using Head = yafl::function::remove_cvref_t<typename yafl::type::Details<yafl::function::remove_cvref_t<Arg>>::ValueType>;
-            if constexpr (std::is_invocable_v<T, Head>) {
-                using ReturnType = std::remove_reference_t<std::invoke_result_t<T, Head>>;
-                if (!hasValue()) {
-                    return Maybe<ReturnType>::Nothing();
-                } else {
-                    if (arg.hasValue()) {
-                        if constexpr (std::is_void_v<ReturnType>) {
-                            std::invoke<T>(value(), arg.value());
-                            return Maybe<ReturnType>::Just();
-                        } else {
-                            return Maybe<ReturnType>::Just(std::invoke<T>(value(), arg.value()));
-                        }
-                    } else {
-                        return Maybe<ReturnType>::Nothing();
-                    }
-                }
-            } else if constexpr (std::is_invocable_v<T>) {
-                using RT = std::invoke_result_t<T>;
-                if constexpr (std::is_invocable_v<RT, Head>) {
-                    using RTT = std::invoke_result_t<RT, Head>;
-                    if (hasValue() && arg.hasValue()) {
-                        if constexpr (std::is_void_v<RTT>) {
-                            std::invoke<RT>(value()(), std::forward<Head>(arg.value()));
-                            return Maybe<RTT>::Just();
-                        } else {
-                            return Maybe<RTT>::Just(std::invoke<RT>(value()(), std::forward<Head>(arg.value())));
-                        }
-                    } else {
-                        return Maybe<RTT>::Nothing();
-                    }
-                } else {
-                    return Maybe<RT>::Nothing();
-                }
+            if (arg.hasValue()) {
+                return internal_apply_non_monad(arg.value());
             } else {
-                if (arg.hasValue() && hasValue()) {
-                    return Maybe<typename function::Details<T>::PartialApplyFirst>::Just(
-                            [callable = value(), first = std::forward<Head>(arg.value())](auto&& ...args) {
-                                return std::apply(callable, std::tuple_cat(std::make_tuple(first), std::make_tuple(args...)));
-                            });
+                using ArgInnerType = yafl::function::remove_cvref_t<typename yafl::type::Details<yafl::function::remove_cvref_t<Arg>>::ValueType>;
+                if constexpr (std::is_invocable_v<T, ArgInnerType>) {
+                    return Maybe<std::invoke_result_t<T, ArgInnerType>>::Nothing();
                 } else {
                     return Maybe<typename function::Details<T>::PartialApplyFirst>::Nothing();
                 }
@@ -395,6 +362,7 @@ private:
 
     template<typename Arg>
     decltype(auto) internal_apply_non_monad(Arg&& arg) const {
+        static_assert(!std::is_invocable_v<T>, "Function that takes 0 arguments cannot be called with arguments");
         if constexpr (std::is_invocable_v<T, Arg>) {
             using ReturnType = yafl::function::remove_cvref_t<std::invoke_result_t<T, Arg>>;
             if (!hasValue()) {
@@ -404,34 +372,29 @@ private:
                     std::invoke<T>(value(), std::forward<Arg>(arg));
                     return Maybe<ReturnType>::Just();
                 } else {
-                    return Maybe<ReturnType>::Just(value()(std::forward<Arg>(arg)));
+                    return Maybe<ReturnType>::Just(std::invoke<T>(value(), std::forward<Arg>(arg)));
                 }
-            }
-        } else if constexpr (std::is_invocable_v<T>) {
-            using RT = std::invoke_result_t<T>;
-            if constexpr (std::is_invocable_v<RT, Arg>) {
-                using RTT = std::invoke_result_t<RT, Arg>;
-                if (hasValue()) {
-                    if constexpr (std::is_void_v<RTT>) {
-                        std::invoke<RT>(value()(), std::forward<Arg>(arg));
-                        return Maybe<RTT>::Just();
-                    } else {
-                        return Maybe<RTT>::Just(std::invoke<RT>(value()(), std::forward<Arg>(arg)));
-                    }
-                } else {
-                    return Maybe<RTT>::Nothing();
-                }
-            } else {
-                return Maybe<RT>::Nothing();
             }
         } else {
+            using PartialFunctionType = typename function::Details<T>::PartialApplyFirst;
+
             if (hasValue()) {
-                return Maybe<typename function::Details<T>::PartialApplyFirst>::Just(
-                        [callable = value(), first = std::forward<Arg>(arg)](auto&& ...args) mutable {
-                            return callable(std::move(first), std::forward<decltype(args)>(args)...);
-                        });
+                auto result = Maybe<PartialFunctionType>::Just([callable = value(), first = std::forward<Arg>(arg)](auto&& ...args) mutable {
+                    return callable(std::move(first), std::forward<decltype(args)>(args)...);
+                });
+
+                if constexpr (function::Details<PartialFunctionType>::ArgCount == 0) {
+                    return result();
+                } else {
+                    return result;
+                }
             } else {
-                return Maybe<typename function::Details<T>::PartialApplyFirst>::Nothing();
+                if constexpr (function::Details<PartialFunctionType>::ArgCount == 0) {
+                    using FuncReturnType = std::invoke_result_t<PartialFunctionType>;
+                    return Maybe<FuncReturnType>::Nothing();
+                } else {
+                    return Maybe<PartialFunctionType>::Nothing();
+                }
             }
         }
     }
@@ -511,11 +474,11 @@ decltype(auto) lift(Callable &&callable) {
         }
     } else {
         using ReturnType = typename yafl::function::Details<Callable>::ReturnType;
+        using ReturnFunctionType =  typename yafl::function::Details<Callable>::template LiftedSignature<yafl::Maybe>;
 
-        return [callable = std::forward<Callable>(callable)](auto ...args) -> Maybe<ReturnType> {
-            if (details::all_true([](auto &&v) { return v.hasValue(); }, args...)) {
-                const auto tp = details::map_tuple_append([](auto &&arg) { return arg.value(); }, std::make_tuple(),
-                                                         args...);
+        const ReturnFunctionType function = [callable = std::forward<Callable>(callable)](auto&& ...args) -> Maybe<ReturnType> {
+            if (details::all_true([](auto&& v) { return v.hasValue(); }, args...)) {
+                const auto tp = details::map_tuple_append([](auto&& arg) { return arg.value(); }, std::make_tuple(), args...);
 
                 if constexpr (std::is_void_v<ReturnType>) {
                     std::apply(callable, tp);
@@ -527,6 +490,8 @@ decltype(auto) lift(Callable &&callable) {
                 return Maybe<ReturnType>::Nothing();
             }
         };
+
+        return function;
     }
 }
 

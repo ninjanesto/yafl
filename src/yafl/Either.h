@@ -111,6 +111,17 @@ struct Details<const Either<InnerError, InnerValue>> {
         }
     };
 };
+
+/**
+ * Helper struct that enables fixing error type and
+ * exposes template alias for value type
+ * @tparam ErrorType
+ */
+template <typename ErrorType>
+struct FixedErrorType {
+    template <typename ValueType>
+    using Type = yafl::Either<ErrorType, ValueType>;
+};
 } // namespace type
 
 /**
@@ -375,47 +386,14 @@ private:
 
     template<typename Arg>
     decltype(auto) internal_apply(Arg&& arg) const {
+        static_assert(!std::is_invocable_v<ValueType>, "Function that takes 0 arguments cannot be called with arguments");
         if constexpr (type::Details<yafl::function::remove_cvref_t<Arg>>::hasMonadicBase) {
-            using ArgValueType = yafl::function::remove_cvref_t<typename yafl::type::Details<yafl::function::remove_cvref_t<Arg>>::ValueType>;
-            if constexpr (std::is_invocable_v<ValueType, ArgValueType>) {
-                using ReturnType = std::remove_reference_t<std::invoke_result_t<ValueType, ArgValueType>>;
-                if (isError()) {
-                    return Either<void, ReturnType>::Error();
-                } else {
-                    if (arg.isOk()) {
-                        if constexpr (std::is_void_v<ReturnType>) {
-                            std::invoke<ValueType>(value(), arg.value());
-                            return Either<void, ReturnType>::Ok();
-                        } else {
-                            return Either<void, ReturnType>::Ok(std::invoke<ValueType>(value(), arg.value()));
-                        }
-                    } else {
-                        return Either<void, ReturnType>::Error();
-                    }
-                }
-            } else if constexpr (std::is_invocable_v<ValueType>) {
-                using RT = std::invoke_result_t<ValueType>;
-                if constexpr (std::is_invocable_v<RT, ArgValueType>) {
-                    using RTT = std::invoke_result_t<RT, ArgValueType>;
-                    if (isOk() && arg.isOk()) {
-                        if constexpr (std::is_void_v<RTT>) {
-                            std::invoke<RT>(value()(), std::forward<ArgValueType>(arg.value()));
-                            return Either<void, RTT>::Ok();
-                        } else {
-                            return Either<void, RTT>::Ok(std::invoke<RT>(value()(), std::forward<ArgValueType>(arg.value())));
-                        }
-                    } else {
-                        return Either<void, RTT>::Nothing();
-                    }
-                } else {
-                    return Either<void, RT>::Nothing();
-                }
+            if (arg.isOk()) {
+                return internal_apply_non_monad(arg.value());
             } else {
-                if (arg.isOk() && isOk()) {
-                    return Either<void, typename function::Details<ValueType>::PartialApplyFirst>::Ok(
-                            [callable = value(), first = std::forward<ArgValueType>(arg.value())](auto&& ...args) {
-                                return std::apply(callable, std::tuple_cat(std::make_tuple(first), std::make_tuple(args...)));
-                            });
+                using ArgInnerType = yafl::function::remove_cvref_t<typename yafl::type::Details<yafl::function::remove_cvref_t<Arg>>::ValueType>;
+                if constexpr (std::is_invocable_v<ValueType, ArgInnerType>) {
+                    return Either<void, std::invoke_result_t<ValueType, ArgInnerType>>::Error();
                 } else {
                     return Either<void, typename function::Details<ValueType>::PartialApplyFirst>::Error();
                 }
@@ -427,6 +405,7 @@ private:
 
     template<typename Arg>
     decltype(auto) internal_apply_non_monad(Arg&& arg) const {
+        static_assert(!std::is_invocable_v<ValueType>, "Function that takes 0 arguments cannot be called with arguments");
         if constexpr (std::is_invocable_v<ValueType, Arg>) {
             using ReturnType = yafl::function::remove_cvref_t<std::invoke_result_t<ValueType, Arg>>;
             if (isError()) {
@@ -436,39 +415,38 @@ private:
                     std::invoke<ValueType>(value(), std::forward<Arg>(arg));
                     return Either<void, ReturnType>::Ok();
                 } else {
-                    return Either<void, ReturnType>::Ok(value()(std::forward<Arg>(arg)));
+                    return Either<void, ReturnType>::Ok(std::invoke<ValueType>(value(), std::forward<Arg>(arg)));
                 }
-            }
-        } else if constexpr (std::is_invocable_v<ValueType>) {
-            using RT = std::invoke_result_t<ValueType>;
-            if constexpr (std::is_invocable_v<RT, Arg>) {
-                using RTT = std::invoke_result_t<RT, Arg>;
-                if (isOk()) {
-                    if constexpr (std::is_void_v<RTT>) {
-                        std::invoke<RT>(value()(), std::forward<Arg>(arg));
-                        return Either<void, RTT>::Ok();
-                    } else {
-                        return Either<void, RTT>::Ok(std::invoke<RT>(value()(), std::forward<Arg>(arg)));
-                    }
-                } else {
-                    return Either<void, RTT>::Error();
-                }
-            } else {
-                return Either<void, RT>::Error();
             }
         } else {
+            using PartialFunctionType = typename function::Details<ValueType>::PartialApplyFirst;
+
             if (isOk()) {
-                return Either<void, typename function::Details<ValueType>::PartialApplyFirst>::Ok(
+                auto result = Either<void, typename function::Details<ValueType>::PartialApplyFirst>::Ok(
                         [callable = value(), first = std::forward<Arg>(arg)](auto&& ...args) mutable {
                             return callable(std::move(first), std::forward<decltype(args)>(args)...);
                         });
+
+                if constexpr (function::Details<PartialFunctionType>::ArgCount == 0) {
+                    return result();
+                } else {
+                    return result;
+                }
+
             } else {
-                return Either<void, typename function::Details<ValueType>::PartialApplyFirst>::Error();
+                if constexpr (function::Details<PartialFunctionType>::ArgCount == 0) {
+                    using FuncReturnType = std::invoke_result_t<PartialFunctionType>;
+                    return Either<void, FuncReturnType>::Error();
+                } else {
+                    return Either<void, PartialFunctionType>::Error();
+                }
             }
         }
     }
 
     decltype(auto) internal_apply() const {
+        static_assert(std::is_invocable_v<ValueType>, "Function that takes one or more arguments and therefore cannot be called without arguments");
+
         using ReturnType = std::remove_reference_t<std::invoke_result_t<ValueType>>;
         if (isError()) {
             return Either<void, ReturnType>::Error();
@@ -799,49 +777,16 @@ private:
 
     template<typename Arg>
     decltype(auto) internal_apply(Arg&& arg) const {
+        static_assert(!std::is_invocable_v<ValueType>, "Function that takes 0 arguments cannot be called with arguments");
         if constexpr (type::Details<yafl::function::remove_cvref_t<Arg>>::hasMonadicBase) {
-            using Head = yafl::function::remove_cvref_t<typename yafl::type::Details<yafl::function::remove_cvref_t<Arg>>::ValueType>;
-            if constexpr (std::is_invocable_v<ValueType, Head>) {
-                using ReturnType = std::remove_reference_t<std::invoke_result_t<ValueType, Head>>;
-                if (isError()) {
-                    return Either<ErrorType, ReturnType>::Error(error());
-                } else {
-                    if (arg.isOk()) {
-                        if constexpr (std::is_void_v<ReturnType>) {
-                            std::invoke<ValueType>(value(), arg.value());
-                            return Either<ErrorType, ReturnType>::Ok();
-                        } else {
-                            return Either<ErrorType, ReturnType>::Ok(std::invoke<ValueType>(value(), arg.value()));
-                        }
-                    } else {
-                        return Either<ErrorType, ReturnType>::Error(error());
-                    }
-                }
-            } else if constexpr (std::is_invocable_v<ValueType>) {
-                using RT = std::invoke_result_t<ValueType>;
-                if constexpr (std::is_invocable_v<RT, Head>) {
-                    using RTT = std::invoke_result_t<RT, Head>;
-                    if (isOk() && arg.isOk()) {
-                        if constexpr (std::is_void_v<RTT>) {
-                            std::invoke<RT>(value()(), std::forward<Head>(arg.value()));
-                            return Either<ErrorType, RTT>::Ok();
-                        } else {
-                            return Either<ErrorType, RTT>::Ok(std::invoke<RT>(value()(), std::forward<Head>(arg.value())));
-                        }
-                    } else {
-                        return Either<ErrorType, RTT>::Error(error());
-                    }
-                } else {
-                    return Either<ErrorType, RT>::Error(error());
-                }
+            if (arg.isOk()) {
+                return internal_apply_non_monad(arg.value());
             } else {
-                if (arg.isOk() && isOk()) {
-                    return Either<ErrorType, typename function::Details<ValueType>::PartialApplyFirst>::Ok(
-                            [callable = value(), first = std::forward<Head>(arg.value())](auto&& ...args) {
-                                return std::apply(callable, std::tuple_cat(std::make_tuple(first), std::make_tuple(args...)));
-                            });
+                using ArgInnerType = yafl::function::remove_cvref_t<typename yafl::type::Details<yafl::function::remove_cvref_t<Arg>>::ValueType>;
+                if constexpr (std::is_invocable_v<ValueType, ArgInnerType>) {
+                    return Either<ErrorType, std::invoke_result_t<ValueType, ArgInnerType>>::Error(arg.error());
                 } else {
-                    return Either<ErrorType, typename function::Details<ValueType>::PartialApplyFirst>::Error(error());
+                    return Either<ErrorType, typename function::Details<ValueType>::PartialApplyFirst>::Error(arg.error());
                 }
             }
         } else {
@@ -860,49 +805,51 @@ private:
                     std::invoke<ValueType>(value(), std::forward<Arg>(arg));
                     return Either<ErrorType, ReturnType>::Ok();
                 } else {
-                    return Either<ErrorType, ReturnType>::Ok(value()(std::forward<Arg>(arg)));
+                    return Either<ErrorType, ReturnType>::Ok(std::invoke<ValueType>(value(), std::forward<Arg>(arg)));
                 }
-            }
-        } else if constexpr (std::is_invocable_v<ValueType>) {
-            using RT = std::invoke_result_t<ValueType>;
-            if constexpr (std::is_invocable_v<RT, Arg>) {
-                using RTT = std::invoke_result_t<RT, Arg>;
-                if (isOk()) {
-                    if constexpr (std::is_void_v<RTT>) {
-                        std::invoke<RT>(value()(), std::forward<Arg>(arg));
-                        return Either<ErrorType, RTT>::Ok();
-                    } else {
-                        return Either<ErrorType, RTT>::Ok(std::invoke<RT>(value()(), std::forward<Arg>(arg)));
-                    }
-                } else {
-                    return Either<ErrorType, RTT>::Error();
-                }
-            } else {
-                return Either<ErrorType, RT>::Error();
             }
         } else {
+            using PartialFunctionType = typename function::Details<ValueType>::PartialApplyFirst;
+
             if (isOk()) {
-                return Either<ErrorType, typename function::Details<ValueType>::PartialApplyFirst>::Ok(
+                auto result = Either<ErrorType, typename function::Details<ValueType>::PartialApplyFirst>::Ok(
                         [callable = value(), first = std::forward<Arg>(arg)](auto&& ...args) mutable {
                             return callable(std::move(first), std::forward<decltype(args)>(args)...);
                         });
+
+                if constexpr (function::Details<PartialFunctionType>::ArgCount == 0) {
+                    return result();
+                } else {
+                    return result;
+                }
+
             } else {
-                return Either<ErrorType, typename function::Details<ValueType>::PartialApplyFirst>::Error(error());
+                if constexpr (function::Details<PartialFunctionType>::ArgCount == 0) {
+                    using FuncReturnType = std::invoke_result_t<PartialFunctionType>;
+                    return Either<ErrorType, FuncReturnType>::Error(error());
+                } else {
+                    return Either<ErrorType, PartialFunctionType>::Error(error());
+                }
             }
         }
     }
 
     decltype(auto) internal_apply() const {
-        using ReturnType = std::remove_reference_t<std::invoke_result_t<ValueType>>;
-        if (isError()) {
-            return Either<ErrorType, ReturnType>::Error(error());
-        } else {
-            if constexpr (std::is_void_v<ReturnType>) {
-                std::invoke<ValueType>(value());
-                return Either<ErrorType, ReturnType>::Ok();
+        static_assert(std::is_invocable_v<ValueType>, "Function that takes one or more arguments and therefore cannot be called without arguments");
+        if constexpr (std::is_invocable_v<ValueType>) {
+            using ReturnType = std::remove_reference_t<std::invoke_result_t<ValueType>>;
+            if (isError()) {
+                return Either<ErrorType, ReturnType>::Error(error());
             } else {
-                return Either<ErrorType, ReturnType>::Ok(std::invoke<ValueType>(value()));
+                if constexpr (std::is_void_v<ReturnType>) {
+                    std::invoke<ValueType>(value());
+                    return Either<ErrorType, ReturnType>::Ok();
+                } else {
+                    return Either<ErrorType, ReturnType>::Ok(std::invoke<ValueType>(value()));
+                }
             }
+        } else {
+            return Either<ErrorType, ValueType>::Error(error());
         }
     }
 
@@ -1037,8 +984,10 @@ decltype(auto) lift(Callable&& callable) {
         }
     } else {
         using ReturnType = typename yafl::function::Details<Callable>::ReturnType;
+        using FixedErrorType = typename type::FixedErrorType<void>;
+        using ReturnFunctionType = typename yafl::function::Details<Callable>::template LiftedSignature<FixedErrorType::template Type>;
 
-        return [callable = std::forward<Callable>(callable)](auto ...args) -> Either<void, ReturnType> {
+        const ReturnFunctionType function =  [callable = std::forward<Callable>(callable)](auto ...args) -> Either<void, ReturnType> {
             if (details::all_true([](auto&& v){ return v.isOk();}, args...)) {
                 const auto tp = details::map_tuple_append([](auto&& arg){ return arg.value();}, std::make_tuple(), args...);
 
@@ -1052,6 +1001,8 @@ decltype(auto) lift(Callable&& callable) {
                 return Either<void, ReturnType>::Error();
             }
         };
+
+        return function;
     }
 }
 

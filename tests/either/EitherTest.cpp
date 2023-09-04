@@ -55,15 +55,6 @@ Either<E, V> createOk() {
 
 using EitherTypes = ::testing::Types<VoidVoid, IntVoid, IntInt, VoidInt>;
 
-template <typename E>
-struct FixedErrorType {
-    template <typename T>
-    using Type = Either<E, T>;
-};
-
-template<typename T>
-using NoErrorEither = Either<void, T>;
-
 TYPED_TEST_SUITE(EitherTest, EitherTypes,);
 
 TYPED_TEST(EitherTest, assertErrorCreateAValidEitherForAnyType) {
@@ -178,7 +169,7 @@ TYPED_TEST(EitherTest, assertFmapComputesCorrectType) {
         }
         {
             const auto either = createOk<typename TypeParam::Error, typename TypeParam::Ok>();
-            const auto f = functor::fmap<FixedErrorType<typename TypeParam::Error>::template Type>([](const typename TypeParam::Ok&){});
+            const auto f = functor::fmap<type::FixedErrorType<typename TypeParam::Error>::template Type>([](const typename TypeParam::Ok&){});
             const auto resultVoid = f(either);
             ASSERT_TRUE(resultVoid.isOk());
         }
@@ -231,7 +222,7 @@ TYPED_TEST(EitherTest, assertBindComputesCorrectType) {
         }
         {
             const auto either = createOk<void, void>();
-            const auto f = monad::bind<FixedErrorType<void>::template Type>([]() { return either::Ok<void, void>(); });
+            const auto f = monad::bind<type::FixedErrorType<void>::template Type>([]() { return either::Ok<void, void>(); });
             const auto resultOk = f(either);
             ASSERT_TRUE(resultOk.isOk());
         }
@@ -266,7 +257,7 @@ TYPED_TEST(EitherTest, assertBindComputesCorrectType) {
         }
         {
             const auto either = createOk<typename TypeParam::Error, void>();
-            const auto f = monad::bind<FixedErrorType<typename TypeParam::Error>::template Type>([]() { return either::Ok<typename TypeParam::Error, void>(); });
+            const auto f = monad::bind<type::FixedErrorType<typename TypeParam::Error>::template Type>([]() { return either::Ok<typename TypeParam::Error, void>(); });
             const auto resultOk = f(either);
             ASSERT_TRUE(resultOk.isOk());
         }
@@ -304,7 +295,7 @@ TYPED_TEST(EitherTest, assertBindComputesCorrectType) {
         }
         {
             const auto either = createOk<void, typename TypeParam::Ok>();
-            const auto f = monad::bind<FixedErrorType<void>::template Type>([](const typename TypeParam::Ok &) { return either::Ok<void, std::string>("42"); });
+            const auto f = monad::bind<type::FixedErrorType<void>::template Type>([](const typename TypeParam::Ok &) { return either::Ok<void, std::string>("42"); });
             const auto resultOk = f(either);
             ASSERT_TRUE(resultOk.isOk());
             constexpr const auto areSameType = std::is_same_v<std::string, decltype(resultOk.value())>;
@@ -350,7 +341,7 @@ TYPED_TEST(EitherTest, assertBindComputesCorrectType) {
         }
         {
             const auto either = createOk<typename TypeParam::Error, typename TypeParam::Ok>();
-            const auto f = monad::bind<FixedErrorType<typename TypeParam::Error>::template Type>([](const typename TypeParam::Ok&){ return either::Ok<typename TypeParam::Error, std::string>(std::string("42")); });
+            const auto f = monad::bind<type::FixedErrorType<typename TypeParam::Error>::template Type>([](const typename TypeParam::Ok&){ return either::Ok<typename TypeParam::Error, std::string>(std::string("42")); });
             const auto resultOk = f(either);
             ASSERT_TRUE(resultOk.isOk());
             constexpr const auto areSameType = std::is_same_v<std::string, decltype(resultOk.value())>;
@@ -418,6 +409,117 @@ TEST(EitherTest, assertApply) {
         const auto multBy42 = either::Ok<void>([](int x) { return x * 42; });
         const auto result = multBy42(2);
         ASSERT_EQ(result.value(), 84);
+        ASSERT_EQ(multBy42(either::Ok<void>(2)).value(), 84);
+        ASSERT_EQ(applicative::apply(multBy42, either::Ok<void>(2)).value(), 84);
+        ASSERT_EQ(applicative::apply(multBy42)(either::Ok<void>(2)).value(), 84);
+        ASSERT_EQ(applicative::apply(multBy42, 2).value(), 84);
+        ASSERT_EQ(applicative::apply(multBy42)(2).value(), 84);
+    }
+    {
+        const auto multBy42 = either::Ok<int>([](int x) { return x * 42; });
+        const auto result = multBy42(2);
+        ASSERT_EQ(result.value(), 84);
+        ASSERT_EQ(multBy42(either::Ok<int>(2)).value(), 84);
+        ASSERT_EQ(applicative::apply(multBy42, either::Ok<int>(2)).value(), 84);
+        ASSERT_EQ(applicative::apply(multBy42)(either::Ok<int>(2)).value(), 84);
+        ASSERT_EQ(applicative::apply(multBy42, 2).value(), 84);
+        ASSERT_EQ(applicative::apply(multBy42)(2).value(), 84);
+    }
+    {
+        const auto multBy42 = either::Ok<void>([](int x) { return x * 42; });
+        ASSERT_TRUE(multBy42(either::Error<void, int>()).isError());
+        ASSERT_TRUE(applicative::apply(multBy42, either::Error<void, int>()).isError());
+        ASSERT_TRUE(applicative::apply(multBy42)(either::Error<void, int>()).isError());
+    }
+    {
+        const auto multBy42 = either::Ok<int>([](int x) { return x * 42; });
+        ASSERT_EQ(multBy42(either::Error<int, int>(29)).error(), 29);
+        ASSERT_EQ(applicative::apply(multBy42, either::Error<int, int>(29)).error(), 29);
+        ASSERT_EQ(applicative::apply(multBy42)(either::Error<int, int>(29)).error(), 29);
+    }
+    {
+        const auto func = [](int x) { return x * 42; };
+        const auto multBy42 = either::Error<void, decltype(func)>();
+        ASSERT_TRUE(multBy42(either::Error<void, int>()).isError());
+        ASSERT_TRUE(applicative::apply(multBy42, either::Error<void, int>()).isError());
+        ASSERT_TRUE(applicative::apply(multBy42)(either::Error<void, int>()).isError());
+        ASSERT_TRUE(multBy42(either::Ok<void>(2)).isError());
+        ASSERT_TRUE(applicative::apply(multBy42, either::Ok<void>(2)).isError());
+        ASSERT_TRUE(applicative::apply(multBy42)(either::Ok<void>(2)).isError());
+    }
+    {
+        const auto func = []() { return [](int i){return 42*i;}; };
+        const auto either = either::Ok<void>(func);
+        ASSERT_EQ(either()(2).value(), 84);
+        ASSERT_EQ(either()(either::Ok<int>(2)).value(), 84);
+        ASSERT_EQ(applicative::apply(either(), either::Ok<int>(2)).value(), 84);
+        ASSERT_EQ(applicative::apply(either())(either::Ok<int>(2)).value(), 84);
+        ASSERT_EQ(applicative::apply(either(), 2).value(), 84);
+        ASSERT_EQ(applicative::apply(either())(2).value(), 84);
+    }
+    {
+        const auto func = []() { return [](int i){return 42*i;}; };
+        const auto either = either::Error<void, decltype(func)>();
+        ASSERT_TRUE(either()(2).isError());
+        ASSERT_TRUE(either()(either::Ok<int>(2)).isError());
+        ASSERT_TRUE(applicative::apply(either(), either::Ok<int>(2)).isError());
+        ASSERT_TRUE(applicative::apply(either())(either::Ok<int>(2)).isError());
+        ASSERT_TRUE(applicative::apply(either(), 2).isError());
+        ASSERT_TRUE(applicative::apply(either())(2).isError());
+    }
+    {
+        const auto func = []() { return [](int i){return 42*i;}; };
+        const auto either = either::Ok<void>(func);
+        ASSERT_TRUE(either()(either::Error<void, int>()).isError());
+        ASSERT_TRUE(applicative::apply(either(), either::Error<void, int>()).isError());
+        ASSERT_TRUE(applicative::apply(either())(either::Error<void, int>()).isError());
+    }
+    {
+        const auto func = []() { return [](int i){return 42*i;}; };
+        const auto either = either::Ok<int>(func);
+        ASSERT_EQ(either()(2).value(), 84);
+        ASSERT_EQ(either()(either::Ok<int>(2)).value(), 84);
+        ASSERT_EQ(applicative::apply(either(), either::Ok<int>(2)).value(), 84);
+        ASSERT_EQ(applicative::apply(either())(either::Ok<int>(2)).value(), 84);
+        ASSERT_EQ(applicative::apply(either(), 2).value(), 84);
+        ASSERT_EQ(applicative::apply(either())(2).value(), 84);
+    }
+    {
+        const auto func = []() { return [](int i){return 42*i;}; };
+        const auto either = either::Error<int, decltype(func)>(29);
+        ASSERT_TRUE(either()(2).isError());
+        ASSERT_TRUE(either()(either::Ok<int>(2)).isError());
+        ASSERT_TRUE(applicative::apply(either(), either::Ok<int>(2)).isError());
+        ASSERT_TRUE(applicative::apply(either())(either::Ok<int>(2)).isError());
+        ASSERT_TRUE(applicative::apply(either(), 2).isError());
+        ASSERT_TRUE(applicative::apply(either())(2).isError());
+    }
+    {
+        const auto func = []() { return [](int i){return 42*i;}; };
+        const auto either = either::Ok<int>(func);
+        ASSERT_TRUE(either()(either::Error<int, int>(29)).isError());
+        ASSERT_TRUE(applicative::apply(either(), either::Error<int, int>(29)).isError());
+        ASSERT_TRUE(applicative::apply(either())(either::Error<int, int>(29)).isError());
+    }
+    {
+        const auto func = []() { return [](int){ }; };
+        const auto either = either::Ok<void>(func);
+        ASSERT_TRUE(either()(2).isOk());
+        ASSERT_TRUE(either()(either::Ok<int>(2)).isOk());
+        ASSERT_TRUE(applicative::apply(either(), either::Ok<int>(2)).isOk());
+        ASSERT_TRUE(applicative::apply(either())(either::Ok<int>(2)).isOk());
+        ASSERT_TRUE(applicative::apply(either(), 2).isOk());
+        ASSERT_TRUE(applicative::apply(either())(2).isOk());
+    }
+    {
+        const auto func = []() { return [](int, int){}; };
+        const auto either = either::Ok<void>(func);
+        ASSERT_TRUE(either()(2)(3).isOk());
+        ASSERT_TRUE(either()(either::Ok<int>(2))(3).isOk());
+        ASSERT_TRUE(applicative::apply(either(), either::Ok<int>(2))(3).isOk());
+        ASSERT_TRUE(applicative::apply(either())(either::Ok<int>(2))(3).isOk());
+        ASSERT_TRUE(applicative::apply(either(), 2)(3).isOk());
+        ASSERT_TRUE(applicative::apply(either())(2)(3).isOk());
     }
     {
         const auto func = []() { return 42; };
@@ -450,7 +552,7 @@ TEST(EitherTest, assertApply) {
         const auto multBy42 = either::Ok<int>([](int) { return; });
         const auto result = multBy42(either::Ok<int>(2));
         ASSERT_TRUE(result.isOk());
-        EXPECT_THROW(multBy42(either::Error<int, int>(29)), std::runtime_error);
+        ASSERT_TRUE(multBy42(either::Error<int, int>(29)).isError());
     }
     {
         const auto multBy42 = either::Ok<void>([](int) { return; });
@@ -475,7 +577,7 @@ TEST(EitherTest, assertApply) {
         const auto applmultBy42 = either::Ok<int, decltype(func)>(func);
         const auto result = applmultBy42(either::Ok<int, int>(2));
         ASSERT_EQ(result.value(), 84);
-        EXPECT_THROW(applmultBy42(either::Error<int, int>(2)), std::runtime_error);
+        ASSERT_TRUE(applmultBy42(either::Error<int, int>(2)).isError());
     }
     {
         const auto func = [](int x, int f) { return x * f; };
@@ -539,8 +641,8 @@ TEST(EitherTest, assertApply) {
         const auto applmultBy42 = either::Ok<int, decltype(func)>(func);
         const auto result = applmultBy42(either::Ok<int, std::string>("OlaOla"))(either::Ok<int, float>(2.2));
         ASSERT_EQ(result.value(), "OlaOla92.40");
-        EXPECT_THROW(applmultBy42(either::Error<int, std::string>(2))(either::Ok<int, float>(2.2)), std::runtime_error);
-        EXPECT_THROW(applmultBy42(either::Error<int, std::string>(2))(either::Error<int, float>(2)), std::runtime_error);
+        ASSERT_FALSE(applmultBy42(either::Error<int, std::string>(2))(either::Ok<int, float>(2.2)).isOk());
+        ASSERT_FALSE(applmultBy42(either::Error<int, std::string>(2))(either::Error<int, float>(2)).isOk());
     }
     {
         const auto func = [](const std::string&, float) {return std::string();};
@@ -557,6 +659,58 @@ TEST(EitherTest, assertApply) {
         ASSERT_TRUE(result.isError());
         const auto result2 = result(either::Ok<int, float>(2.2));
         ASSERT_TRUE(result2.isError());
+    }
+    {
+        const auto f1 = [](int i){ return std::to_string(i);};
+        const auto f2 = [](const std::string& i){ return std::atoi(i.c_str()) * 21;};
+        const auto ap_errorvoid = either::Ok<void>(&compose<decltype(f1), decltype(f2)>);
+        const auto ap_errorint = either::Ok<int>(&compose<decltype(f1), decltype(f2)>);
+        ASSERT_EQ(ap_errorvoid(f1)(f2)(2).value(), 42);
+        ASSERT_EQ(ap_errorint(f1)(f2)(2).value(), 42);
+        ASSERT_EQ(ap_errorvoid(either::Ok<void>(f1))(either::Ok<void>(f2))(either::Ok<void>(2)).value(), 42);
+        ASSERT_EQ(ap_errorint(either::Ok<int>(f1))(either::Ok<int>(f2))(either::Ok<int>(2)).value(), 42);
+    }
+    {
+        const auto f1 = [](int i){ return std::to_string(i);};
+        const auto f2 = [](const std::string& i){ return std::atoi(i.c_str()) * 21;};
+        const auto ap_errorvoid = either::Ok<void>(&compose<decltype(f1), decltype(f2)>);
+        const auto ap_errorint = either::Ok<int>(&compose<decltype(f1), decltype(f2)>);
+        ASSERT_FALSE(ap_errorvoid(either::Error<void, decltype(f1)>())(either::Ok<void>(f2))(either::Ok<void>(2)).isOk());
+        ASSERT_FALSE(ap_errorvoid(either::Ok<void>(f1))(either::Error<void, decltype(f2)>())(either::Ok<void>(2)).isOk());
+        ASSERT_FALSE(ap_errorvoid(either::Ok<void>(f1))(either::Ok<void>(f2))(either::Error<void, int>()).isOk());
+        ASSERT_EQ(ap_errorint(either::Error<int, decltype(f1)>(29))(either::Ok<int>(f2))(either::Ok<int>(2)).error(), 29);
+        ASSERT_EQ(ap_errorint(either::Ok<int, decltype(f1)>(f1))(either::Error<int, decltype(f2)>(32))(either::Ok<int>(2)).error(), 32);
+        ASSERT_EQ(ap_errorint(either::Ok<int>(f1))(either::Ok<int>(f2))(either::Error<int, int>(2)).error(), 2);
+    }
+    {
+        const auto f1 = [](int i){ return Either<void, std::string>::Ok(std::to_string(i));};
+        const auto f1_error = [](int){ return Either<void, std::string>::Error();};
+        const auto f2 = [](const std::string& i){ return Either<void, int>::Ok(std::atoi(i.c_str()) * 21);};
+        const auto f2_error = [](const std::string&){ return Either<void, int>::Error();};
+        const auto ap_void = either::Ok<void>(&compose<decltype(f1), decltype(f2)>);
+        const auto ap_void_f1error = either::Ok<void>(&compose<decltype(f1_error), decltype(f2)>);
+        const auto ap_void_f2error = either::Ok<void>(&compose<decltype(f1), decltype(f2_error)>);
+        ASSERT_EQ(ap_void(f1)(f2)(2).bind(&id<Either<void, int>>).value(), 42);
+        ASSERT_EQ(ap_void(either::Ok<void>(f1))(either::Ok<void>(f2))(either::Ok<void>(2)).bind(&id<Either<void, int>>).value(), 42);
+        ASSERT_TRUE(ap_void_f1error(f1_error)(f2)(2).bind(&id<Either<void, int>>).isError());
+        ASSERT_TRUE(ap_void_f2error(f1)(f2_error)(2).bind(&id<Either<void, int>>).isError());
+        ASSERT_TRUE(ap_void(f1)(f2)(either::Error<void, int>()).bind(&id<Either<void, int>>).isError());
+    }
+    {
+        const auto f1 = [](int i){ return Either<int, std::string>::Ok(std::to_string(i));};
+        const auto f1_error = [](int){ return Either<int, std::string>::Error(29);};
+        const auto f2 = [](const std::string& i){ return Either<int, int>::Ok(std::atoi(i.c_str()) * 21);};
+        const auto f2_error = [](const std::string&){ return Either<int, int>::Error(32);};
+        const auto ap_void = either::Ok<int>(&compose<decltype(f1), decltype(f2)>);
+        const auto ap_void_f1error = either::Ok<int>(&compose<decltype(f1_error), decltype(f2)>);
+        const auto ap_void_f2error = either::Ok<int>(&compose<decltype(f1), decltype(f2_error)>);
+        ASSERT_EQ(ap_void(f1)(f2)(2).bind(&id<Either<int, int>>).value(), 42);
+        ASSERT_EQ(ap_void(either::Ok<int>(f1))(either::Ok<int>(f2))(either::Ok<int>(2)).bind(&id<Either<int, int>>).value(), 42);
+        ASSERT_EQ(ap_void_f1error(f1_error)(f2)(2).value().error(), 29);
+        ASSERT_EQ(ap_void_f2error(f1)(f2_error)(2).value().error(), 32);
+        ASSERT_EQ(ap_void_f1error(f1_error)(f2)(either::Error<int, int>(11)).error(), 11);
+        ASSERT_EQ(ap_void_f2error(f1)(f2_error)(either::Error<int, int>(11)).error(), 11);
+        ASSERT_EQ(ap_void(f1)(f2)(either::Error<int, int>(11)).error(), 11);
     }
 }
 
@@ -624,7 +778,6 @@ TEST(EitherTest, validate_kleisli_compose){
     }
 }
 
-
 TEST(EitherTest, validate_lift) {
     {
         const auto funcNoArgRetVoid = []() { return;};
@@ -659,13 +812,13 @@ TEST(EitherTest, validate_lift) {
     {
         const auto funcMultiArgRetVoid = [](int, float, const std::string&) { return;};
         const auto lifted = yafl::either::lift(funcMultiArgRetVoid);
-        const auto result = lifted(either::Ok<void>(2), either::Ok<void>(4.2), either::Ok<void, std::string>("dummy"));
+        const auto result = lifted(either::Ok<void>(2), either::Ok<void, float>(4.2), either::Ok<void, std::string>("dummy"));
         ASSERT_TRUE(result.isOk());
-        const auto result2 = lifted(either::Error<void, int>(), either::Ok<void>(4.2), either::Ok<void, std::string>("dummy"));
+        const auto result2 = lifted(either::Error<void, int>(), either::Ok<void, float>(4.2), either::Ok<void, std::string>("dummy"));
         ASSERT_FALSE(result2.isOk());
         const auto result3 = lifted(either::Ok<void>(1), either::Error<void, float>(), either::Ok<void, std::string>("dummy"));
         ASSERT_FALSE(result3.isOk());
-        const auto result4 = lifted(either::Ok<void>(1), either::Ok<void>(4.2), either::Error<void, std::string>());
+        const auto result4 = lifted(either::Ok<void>(1), either::Ok<void, float>(4.2), either::Error<void, std::string>());
         ASSERT_FALSE(result4.isOk());
     }
     {
@@ -674,11 +827,11 @@ TEST(EitherTest, validate_lift) {
         const auto result = lifted(either::Ok<void>(2), either::Ok<void>(4), either::Ok<void, std::string>("dummy"));
         ASSERT_TRUE(result.isOk());
         ASSERT_EQ(result.value(), "dummy6");
-        const auto result2 = lifted(either::Error<void, int>(), either::Ok<void>(4.2), either::Ok<void, std::string>("dummy"));
+        const auto result2 = lifted(either::Error<void, int>(), either::Ok<void, int>(4), either::Ok<void, std::string>("dummy"));
         ASSERT_FALSE(result2.isOk());
-        const auto result3 = lifted(either::Ok<void>(1), either::Error<void, float>(), either::Ok<void, std::string>("dummy"));
+        const auto result3 = lifted(either::Ok<void>(1), either::Error<void, int>(), either::Ok<void, std::string>("dummy"));
         ASSERT_FALSE(result3.isOk());
-        const auto result4 = lifted(either::Ok<void>(1), either::Ok<void>(4.2), either::Error<void, std::string>());
+        const auto result4 = lifted(either::Ok<void>(1), either::Ok<void, int>(4), either::Error<void, std::string>());
         ASSERT_FALSE(result4.isOk());
     }
 }
