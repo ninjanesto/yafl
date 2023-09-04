@@ -190,7 +190,7 @@ TYPED_TEST(MaybeTest, assertBindComputesCorrectType) {
             const auto maybe = Maybe<TypeParam>::Nothing();
             const auto resultInt = maybe.bind([](){ return Maybe<int>::Nothing();});
             ASSERT_FALSE(resultInt.hasValue());
-            const auto resultFloat = maybe.bind([](){ return Maybe<float>::Just(42.24);});
+            const auto resultFloat = maybe.bind([](){ return Maybe<float>::Just(42.24f);});
             ASSERT_FALSE(resultFloat.hasValue());
         }
     } else {
@@ -220,7 +220,7 @@ TYPED_TEST(MaybeTest, assertBindComputesCorrectType) {
             const auto maybe = Maybe<TypeParam>::Nothing();
             const auto resultInt = maybe.bind([](const TypeParam&){ return Maybe<int>::Nothing();});
             ASSERT_FALSE(resultInt.hasValue());
-            const auto resultFloat = maybe.bind([](const TypeParam&){ return Maybe<float>::Just(42.24);});
+            const auto resultFloat = maybe.bind([](const TypeParam&){ return Maybe<float>::Just(42.24f);});
             ASSERT_FALSE(resultFloat.hasValue());
         }
     }
@@ -278,7 +278,7 @@ TEST(MaybeTest, assertApply) {
         ASSERT_FALSE(result2.hasValue());
     }
     {
-        const auto partialApply = maybe::Just([](int x, float f, const std::string& s){ return std::to_string(x*f*42) + s;});
+        const auto partialApply = maybe::Just([](int x, float f, const std::string& s){ return std::to_string(static_cast<float>(x) * f * 42) + s;});
         const auto resultPartialFunc = partialApply(maybe::Just(2));
         const auto resultPartialFunc2 = resultPartialFunc(maybe::Just<float>(0.5));
         const auto resultPartialFunc3 = resultPartialFunc2(maybe::Just<std::string>("Text"));
@@ -286,27 +286,27 @@ TEST(MaybeTest, assertApply) {
         ASSERT_EQ(resultPartialFunc3.value(), "42.000000Text");
 
         const auto resultPartialFunc11 = partialApply(2);
-        const auto resultPartialFunc21 = resultPartialFunc11(0.5);
+        const auto resultPartialFunc21 = resultPartialFunc11(0.5f);
         const auto resultPartialFunc31 = resultPartialFunc21("Text");
 
         ASSERT_EQ(resultPartialFunc31.value(), "42.000000Text");
 
-        const auto resultPartialFunc4 = partialApply(maybe::Just(1), maybe::Just(2.0))(maybe::Just(std::string("Text")));
+        const auto resultPartialFunc4 = partialApply(maybe::Just(1), maybe::Just(2.0f))(maybe::Just(std::string("Text")));
         ASSERT_EQ(resultPartialFunc4.value(), "84.000000Text");
 
-        const auto resultPartialFunc5 = partialApply(maybe::Just(1))(maybe::Just(0.5))(maybe::Just(std::string("Text")));
+        const auto resultPartialFunc5 = partialApply(maybe::Just(1))(maybe::Just(0.5f))(maybe::Just(std::string("Text")));
         ASSERT_EQ(resultPartialFunc5.value(), "21.000000Text");
 
-        const auto resultPartialFunc6 = partialApply(maybe::Just(1), maybe::Just(0.5), maybe::Just(std::string("Text")));
+        const auto resultPartialFunc6 = partialApply(maybe::Just(1), maybe::Just(0.5f), maybe::Just(std::string("Text")));
         ASSERT_EQ(resultPartialFunc6.value(), "21.000000Text");
 
         const auto resultPartialFunc7 = partialApply.value()(1,3, std::string("Text"));
         ASSERT_EQ(resultPartialFunc7, "126.000000Text");
     }
     {
-        const auto partialApply = maybe::Just([](int x, float f, const std::string& s){ return std::to_string(x*f*42) + s;});
+        const auto partialApply = maybe::Just([](int x, float f, const std::string& s){ return std::to_string(static_cast<float>(x) * f * 42) + s;});
         const auto resultPartialNothing = partialApply(maybe::Nothing<int>());
-        const auto resultPartialFunc2 = resultPartialNothing(maybe::Just(0.5));
+        const auto resultPartialFunc2 = resultPartialNothing(maybe::Just(0.5f));
         const auto resultPartialFunc3 = resultPartialFunc2(maybe::Just<std::string>("Text"));
 
         ASSERT_FALSE(resultPartialFunc3.hasValue());
@@ -383,14 +383,14 @@ TEST(MaybeTest, assertApply) {
         ASSERT_TRUE(ap().hasValue());
     }
     {
-        const auto f1 = [](int i){ return i * 4.2;};
+        const auto f1 = [](int i){ return static_cast<float>(i) * 4.2f;};
         const auto f2 = [](float i){ return i;};
         const auto ap = maybe::Just(&compose<decltype(f1), decltype(f2)>);
         ASSERT_TRUE(ap(f1)(f2)(2).hasValue());
         ASSERT_TRUE(ap(maybe::Just(f1))(maybe::Just(f2))(maybe::Just(2)).hasValue());
     }
     {
-        const auto f1 = [](int i){ return i * 4.2;};
+        const auto f1 = [](int i){ return static_cast<float>(i) * 4.2f;};
         const auto f2 = [](float i){ return i;};
         const auto ap = maybe::Just(&compose<decltype(f1), decltype(f2)>);
         ASSERT_FALSE(ap(maybe::Nothing<decltype(f1)>())(maybe::Just(f2))(maybe::Just(2)).hasValue());
@@ -398,19 +398,19 @@ TEST(MaybeTest, assertApply) {
         ASSERT_FALSE(ap(maybe::Just(f1))(maybe::Just(f2))(maybe::Nothing<int>()).hasValue());
     }
     {
-        const auto f1 = [](int i){ return Maybe<float>::Just(i * 4.2);};
+        const auto f1 = [](int i){ return Maybe<float>::Just(static_cast<float>(i) * 4.2f);};
         const auto f2 = [](float i){ return Maybe<float>::Just(i);};
         const auto ap = maybe::Nothing<decltype(&compose<decltype(f1), decltype(f2)>)>();
         ASSERT_FALSE(ap(f1)(f2)(2).hasValue());
     }
     {
-        const auto f1 = [](int i){ return Maybe<float>::Just(i * 4.2);};
+        const auto f1 = [](int i){ return Maybe<float>::Just(static_cast<float>(i) * 4.2f);};
         const auto f2 = [](float i){ return Maybe<float>::Just(i);};
         const auto ap = maybe::Just(&compose<decltype(f1), decltype(f2)>);
         ASSERT_TRUE(ap(maybe::Just(f1))(maybe::Just(f2))(maybe::Just(2)).hasValue());
     }
     {
-        const auto f1 = [](int i){ return Maybe<float>::Just(i * 4.2);};
+        const auto f1 = [](int i){ return Maybe<float>::Just(static_cast<float>(i) * 4.2f);};
         const auto f2 = [](float i){ return Maybe<float>::Just(i);};
         const auto ap = maybe::Just(&compose<decltype(f1), decltype(f2)>);
         ASSERT_FALSE(ap(maybe::Nothing<decltype(f1)>())(maybe::Just(f2))(maybe::Just(2)).hasValue());
@@ -418,7 +418,7 @@ TEST(MaybeTest, assertApply) {
         ASSERT_FALSE(ap(maybe::Just(f1))(maybe::Just(f2))(maybe::Nothing<int>()).hasValue());
     }
     {
-        const auto f1 = [](int i){ return Maybe<float>::Just(i * 4.2);};
+        const auto f1 = [](int i){ return Maybe<float>::Just(static_cast<float>(i) * 4.2f);};
         const auto f2 = [](float i){ return Maybe<float>::Just(i);};
         const auto ap = maybe::Nothing<decltype(&compose<decltype(f1), decltype(f2)>)>();
         ASSERT_FALSE(ap(f1)(f2)(2).hasValue());
@@ -510,13 +510,13 @@ TEST(MaybeTest, validate_lift) {
     {
         const auto funcMultiArgRetVoid = [](int, float, const std::string&) { return;};
         const auto lifted = maybe::lift(funcMultiArgRetVoid);
-        const auto result = lifted(maybe::Just(2), maybe::Just<float>(4.2), maybe::Just<std::string>("dummy"));
+        const auto result = lifted(maybe::Just(2), maybe::Just<float>(4.2f), maybe::Just<std::string>("dummy"));
         ASSERT_TRUE(result.hasValue());
-        const auto result2 = lifted(maybe::Nothing<int>(), maybe::Just<float>(4.2), maybe::Just<std::string>("dummy"));
+        const auto result2 = lifted(maybe::Nothing<int>(), maybe::Just<float>(4.2f), maybe::Just<std::string>("dummy"));
         ASSERT_FALSE(result2.hasValue());
         const auto result3 = lifted(maybe::Just(1), maybe::Nothing<float>(), maybe::Just<std::string>("dummy"));
         ASSERT_FALSE(result3.hasValue());
-        const auto result4 = lifted(maybe::Just(1), maybe::Just<float>(4.2), maybe::Nothing<std::string>());
+        const auto result4 = lifted(maybe::Just(1), maybe::Just<float>(4.2f), maybe::Nothing<std::string>());
         ASSERT_FALSE(result4.hasValue());
     }
     {

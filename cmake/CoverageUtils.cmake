@@ -13,15 +13,18 @@ set(COVERAGE_BRANCH_COVERAGE 1)
 set(COVERAGE_WORKING_DIR ${CMAKE_CURRENT_BINARY_DIR})
 set(COVERAGE_REPORT_DIR "${COVERAGE_WORKING_DIR}/coverage_report")
 
-# Set compile options
-add_compile_options(--coverage)
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --coverage")
-set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} --coverage")
-set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} --coverage")
+if(CMAKE_CXX_COMPILER_ID STREQUAL GNU)
+    add_compile_options(--coverage)
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --coverage")
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} --coverage")
+    set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} --coverage")
+endif()
 
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-    # Set compile options for Clang
-    add_compile_options(-fprofile-instr-generate -fcoverage-mapping)
+if (CMAKE_CXX_COMPILER_ID STREQUAL Clang)
+    add_compile_options(-fprofile-instr-generate -fcoverage-mapping --coverage)
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fprofile-instr-generate")
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -fprofile-instr-generate")
+    set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -fprofile-instr-generate")
 endif()
 
 # Add coverage target

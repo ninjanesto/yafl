@@ -639,9 +639,9 @@ TEST(EitherTest, assertApply) {
             return ss.str();
         };
         const auto applmultBy42 = either::Ok<int, decltype(func)>(func);
-        const auto result = applmultBy42(either::Ok<int, std::string>("OlaOla"))(either::Ok<int, float>(2.2));
+        const auto result = applmultBy42(either::Ok<int, std::string>("OlaOla"))(either::Ok<int, float>(2.2f));
         ASSERT_EQ(result.value(), "OlaOla92.40");
-        ASSERT_FALSE(applmultBy42(either::Error<int, std::string>(2))(either::Ok<int, float>(2.2)).isOk());
+        ASSERT_FALSE(applmultBy42(either::Error<int, std::string>(2))(either::Ok<int, float>(2.2f)).isOk());
         ASSERT_FALSE(applmultBy42(either::Error<int, std::string>(2))(either::Error<int, float>(2)).isOk());
     }
     {
@@ -657,7 +657,7 @@ TEST(EitherTest, assertApply) {
         const auto applmultBy42 = either::Error<int, decltype(func)>(2);
         const auto result = applmultBy42(either::Ok<int, std::string>("OlaOla"));
         ASSERT_TRUE(result.isError());
-        const auto result2 = result(either::Ok<int, float>(2.2));
+        const auto result2 = result(either::Ok<int, float>(2.2f));
         ASSERT_TRUE(result2.isError());
     }
     {
@@ -812,13 +812,13 @@ TEST(EitherTest, validate_lift) {
     {
         const auto funcMultiArgRetVoid = [](int, float, const std::string&) { return;};
         const auto lifted = yafl::either::lift(funcMultiArgRetVoid);
-        const auto result = lifted(either::Ok<void>(2), either::Ok<void, float>(4.2), either::Ok<void, std::string>("dummy"));
+        const auto result = lifted(either::Ok<void>(2), either::Ok<void, float>(4.2f), either::Ok<void, std::string>("dummy"));
         ASSERT_TRUE(result.isOk());
-        const auto result2 = lifted(either::Error<void, int>(), either::Ok<void, float>(4.2), either::Ok<void, std::string>("dummy"));
+        const auto result2 = lifted(either::Error<void, int>(), either::Ok<void, float>(4.2f), either::Ok<void, std::string>("dummy"));
         ASSERT_FALSE(result2.isOk());
         const auto result3 = lifted(either::Ok<void>(1), either::Error<void, float>(), either::Ok<void, std::string>("dummy"));
         ASSERT_FALSE(result3.isOk());
-        const auto result4 = lifted(either::Ok<void>(1), either::Ok<void, float>(4.2), either::Error<void, std::string>());
+        const auto result4 = lifted(either::Ok<void>(1), either::Ok<void, float>(4.2f), either::Error<void, std::string>());
         ASSERT_FALSE(result4.isOk());
     }
     {

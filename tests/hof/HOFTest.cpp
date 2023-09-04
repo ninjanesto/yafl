@@ -86,7 +86,7 @@ TEST(HOFTest, validate_curry) {
         ASSERT_EQ(curried_func(21), 42);
     }
     {
-        const auto func = [](int i, float f){ return i*f*2; };
+        const auto func = [](int i, float f){ return static_cast<float>(i) * f * 2; };
         const auto curried_func = yafl::curry(func);
         ASSERT_EQ(curried_func(21)(2), 84);
     }
@@ -108,14 +108,14 @@ TEST(HOFTest, validate_uncurry) {
         ASSERT_EQ(uncurried_func(21), 42);
     }
     {
-        const auto func = [](int i, float f){ return i*f*2; };
+        const auto func = [](int i, float f){ return static_cast<float>(i) * f * 2; };
         const auto curried_func = yafl::curry(func);
         ASSERT_EQ(curried_func(21)(2), 84);
         const auto uncurried_func = yafl::uncurry(curried_func);
-        ASSERT_EQ(uncurried_func(21, 2), 84);
+        ASSERT_EQ(uncurried_func(21, 2.f), 84);
     }
     {
-        const auto func = [](int i, float f){ return i*f*2; };
+        const auto func = [](int i, float f){ return static_cast<float>(i) * f * 2; };
         const auto curried_func = yafl::curry(func);
         ASSERT_EQ(curried_func(21)(2), 84);
         const std::function<float (int, float)> uncurried_func = yafl::uncurry(curried_func);
@@ -128,7 +128,7 @@ TEST(HOFTest, validate_uncurry) {
         const auto func = [&void_result](int, float){ void_result = true; return; };
         const auto curried_func = yafl::curry(func);
         const auto uncurried_func = yafl::uncurry(curried_func);
-        uncurried_func(21, 2);
+        uncurried_func(21, 2.f);
         ASSERT_EQ(void_result, true);
     }
 }

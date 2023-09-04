@@ -43,13 +43,13 @@ TEST(LawsTest, validatePartialApplication) {
 
     const auto f = [](int, int, float, const std::string&, const Xpto&) {return 42;};
 
-    const auto partial_3arg_app = yafl::partial(f, 1, 2, 3.14);
+    const auto partial_3arg_app = yafl::partial(f, 1, 2, 3.14f);
     const auto result = partial_3arg_app("s", Xpto{""});
 
     ASSERT_EQ(result, 42);
 
     const auto partial_2arg_app = yafl::partial(f, 1, 2);
-    const auto partial_4arg_app = yafl::partial(partial_2arg_app, 3.14, "");
+    const auto partial_4arg_app = yafl::partial(partial_2arg_app, 3.14f, "");
     const auto result2 = partial_4arg_app(Xpto{""});
     ASSERT_EQ(result2, 42);
 }
@@ -59,12 +59,12 @@ int function1(int, float, const std::string&) { return 42;}
 TEST(LawsTest, validateCurryUncurry) {
     {
         const auto curried_function1 = yafl::curry(function1);
-        const auto curried_function1_with_arg1_and_arg2 = curried_function1(42)(3.14);
+        const auto curried_function1_with_arg1_and_arg2 = curried_function1(42)(3.14f);
         const auto result = curried_function1_with_arg1_and_arg2("dummy");
         ASSERT_EQ(result, 42);
 
         const auto uncurried_function1 = yafl::uncurry(curried_function1);
-        const auto result2 = uncurried_function1(42, 3.14, "dummy");
+        const auto result2 = uncurried_function1(42, 3.14f, "dummy");
         ASSERT_EQ(result2, 42);
     }
     {
