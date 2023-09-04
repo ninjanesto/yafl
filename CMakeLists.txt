@@ -19,15 +19,15 @@ if(CMAKE_BUILD_TYPE STREQUAL VALGRIND)
 endif()
 
 if(BUILD_YAFL_COVERAGE)
-    set(COVERAGE_REPORTS YES)
-    set(COVERAGE_THRESHOLD_LINE 100.0)
-    set(COVERAGE_THRESHOLD_FUNCTION 75.0)
-    include(CoverageTarget REQUIRED)
+    set(COVERAGE_INCLUDES
+        ${CMAKE_SOURCE_DIR}/src
+    )
+    include(CoverageUtils)
 endif()
 
 add_subdirectory(src)
 
-if(BUILD_YAFL_TESTS)
+if(BUILD_YAFL_TESTS OR BUILD_YAFL_COVERAGE)
     include(TestUtils)
     setup_testing()
     enable_testing()
