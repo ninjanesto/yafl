@@ -1,5 +1,13 @@
 ![](doc/logo/yafl.png "Yet Another Functional Library")
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+![Yafl Build and Tests](https://github.com/ninjanesto/yafl/actions/workflows/yafl-build-run-tests.yml/badge.svg?branch=master)
+
+[![Yafl Build and Run Coverage](https://github.com/ninjanesto/yafl/actions/workflows/yafl-build-run-coverage.yml/badge.svg)](https://github.com/ninjanesto/yafl/actions/workflows/yafl-build-run-coverage.yml) [![Yafl Coverage](https://codecov.io/gh/ninjanesto/yafl/graph/badge.svg?token=0XDHUSTRNG)](https://codecov.io/gh/ninjanesto/yafl)
+
+[![Yafl Doxygen Docs](https://github.com/ninjanesto/yafl/actions/workflows/yafl-build-docs.yml/badge.svg)](https://github.com/ninjanesto/yafl/actions/workflows/yafl-build-docs.yml)
+
 # Yet Another Functional Library
 Functional Programming concepts implemented in C++17
 
@@ -16,13 +24,13 @@ Functional Programming concepts implemented in C++17
 10. [Future](#future)
 
 ## Introduction
-C++ is a multi paradigm programming language and functional programming concepts keep getting added to the C++ standard.
+C++ is a multi paradigm programming language and functional programming (FP) concepts keep getting added to the C++ standard.
 
 Yafl is a header only library that implements some key FP concepts, such as curring / uncurring, partial application, function composition, kleisli composition, and also the Maybe and Either monads (Functor, Applicative Functor and Monad).
 
-This library helps you in reducing code noise and boilerplate code. It can improve readability (if you are accustomed to FP) and it is really fun to use and learn functional concepts.
+This library helps you in reducing code noise and boilerplate code. It can improve readability (if you are accustomed to FP) and it is really useful to learn functional concepts.
 
-Most of the concepts present in this library were inspired in some Haskell features, which is a really cool functional programming language
+Most of the concepts present in this library were inspired in some Haskell features.
 
 ### High Order Functions (HOF)
 Higher order functions are functions that take one or more functions as arguments, and/or return a function as their result.
@@ -419,5 +427,6 @@ It provides a structured way to handle errors, compose computations, and ensure 
 ## Future
  - CMake Install targets 
  - Bazel input flags and install targets
+ - Bazel github actions
  - Add BiFunctor implementation to Either type
  - Add Continuation monad

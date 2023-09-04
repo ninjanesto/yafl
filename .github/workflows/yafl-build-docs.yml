@@ -1,0 +1,54 @@
+name: Yafl Generate Doxygen
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+
+      matrix:
+        os: [ubuntu-latest]
+        build_type: [Release]
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set reusable strings
+      id: strings
+      shell: bash
+      run: |
+        echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
+
+    - name: Install Doxygen
+      run: sudo apt-get update && sudo apt-get install -y doxygen plantuml
+
+    - name: Configure CMake
+      run: >
+        cmake -B ${{ steps.strings.outputs.build-output-dir }}
+        -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+        -DBUILD_YAFL_COVERAGE=OFF
+        -DBUILD_YAFL_TESTS=OFF
+        -DBUILD_YAFL_EXAMPLE=OFF
+        -DBUILD_YAFL_DOCS=ON
+        -DCMAKE_CXX_STANDARD=17
+        -S ${{ github.workspace }}
+
+    - name: Build
+      run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
+
+    - name: Generate docs
+      working-directory: ${{ steps.strings.outputs.build-output-dir }}
+      run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --target doc --config ${{ matrix.build_type }}
+
+    - name: Deploy Documentation
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.YAFL_GITHUB_TOKEN }}
+        publish_dir: ${{ steps.strings.outputs.build-output-dir }}/doc  # Replace with the actual output directory

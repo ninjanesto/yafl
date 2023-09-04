@@ -19,6 +19,11 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --coverage")
 set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} --coverage")
 set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} --coverage")
 
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+    # Set compile options for Clang
+    add_compile_options(-fprofile-instr-generate -fcoverage-mapping)
+endif()
+
 # Add coverage target
 add_custom_target(coverage)
 add_custom_command(TARGET coverage POST_BUILD

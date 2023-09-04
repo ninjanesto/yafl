@@ -11,6 +11,7 @@
 #include <memory>
 #include <functional>
 #include <variant>
+#include <optional>
 #include "yafl/Functor.h"
 #include "yafl/Monad.h"
 #include "yafl/Applicative.h"
