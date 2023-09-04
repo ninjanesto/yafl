@@ -925,8 +925,8 @@ decltype(auto) lift(Callable&& callable) {
         using ReturnFunctionType = typename function::Details<Callable>::template LiftedSignature<FixedErrorType::template Type>;
 
         const ReturnFunctionType function =  [callable = std::forward<Callable>(callable)](auto ...args) -> Either<void, ReturnType> {
-            if (details::all_true([](auto&& v){ return v.isOk();}, args...)) {
-                const auto tp = details::map_tuple_append([](auto&& arg){ return arg.value();}, std::make_tuple(), args...);
+            if (all_true([](auto&& v){ return v.isOk();}, args...)) {
+                const auto tp = tuple::map_append([](auto&& arg){ return arg.value();}, std::make_tuple(), args...);
 
                 if constexpr (std::is_void_v<ReturnType>) {
                     std::apply(callable, tp);

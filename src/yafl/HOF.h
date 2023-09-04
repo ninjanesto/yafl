@@ -12,34 +12,18 @@
 
 namespace yafl {
 
-namespace details {
-    template<typename Callable, typename Head>
-    decltype(auto) uncurry_impl(Callable&& callable, Head&& value) {
-        return callable(std::forward<Head>(value));
-    }
-
-    template<typename Callable, typename Head, typename ...Tail>
-    decltype(auto) uncurry_impl(Callable&& callable, Head&& value, Tail&&...ts) {
-        const auto result = callable(std::forward<Head>(value));
-        return uncurry_impl(result, std::forward<Tail>(ts)...);
-    }
-
-    template<typename Predicate, typename ...Args>
-    decltype(auto) all_true(Predicate&& predicate, Args&& ...args) {
-        return (predicate(std::forward<Args>(args)) && ...);
-    }
-
-    template<typename Callable, typename Tuple, typename Head>
-    decltype(auto) map_tuple_append(Callable&& callable, Tuple&& tuple, Head&& value) {
-        return std::tuple_cat(std::forward<Tuple>(tuple), std::make_tuple(callable(std::forward<Head>(value))));
-    }
-
-    template<typename Callable, typename Tuple, typename Head, typename ...Tail>
-    decltype(auto) map_tuple_append(Callable&& callable, Tuple&& tuple, Head&& value, Tail&&...ts) {
-        return map_tuple_append(std::forward<Callable>(callable),
-                                std::tuple_cat(std::forward<Tuple>(tuple), std::make_tuple(callable(std::forward<Head>(value)))),
-                                std::forward<Tail>(ts)...);
-    }
+/**
+ * @ingroup HOF
+ * Function that applies given predicate to all input arguments
+ * @tparam Predicate Predicate function type
+ * @tparam Args Input arguments types
+ * @param predicate predicate function
+ * @param args input arguments
+ * @return true if all arguments verify the predicate and false otherwise
+ */
+template<typename Predicate, typename ...Args>
+decltype(auto) all_true(Predicate&& predicate, Args&& ...args) {
+    return (predicate(std::forward<Args>(args)) && ...);
 }
 
 /**
@@ -164,6 +148,19 @@ decltype(auto) curry(Callable&& callable) {
     }
 }
 
+namespace {
+    template<typename Callable, typename Head>
+    decltype(auto) uncurry_impl(Callable&& callable, Head&& value) {
+        return callable(std::forward<Head>(value));
+    }
+
+    template<typename Callable, typename Head, typename ...Tail>
+    decltype(auto) uncurry_impl(Callable&& callable, Head&& value, Tail&&...ts) {
+        const auto result = callable(std::forward<Head>(value));
+        return uncurry_impl(result, std::forward<Tail>(ts)...);
+    }
+} // end namespace
+
 /**
  * @ingroup HOF
  * Uncurry given callable
@@ -174,7 +171,7 @@ decltype(auto) curry(Callable&& callable) {
 template <typename Callable>
 decltype(auto) uncurry(Callable&& callable) {
     return [callable = std::forward<Callable>(callable)](auto&& ...args) {
-        return details::uncurry_impl(callable, std::forward<decltype(args)>(args)...);
+        return uncurry_impl(callable, std::forward<decltype(args)>(args)...);
     };
 }
 
@@ -189,15 +186,24 @@ decltype(auto) uncurry(Callable&& callable) {
  */
 template <typename Callable, typename ...Args>
 decltype(auto) partial(Callable&& callable, Args&& ...args) {
-        if constexpr (std::is_invocable_v<std::decay_t<Callable>, std::decay_t<Args>...>) {
+    using IsTupleSubset = tuple::IsTupleSubset<typename function::Details<Callable>::ArgTypes, std::tuple<Args...>>;
+    static_assert(IsTupleSubset::value, "Input arguments are not a subset of the Callable arguments");
+
+    if constexpr (std::is_invocable_v<std::decay_t<Callable>, std::decay_t<Args>...>) {
         return std::invoke(callable, std::forward<Args>(args)...);
     } else {
-        return [callable = std::forward<Callable>(callable), vargs = std::make_tuple(std::forward<Args>(args)...)](auto&& ...inner_args) {
+
+        using RemainingArgsTuple = tuple::TupleSubset<IsTupleSubset::index, typename function::Details<Callable>::ArgTypes>;
+        using ReturnType = function::FunctionFromTuple<typename function::Details<Callable>::ReturnType, RemainingArgsTuple>;
+
+        const ReturnType f = [callable = std::forward<Callable>(callable), vargs = std::make_tuple(std::forward<Args>(args)...)](auto&& ...inner_args) {
             return std::apply([callable = std::move(callable)](auto&& ...apply_args){
-                    return callable(std::forward<decltype(apply_args)>(apply_args)...);
-                },
-                std::tuple_cat(vargs, std::make_tuple(inner_args...)));
+                                  return callable(std::forward<decltype(apply_args)>(apply_args)...);
+                              },
+                              std::tuple_cat(vargs, std::make_tuple(inner_args...)));
         };
+
+        return f;
     }
 }
 

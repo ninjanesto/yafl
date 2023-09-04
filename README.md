@@ -11,8 +11,9 @@ Functional Programming concepts implemented in C++17
 5. [Either](#either)
 6. [Function Lift](#function-lift)
 7. [Build](#build)
-8. [Example](#example)
-9. [Future](#future)
+8. [Use/Install](#use--install)
+9. [Example App](#example-app)
+10. [Future](#future)
 
 ## Introduction
 C++ is a multi paradigm programming language and functional programming concepts keep getting added to the C++ standard.
@@ -73,8 +74,7 @@ const auto result = partial_3arg_app("s", Xpto{""});
 std::cout << result << std::endl;
 
 const auto partial_2arg_app = yafl::partial(f, 1, 2);
-// Here we need to explicitly declare the correct type
-const auto partial_4arg_app = yafl::partial<std::function<int(float f, const std::string&, const Xpto&)>>(partial_2arg_app, 3.14, "");
+const auto partial_4arg_app = yafl::partial(partial_2arg_app, 3.14, "");
 const auto result2 = partial_4arg_app(Xpto{""});
 std::cout << result2 << std::endl;
 ```
@@ -412,8 +412,12 @@ It provides a structured way to handle errors, compose computations, and ensure 
 
 ## Build
 
-## Example
+## Use / Install
+
+## Example App
 
 ## Future
+ - CMake Install targets 
+ - Bazel input flags and install targets
  - Add BiFunctor implementation to Either type
  - Add Continuation monad
