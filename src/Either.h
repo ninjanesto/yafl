@@ -5,331 +5,293 @@
 #include <functional>
 #include <variant>
 #include "Functor.h"
+#include "Monad.h"
+
+
+template <typename T>
+struct EitherTraits;
+
+template <template <typename, typename> typename Either, typename InnerError, typename InnerValue>
+struct EitherTraits<Either<InnerError, InnerValue>> {
+    using ErrorType = InnerError;
+    using ValueType = InnerValue;
+};
+template <template <typename, typename> typename Either, typename InnerError, typename InnerValue>
+struct EitherTraits<const Either<InnerError, InnerValue>> {
+    using ErrorType = InnerError;
+    using ValueType = InnerValue;
+};
 
 // Either Monad
-//template <typename L, typename R>
-//class Either;
-
-template<typename ...T>
+template<typename Error, typename Value>
 class Either;
 
 template<>
-class Either<> : public Functor<Either> {
-                 //public Applicative<Maybe>,
-                 //public Monad<Maybe> {
-    friend class Functor<Either>;
+class Either<void, void> : public Functor<Either, void, void>
+                 //, public Applicative<Maybe>
+                         , public Monad<Either, void, void> {
+    friend class Functor<Either, void, void>;
 private:
     explicit Either(bool v) : _value(v) {}
 public:
-    static Either<> Left() {
-        return Either<>(false);
+    static Either<void, void> Error() {
+        return Either<void, void>(false);
     }
 
-    static Either<> Right() {
-        return Either<>{true};
+    static Either<void, void> Ok() {
+        return Either<void, void>{true};
     }
 
-    [[nodiscard]] bool isLeft() const { return !_value; }
+    [[nodiscard]] bool isError() const { return !_value; }
 
-    [[nodiscard]] bool isRight() const { return _value; }
-
-    void left() const {
-        if (!_value) return;
-        throw std::runtime_error("Left not defined");
-    }
-
-    void right() const {
-        if (_value) return;
-        throw std::runtime_error("Right not defined");
-    }
+    [[nodiscard]] bool isOk() const { return _value; }
 
 private:
     template <typename Callable>
     decltype(auto) internal_fmap(const Callable& callable) const {
-        static_assert(std::is_invocable_v<Callable>, "Input argument in not invocable");
+        static_assert(std::is_invocable_v<Callable>, "Input argument is not invocable");
         using ReturnType = std::invoke_result_t<Callable>;
-        if (this->isRight()) {
+        if (this->isOk()) {
             if constexpr (std::is_void_v<ReturnType>) {
                 callable();
-                return Either<>::Right();
+                return Either<void, void>::Ok();
             } else {
-                return Either<void, ReturnType>::Right(callable());
+                return Either<void, ReturnType>::Ok(callable());
             }
         } else {
-            if constexpr (std::is_void_v<ReturnType>) {
-                return Either<>::Left();
-            } else {
-                return Either<void, ReturnType>::Left();
-            }
+            return Either<void, ReturnType>::Error();
+        }
+    }
+
+    template <typename Callable>
+    decltype(auto) internal_bind(const Callable& callable) const {
+        static_assert(std::is_invocable_v<Callable>, "Input argument is not invocable");
+        using ReturnType = std::invoke_result_t<Callable>;
+        using InnerTypeError = typename EitherTraits<ReturnType>::ErrorType;
+        static_assert(std::is_same_v<void, InnerTypeError>, "Error type does not match");
+        using InnerTypeOK = typename EitherTraits<ReturnType>::ValueType;
+        if (this->isOk()) {
+            return callable();
+        } else {
+            return Either<InnerTypeError, InnerTypeOK>::Error();
         }
     }
 private:
     bool _value;
 };
 
-template <typename R>
-class Either<void, R> : public Functor<Either, void, R> {
-    friend class Functor<Either, void, R>;
+template <typename ValueType>
+class Either<void, ValueType> : public Functor<Either, void, ValueType> {
+    friend class Functor<Either, void, ValueType>;
 private:
-    explicit Either(bool isLeft) : _isLeft{isLeft}, _right{nullptr} {}
+    explicit Either(bool isError) : _right{nullptr}, _isError{isError} {}
 public:
-    static Either<void, R> Left() {
-        return Either<void, R>(true);
+    static Either<void, ValueType> Error() {
+        return Either<void, ValueType>(true);
     }
 
-    static Either<void, R> Right(const R& value) {
-        Either<void, R> result(false);
-        result._right = std::make_unique<R>(value);
+    static Either<void, ValueType> Ok(const ValueType& value) {
+        Either<void, ValueType> result(false);
+        result._right = std::make_unique<ValueType>(value);
         return result;
     }
 
-    [[nodiscard]] bool isLeft() const { return _isLeft; }
+    [[nodiscard]] bool isError() const { return _isError; }
 
-    [[nodiscard]] bool isRight() const { return !_isLeft; }
+    [[nodiscard]] bool isOk() const { return !_isError; }
 
-    void left() const {
-        if (_isLeft) return;
-        throw std::runtime_error("Left not defined");
-    }
-
-    R right() const {
-        if (!_isLeft) return *(_right.get());;
-        throw std::runtime_error("Right not defined");
+    ValueType value() const {
+        if (!_isError) return *(_right.get());;
+        throw std::runtime_error("Ok not defined");
     }
 private:
     template <typename Callable>
     decltype(auto) internal_fmap(const Callable& callable) const {
-        static_assert(std::is_invocable_v<Callable, R>, "Input argument in not invocable");
-        using ReturnType = std::invoke_result_t<Callable, R>;
-        if (this->isRight()) {
+        static_assert(std::is_invocable_v<Callable, ValueType>, "Input argument is not invocable");
+        using ReturnType = std::invoke_result_t<Callable, ValueType>;
+        if (this->isOk()) {
             if constexpr (std::is_void_v<ReturnType>) {
-                callable(right());
-                return Either<>::Right();
+                callable(value());
+                return Either<void, void>::Ok();
             } else {
-                return Either<void, ReturnType>::Right(callable(right()));
+                return Either<void, ReturnType>::Ok(callable(value()));
             }
         } else {
-            if constexpr (std::is_void_v<ReturnType>) {
-                return Either<>::Left();
-            } else {
-                return Either<void, ReturnType>::Left();
-            }
+            return Either<void, ReturnType>::Error();
+        }
+    }
+
+    template <typename Callable>
+    decltype(auto) internal_bind(const Callable& callable) const {
+        static_assert(std::is_invocable_v<Callable, ValueType>, "Input argument is not invocable");
+        using ReturnType = std::invoke_result_t<Callable, ValueType>;
+        using InnerTypeError = typename EitherTraits<ReturnType>::ErrorType;
+        static_assert(std::is_same_v<void, InnerTypeError>, "Error type does not match");
+        using InnerTypeOK = typename EitherTraits<ReturnType>::ValueType;
+        if (this->isOk()) {
+            return callable(this->value());
+        } else {
+            return Either<InnerTypeError, InnerTypeOK>::Error();
         }
     }
 private:
-    std::unique_ptr<R> _right;
-    bool _isLeft;
+    std::unique_ptr<ValueType> _right;
+    bool _isError;
 };
-//
-//template <typename L, typename R, typename std::enable_if_t<std::is_void_v<L>>
-//class Either<void, R> : public Functor<Either, R> {
-//    friend class Functor<Either, R>;
-//    class LeftType{};
-//    class RightType{};
-//private:
-//    inline static auto leftType = LeftType{};
-//    inline static auto rightType = RightType{};
-//    explicit Either(const L& value, const LeftType&)
-//            : _left{std::make_unique<L>(value)}
-//            , _isLeft{true}{}
-//    explicit Either(const RightType&)
-//            : _left{nullptr}
-//            , _isLeft{false}{}
-//public:
-//    static Either<void, R> Left(const L& value) {
-//        return Either<L, void>(value, leftType);
-//    }
-//
-//    static Either<L, void> Right() {
-//        return Either<L, void>(rightType);
-//    }
-//
-//    [[nodiscard]] bool isLeft() const { return _isLeft; }
-//
-//    [[nodiscard]] bool isRight() const { return !_isLeft; }
-//
-//    L left() const {
-//        if (_isLeft) return *(_left.get());
-//        throw std::runtime_error("Left not defined");
-//    }
-//
-//    void right() const {
-//        if (!_isLeft) return;
-//        throw std::runtime_error("Right not defined");
-//    }
-//private:
-//    template <typename Callable>
-//    decltype(auto) internal_fmap(const Callable& callable) const {
-//        static_assert(std::is_invocable_v<Callable>, "Input argument in not invocable");
-//        using ReturnType = std::invoke_result_t<Callable>;
-//        if (this->isRight()) {
-//            if constexpr (std::is_void_v<ReturnType>) {
-//                callable();
-//                return Either<L, void>::Right();
-//            } else {
-//                return Either<L, ReturnType>::Right(callable());
-//            }
-//        } else {
-//            if constexpr (std::is_void_v<ReturnType>) {
-//                return Either<L, void>::Left(left());
-//            } else {
-//                return Either<L, ReturnType>::Left(left());
-//            }
-//        }
-//    }
-//
-//private:
-//    std::unique_ptr<L> _left;
-//    bool _isLeft;
-//};
 
-template <typename L, typename R>
-class Either<L, R> : public Functor<Either, L, R> {
-    friend class Functor<Either, L, R>;
+
+template <typename ErrorType>
+class Either<ErrorType, void> : public Functor<Either, ErrorType, void> {
+    friend class Functor<Either, ErrorType, void>;
 private:
-    explicit Either(bool isLeft): _isLeft{isLeft}{}
+    explicit Either(bool isError) : _left{nullptr}, _isError{isError} {}
 public:
-    static Either<L, R> Left(const L& value) {
-        Either<L, R> result{true};
+    static Either<ErrorType, void> Ok() {
+        return Either<ErrorType, void>(false);
+    }
+
+    static Either<ErrorType, void> Error(const ErrorType& value) {
+        Either<ErrorType, void> result(true);
+        result._left = std::make_unique<ErrorType>(value);
+        return result;
+    }
+
+    [[nodiscard]] bool isError() const { return _isError; }
+
+    [[nodiscard]] bool isOk() const { return !_isError; }
+
+    ErrorType error() const {
+        if (_isError) return *(_left.get());;
+        throw std::runtime_error("Ok not defined");
+    }
+private:
+    template <typename Callable>
+    decltype(auto) internal_fmap(const Callable& callable) const {
+        static_assert(std::is_invocable_v<Callable>, "Input argument is not invocable");
+        using ReturnType = std::invoke_result_t<Callable>;
+        if (this->isOk()) {
+            if constexpr (std::is_void_v<ReturnType>) {
+                callable();
+                return Either<ErrorType, void>::Ok();
+            } else {
+                return Either<ErrorType, ReturnType>::Ok(callable());
+            }
+        } else {
+            return Either<ErrorType, ReturnType>::Error(error());
+        }
+    }
+
+    template <typename Callable>
+    decltype(auto) internal_bind(const Callable& callable) const {
+        static_assert(std::is_invocable_v<Callable>, "Input argument is not invocable");
+        using ReturnType = std::invoke_result_t<Callable>;
+        using InnerTypeError = typename EitherTraits<ReturnType>::ErrorType;
+        static_assert(std::is_same_v<ErrorType, InnerTypeError>, "Error type does not match");
+        using InnerTypeOK = typename EitherTraits<ReturnType>::ValueType;
+        if (this->isOk()) {
+            return callable();
+        } else {
+            return Either<InnerTypeError, InnerTypeOK>::Error(this->error());
+        }
+    }
+private:
+    std::unique_ptr<ErrorType> _left;
+    bool _isError;
+};
+
+template <typename ErrorType, typename ValueType>
+class Either : public Functor<Either, ErrorType, ValueType> {
+    friend class Functor<Either, ErrorType, ValueType>;
+private:
+    explicit Either(bool isError): _isError{isError}{}
+public:
+    static Either<ErrorType, ValueType> Error(const ErrorType& value) {
+        Either<ErrorType, ValueType> result{true};
         result._value.template emplace<0>(value);
         return result;
     }
 
-    static Either<L,R> Right(const R& value) {
-        Either<L, R> result{false};
+    static Either<ErrorType,ValueType> Ok(const ValueType& value) {
+        Either<ErrorType, ValueType> result{false};
         result._value.template emplace<1>(value);
         return result;
     }
 
-    [[nodiscard]] bool isLeft() const { return _isLeft; }
+    [[nodiscard]] bool isError() const { return _isError; }
 
-    [[nodiscard]] bool isRight() const { return !_isLeft; }
+    [[nodiscard]] bool isOk() const { return !_isError; }
 
-    L left() const {
-        if (isLeft()) return std::get<0>(_value);
-        throw std::runtime_error("Left not defined");
+    ErrorType error() const {
+        if (isError()) return std::get<0>(_value);
+        throw std::runtime_error("Error not defined");
     }
 
-    R right() const {
-        if (isRight()) return std::get<1>(_value);
-        throw std::runtime_error("Right not defined");
+    ValueType value() const {
+        if (isOk()) return std::get<1>(_value);
+        throw std::runtime_error("Ok not defined");
     }
 private:
     template <typename Callable>
     decltype(auto) internal_fmap(const Callable& callable) const {
-        static_assert(std::is_invocable_v<Callable, R>, "Input argument in not invocable");
-        using ReturnType = std::invoke_result_t<Callable, R>;
-        if (this->isRight()) {
+        static_assert(std::is_invocable_v<Callable, ValueType>, "Input argument is not invocable");
+        using ReturnType = std::invoke_result_t<Callable, ValueType>;
+        if (this->isOk()) {
             if constexpr (std::is_void_v<ReturnType>) {
-                callable(right());
-                return Either<L, void>::Right();
+                callable(value());
+                return Either<ErrorType, void>::Ok();
             } else {
-                return Either<L, ReturnType>::Right(callable(right()));
+                return Either<ErrorType, ReturnType>::Ok(callable(value()));
             }
         } else {
-            if constexpr (std::is_void_v<ReturnType>) {
-                return Either<L, void>::Left(left());
-            } else {
-                return Either<L, ReturnType>::Left(left());
-            }
+            return Either<ErrorType, ReturnType>::Error(error());
+        }
+    }
+
+    template <typename Callable>
+    decltype(auto) internal_bind(const Callable& callable) const {
+        static_assert(std::is_invocable_v<Callable, ValueType>, "Input argument is not invocable");
+        using ReturnType = std::invoke_result_t<Callable, ValueType>;
+        using InnerTypeError = typename EitherTraits<ReturnType>::ErrorType;
+        static_assert(std::is_same_v<ErrorType, InnerTypeError>, "Error type does not match");
+        using InnerTypeOK = typename EitherTraits<ReturnType>::ValueType;
+        if (this->isOk()) {
+            return callable(this->value());
+        } else {
+            return Either<InnerTypeError, InnerTypeOK>::Error(this->error());
         }
     }
 
 private:
-    std::variant<L, R> _value;
-    bool _isLeft;
+    std::variant<ErrorType, ValueType> _value;
+    bool _isError;
 };
 
+template<typename ValueType>
+std::enable_if_t<!std::is_void_v<ValueType>, Either<void, ValueType>>
+Ok(const ValueType& arg) { return Either<void, ValueType>::Ok(arg); }
 
-template<typename ...T>
-Either<T...> Right(T&& ...args);
+template<typename ValueType>
+std::enable_if_t<(std::is_void_v<ValueType>), Either<void, void>>
+Ok() { return Either<void, void>::Ok(); }
 
-template<>
-Either<> Right() { return Either<>::Right(); }
+template<typename ErrorType, typename ValueType>
+std::enable_if_t<std::is_void_v<ErrorType> && std::is_void_v<ValueType>, Either<void, void>>
+Ok() { return Either<void, void>::Ok(); }
 
-template<typename R>
-Either<void, R> Right(const R& arg) { return Either<void, R>::Right(arg); }
+template<typename ErrorType, typename ValueType>
+Either<ErrorType, ValueType> Ok(const ValueType& arg) { return Either<ErrorType, ValueType>::Ok(arg); }
 
-template<typename L, typename R>
-Either<L, R> Right(const R& arg) { return Either<L, R>::Right(arg); }
+template<typename ErrorType>
+std::enable_if_t<!std::is_void_v<ErrorType>, Either<ErrorType, void>>
+Error(const ErrorType& arg) { return Either<ErrorType, void>::Error(arg); }
 
-template<typename ...T>
-Either<T...> Left(T&& ...args);
+template<typename ErrorType>
+std::enable_if_t<(std::is_void_v<ErrorType>), Either<void, void>>
+Error() { return Either<void, void>::Error(); }
 
-template<>
-Either<> Left() { return Either<>::Left(); }
+template<typename ErrorType, typename ValueType>
+std::enable_if_t<std::is_void_v<ErrorType> && std::is_void_v<ValueType>, Either<void, void>>
+Error() { return Either<void, void>::Error(); }
 
-template<typename R>
-Either<void, R> Left() { return Either<void, R>::Left(); }
-
-template<typename L, typename R>
-Either<L, R> Left(const L& arg) { return Either<L, R>::Left(arg); }
-
-
-
-//template<typename L = std::monostate, typename R = std::monostate>
-//Either<L, R> Left(const L& value) { return Either<L, R>::createLeft(value); }
-//
-//template<typename L = std::monostate, typename R = std::monostate>
-//Either<L, R> Right(const R& value) { return Either<L, R>::createRight(value); }
-//
-//template<typename L = std::monostate, typename R = std::monostate>
-//class Either : public Functor<Either, L, R>,
-//               public Monad<Either, L, R> {
-//    friend class Functor<Either, L, R>;
-//    friend class Monad<Either, L, R>;
-//
-//private:
-//    std::variant<L, R> _value;
-//    Either() = default;
-//public:
-//    static Either<L,R> createLeft(const L& value) {
-//        Either<L,R> result;
-//        result._value.template emplace<0>(value);
-//        return result;
-//    }
-//
-//    static Either<L,R> createRight(const R& value) {
-//        Either<L,R> result;
-//        result._value.template emplace<1>(value);
-//        return result;
-//    }
-//
-//    [[nodiscard]] bool isLeft() const {
-//        return _value.index() == 0;
-//    }
-//
-//    [[nodiscard]] bool isRight() const {
-//        return _value.index() == 1;
-//    }
-//
-//    [[nodiscard]] L left() const {
-//        return std::get<0>(_value);
-//    }
-//
-//    [[nodiscard]] R right() const {
-//        return std::get<1>(_value);
-//    }
-//
-//    [[nodiscard]] L leftOr(const L& defaultValue) const {
-//        return (isLeft()) ? left() : defaultValue;
-//    }
-//
-//    [[nodiscard]] R rightOr(const R& defaultValue) const {
-//        return (isRight()) ? right() : defaultValue;
-//    }
-//
-//private:
-//    template <typename F>
-//    decltype(auto) internal_bind(F&& fa) const {
-//        using rtype = decltype(fa(this->right()));
-//        return this->isRight() ? fa(this->right())
-//                               : Left<L, decltype(std::declval<rtype>().right())>(this->left());
-//    }
-//
-//    template <typename F>
-//    decltype(auto) internal_fmap(F&& f) const {
-//        return this->isRight() ? Right<L, decltype(f(this->right()))>(f(this->right()))
-//                               : Left<L, decltype(f(this->right()))>(this->left());
-//    }
-//};
+template<typename ErrorType, typename R>
+Either<ErrorType, R> Error(const ErrorType& arg) { return Either<ErrorType, R>::Error(arg); }

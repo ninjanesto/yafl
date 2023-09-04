@@ -8,7 +8,10 @@
 
 #include "Maybe.h"
 #include <string>
+#include <tuple>
 #include <gtest/gtest.h>
+#include <gmock/gmock.h>
+
 
 template <typename T>
 Maybe<T> createMaybe() {
@@ -38,7 +41,20 @@ TYPED_TEST(MaybeTest, assertJustCreateAValidMaybeForAnyType) {
 
 TYPED_TEST(MaybeTest, assertValueReturnsCorrectType) {
     const auto maybe = createMaybe<TypeParam>();
-    constexpr const auto areSameType = std::is_same_v<TypeParam, decltype(maybe.value())>;
+    if constexpr (!std::is_void_v<TypeParam>) {
+        constexpr const auto areSameType = std::is_same_v<TypeParam, decltype(maybe.value())>;
+        ASSERT_TRUE(areSameType);
+    }
+    constexpr const auto areSameType = std::is_same_v<TypeParam, typename MaybeTraits<decltype(maybe)>::ValueType>;
+    ASSERT_TRUE(areSameType);
+}
+
+TYPED_TEST(MaybeTest, assertValueReturnsExceptionWhenisNothing) {
+    const auto maybe = Nothing<TypeParam>();
+    if constexpr (!std::is_void_v<TypeParam>) {
+        EXPECT_THAT([&maybe]() { std::ignore = maybe.value(); }, testing::Throws<std::runtime_error>());
+    }
+    constexpr const auto areSameType = std::is_same_v<TypeParam, typename MaybeTraits<decltype(maybe)>::ValueType>;
     ASSERT_TRUE(areSameType);
 }
 
@@ -55,7 +71,8 @@ TYPED_TEST(MaybeTest, assertFmapComputesCorrectType) {
         {
             const auto maybe = createMaybe<TypeParam>();
             const auto resultVoid = maybe.fmap([](){});
-            ASSERT_TRUE(std::is_void_v<decltype(resultVoid.value())>);
+
+            ASSERT_TRUE(std::is_void_v<typename MaybeTraits<decltype(resultVoid)>::ValueType>);
         }
         {
             const auto maybe = createMaybe<TypeParam>();
@@ -63,17 +80,31 @@ TYPED_TEST(MaybeTest, assertFmapComputesCorrectType) {
             constexpr const auto areSameType = std::is_same_v<int, decltype(resultType.value())>;
             ASSERT_TRUE(areSameType);
         }
+        {
+            const auto maybe = Maybe<TypeParam>::Nothing();
+            const auto resultInt = maybe.fmap([](){ return;});
+            ASSERT_FALSE(resultInt.hasValue());
+            const auto resultFloat = maybe.fmap([](){ return 42.24;});
+            ASSERT_FALSE(resultFloat.hasValue());
+        }
     } else {
         {
             const auto maybe = createMaybe<TypeParam>();
             const auto resultVoid = maybe.fmap([](const TypeParam&){});
-            ASSERT_TRUE(std::is_void_v<decltype(resultVoid.value())>);
+            ASSERT_TRUE(std::is_void_v<typename MaybeTraits<decltype(resultVoid)>::ValueType>);
         }
         {
             const auto maybe = createMaybe<TypeParam>();
             const auto resultType = maybe.fmap([](const TypeParam&){return 42;});
             constexpr const auto areSameType = std::is_same_v<int, decltype(resultType.value())>;
             ASSERT_TRUE(areSameType);
+        }
+        {
+            const auto maybe = Maybe<TypeParam>::Nothing();
+            const auto resultInt = maybe.fmap([](const TypeParam&){ return;});
+            ASSERT_FALSE(resultInt.hasValue());
+            const auto resultFloat = maybe.fmap([](const TypeParam&){ return 42.24;});
+            ASSERT_FALSE(resultFloat.hasValue());
         }
     }
 }
@@ -83,7 +114,7 @@ TYPED_TEST(MaybeTest, assertBindComputesCorrectType) {
         {
             const auto maybe = createMaybe<TypeParam>();
             const auto resultVoid = maybe.bind([](){ return Maybe<void>::Nothing();});
-            ASSERT_TRUE(std::is_void_v<decltype(resultVoid.value())>);
+            ASSERT_TRUE(std::is_void_v<typename MaybeTraits<decltype(resultVoid)>::ValueType>);
         }
         {
             const auto maybe = createMaybe<TypeParam>();
@@ -91,17 +122,31 @@ TYPED_TEST(MaybeTest, assertBindComputesCorrectType) {
             constexpr const auto areSameType = std::is_same_v<int, decltype(resultType.value())>;
             ASSERT_TRUE(areSameType);
         }
+        {
+            const auto maybe = Maybe<TypeParam>::Nothing();
+            const auto resultInt = maybe.bind([](){ return Maybe<int>::Nothing();});
+            ASSERT_FALSE(resultInt.hasValue());
+            const auto resultFloat = maybe.bind([](){ return Maybe<float>::Just(42.24);});
+            ASSERT_FALSE(resultFloat.hasValue());
+        }
     } else {
         {
             const auto maybe = createMaybe<TypeParam>();
             const auto resultVoid = maybe.bind([](const TypeParam&){return Maybe<void>::Nothing();});
-            ASSERT_TRUE(std::is_void_v<decltype(resultVoid.value())>);
+            ASSERT_TRUE(std::is_void_v<typename MaybeTraits<decltype(resultVoid)>::ValueType>);
         }
         {
             const auto maybe = createMaybe<TypeParam>();
             const auto resultType = maybe.bind([](const TypeParam&){ return Maybe<int>::Just(42);});
             constexpr const auto areSameType = std::is_same_v<int, decltype(resultType.value())>;
             ASSERT_TRUE(areSameType);
+        }
+        {
+            const auto maybe = Maybe<TypeParam>::Nothing();
+            const auto resultInt = maybe.bind([](const TypeParam&){ return Maybe<int>::Nothing();});
+            ASSERT_FALSE(resultInt.hasValue());
+            const auto resultFloat = maybe.bind([](const TypeParam&){ return Maybe<float>::Just(42.24);});
+            ASSERT_FALSE(resultFloat.hasValue());
         }
     }
 }
@@ -118,6 +163,28 @@ TEST(MaybeTest, assertApply) {
         const auto void42 = Just([]() { return 42; });
         const auto result = void42();
         ASSERT_EQ(result.value(), 42);
+    }
+    {
+        const auto voidFunc = []() { return ;};
+        const auto nothingVoid = Nothing<decltype(voidFunc)>();
+        const auto result = nothingVoid();
+        ASSERT_FALSE(result.hasValue());
+    }
+    {
+        const auto intFunc = []() { return 42;};
+        const auto nothingInt = Nothing<decltype(intFunc)>();
+        const auto result = nothingInt();
+        ASSERT_FALSE(result.hasValue());
+    }
+    {
+        const auto justVoidFunc = Just([]() { return ;});
+        const auto result = justVoidFunc();
+        ASSERT_TRUE(result.hasValue());
+    }
+    {
+        const auto justIntFunc = Just([]() { return 42;});
+        const auto result = justIntFunc();
+        ASSERT_TRUE(result.hasValue());
     }
     {
         const auto printX = Just([](int x){ std::cout << x << std::endl;});
@@ -145,5 +212,19 @@ TEST(MaybeTest, assertApply) {
 
         const auto resultPartialFunc7 = partialApply.value()(1,3, std::string("Text"));
         ASSERT_EQ(resultPartialFunc7, "126.000000Text");
+    }
+    {
+        const auto partialApply = Just([](int x, float f, const std::string& s){ return std::to_string(x*f*42) + s;});
+        const auto resultPartialNothing = partialApply(Nothing<int>());
+        const auto resultPartialFunc2 = resultPartialNothing(Just(0.5));
+        const auto resultPartialFunc3 = resultPartialFunc2(Just<std::string>("Text"));
+
+        ASSERT_FALSE(resultPartialFunc3.hasValue());
+    }
+    {
+        const auto func = [](int){ return;};
+        const auto partialApply = Nothing<decltype(func)>();
+        const auto resultPartialJust = partialApply(Nothing<int>());
+        ASSERT_FALSE(resultPartialJust.hasValue());
     }
 }

@@ -52,17 +52,6 @@ function(setup_testing)
 
         # We use our own main(), thus we don't need the ones provided by GMock/GTest
         set(GTEST_LIBS "${GMOCK_LIBRARIES};${GTEST_LIBRARIES};pthread" CACHE INTERNAL "GTest libraries")
-
-        if (COVERAGE_REPORTS)
-            if(CMAKE_TARGET_TYPE STREQUAL MGU22)
-                set(COVERAGE_THRESHOLD_LINE 100.0)
-                set(COVERAGE_THRESHOLD_FUNCTION 75.0)
-            else()
-                set(COVERAGE_THRESHOLD_LINE 100.0)
-                set(COVERAGE_THRESHOLD_FUNCTION 75.0)
-            endif()
-            include(CoverageTarget REQUIRED)
-        endif()
     endif()
 
 endfunction()

@@ -19,7 +19,10 @@ if(CMAKE_BUILD_TYPE STREQUAL VALGRIND)
 endif()
 
 if(BUILD_YAFL_COVERAGE)
-    include(CoverageTarget)
+    set(COVERAGE_REPORTS YES)
+    set(COVERAGE_THRESHOLD_LINE 100.0)
+    set(COVERAGE_THRESHOLD_FUNCTION 75.0)
+    include(CoverageTarget REQUIRED)
 endif()
 
 add_subdirectory(src)

@@ -9,6 +9,18 @@
 #include "Monad.h"
 #include "TypeTraits.h"
 
+template <typename T>
+struct MaybeTraits;
+
+template <template <typename> typename Maybe, typename Inner>
+struct MaybeTraits<Maybe<Inner>> {
+    using ValueType = Inner;
+};
+template <template <typename> typename Maybe, typename Inner>
+struct MaybeTraits<const Maybe<Inner>> {
+    using ValueType = Inner;
+};
+
 //Monad Maybe
 template <typename T>
 class Maybe;
@@ -32,24 +44,13 @@ public:
 
     [[nodiscard]] bool hasValue() const { return _value; }
 
-    void value() const {
-        if (_value) return;
-        throw std::runtime_error("Nothing");
-    }
-
 private:
     template <typename Callable>
     decltype(auto) internal_bind(const Callable& callable) const {
-        static_assert(std::is_invocable_v<Callable>, "Input argument in not invocable");
+        static_assert(std::is_invocable_v<Callable>, "Input argument is not invocable");
         using ReturnType = std::invoke_result_t<Callable>;
-        using InnerType = decltype(std::declval<ReturnType>().value());
         if (this->hasValue()) {
-            if constexpr (std::is_void_v<InnerType>) {
-                callable();
-                return Maybe<void>::Just();
-            } else {
-                return callable();
-            }
+            return callable();
         } else {
             return ReturnType::Nothing();
         }
@@ -57,7 +58,7 @@ private:
 
     template <typename Callable>
     decltype(auto) internal_fmap(const Callable& callable) const {
-        static_assert(std::is_invocable_v<Callable>, "Input argument in not invocable");
+        static_assert(std::is_invocable_v<Callable>, "Input argument is not invocable");
         using ReturnType = std::invoke_result_t<Callable>;
         if (this->hasValue()) {
             if constexpr (std::is_void_v<ReturnType>) {
@@ -67,11 +68,7 @@ private:
                 return Maybe<ReturnType>::Just(callable());
             }
         } else {
-            if constexpr (std::is_void_v<ReturnType>) {
-                return Maybe<void>::Nothing();
-            } else {
-                return Maybe<ReturnType>::Nothing();
-            }
+            return Maybe<ReturnType>::Nothing();
         }
     }
 private:
@@ -114,16 +111,10 @@ public:
 private:
     template <typename Callable>
     decltype(auto) internal_bind(const Callable& callable) const {
-        static_assert(std::is_invocable_v<Callable, T>, "Input argument in not invocable");
+        static_assert(std::is_invocable_v<Callable, T>, "Input argument is not invocable");
         using ReturnType = std::invoke_result_t<Callable, T>;
-        using InnerType = decltype(std::declval<ReturnType>().value());
         if (this->hasValue()) {
-            if constexpr (std::is_void_v<InnerType>) {
-                callable(this->value());
-                return Maybe<void>::Just();
-            } else {
-                return callable(this->value());
-            }
+            return callable(this->value());
         } else {
             return ReturnType::Nothing();
         }
@@ -131,7 +122,7 @@ private:
 
     template <typename Callable>
     decltype(auto) internal_fmap(const Callable& callable) const {
-        static_assert(std::is_invocable_v<Callable, T>, "Input argument in not invocable");
+        static_assert(std::is_invocable_v<Callable, T>, "Input argument is not invocable");
         using ReturnType = std::invoke_result_t<Callable, T>;
         if (this->hasValue()) {
             if constexpr (std::is_void_v<ReturnType>) {
@@ -141,18 +132,14 @@ private:
                 return Maybe<ReturnType>::Just(callable(this->value()));
             }
         } else {
-            if constexpr (std::is_void_v<ReturnType>) {
-                return Maybe<void>::Nothing();
-            } else {
-                return Maybe<ReturnType>::Nothing();
-            }
+            return Maybe<ReturnType>::Nothing();
         }
     }
 
     template<typename Head>
     decltype(auto) internal_apply(const Maybe<Head>& arg) const {
         if constexpr (function_traits<T>::ArgCount > 1) {
-            if (arg.hasValue()) {
+            if (arg.hasValue() && this->hasValue()) {
                 return Maybe<typename function_traits<T>::PartialApplyFirst>::Just([callable = value(), first = arg.value()](const auto& ...args) {
                     return callable(first, args...);
                 });
@@ -162,11 +149,7 @@ private:
         } else {
             using ReturnType = std::invoke_result_t<T, Head>;
             if (!this->hasValue()) {
-                if constexpr (std::is_void_v<ReturnType>) {
-                    return Maybe<void>::Nothing();
-                } else {
-                    return Maybe<ReturnType>::Nothing();
-                }
+                return Maybe<ReturnType>::Nothing();
             } else {
                 if (arg.hasValue()) {
                     if constexpr (std::is_void_v<ReturnType>) {
@@ -176,11 +159,7 @@ private:
                         return Maybe<ReturnType>::Just(value()(arg.value()));
                     }
                 } else {
-                    if constexpr (std::is_void_v<ReturnType>) {
-                        return Maybe<void>::Nothing();
-                    } else {
-                        return Maybe<ReturnType>::Nothing();
-                    }
+                    return Maybe<ReturnType>::Nothing();
                 }
             }
         }
@@ -190,11 +169,7 @@ private:
     decltype(auto) internal_apply() const {
         using ReturnType = std::invoke_result_t<T>;
         if (!this->hasValue()) {
-            if constexpr (std::is_void_v<ReturnType>) {
-                return Maybe<void>::Nothing();
-            } else {
-                return Maybe<ReturnType>::Nothing();
-            }
+            return Maybe<ReturnType>::Nothing();
         } else {
             if constexpr (std::is_void_v<ReturnType>) {
                 value()();

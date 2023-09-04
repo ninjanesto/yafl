@@ -1,5 +1,5 @@
-build/*
-cmake-build-*/*
-.idea/
-.tmp_clion/
-
+/cmake-build-*/*
+/.idea
+/.tmp_clion
+/.clwb
+/bazel-*

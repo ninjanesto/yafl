@@ -65,7 +65,6 @@
 #  Minimal branch coverage in percent.
 #  A lower coverage results in build failure.
 #]rst
-
 include(CommonCMakeUtils)
 include(FindPackageHandleStandardArgs)
 

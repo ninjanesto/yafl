@@ -8,9 +8,12 @@
  * @param rhs Right argument
  * @return function composed by executing rhs after lhs
  */
-template <typename TLeft, typename TRight>
+
+#include <utility>
+
+template <typename TLeft, typename TRight, typename ...Args>
 decltype(auto) operator|(const TLeft& lhs, const TRight& rhs) {
-    return [&rhs, &lhs](auto&& ...args) {
-        return rhs (lhs (args...));
+    return [&rhs, &lhs](Args&& ...args) {
+        return rhs (lhs (std::forward<Args>(args)...));
     };
 }

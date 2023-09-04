@@ -49,8 +49,8 @@ public:
      * @return a new Applicative Functor containing a new function with one input argument less
      */
     template<typename Head, typename ...Tail>
-    decltype(auto) operator()(const Head& head, const Tail& ...tail) const {
-        return static_cast<const TDerivedApplicative<Args...>*>(this)->internal_apply(head)(tail...);
+    decltype(auto) operator()(const Head& head, Tail&& ...tail) const {
+        return static_cast<const TDerivedApplicative<Args...>*>(this)->internal_apply(head)(std::forward<Tail>(tail)...);
     }
 };
 
