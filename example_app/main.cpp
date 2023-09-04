@@ -135,9 +135,36 @@ int main(int argc, char** argv) {
     {
         // Method 4
         const auto op = validate_operation(operation).value();
-        const auto curried_op = yafl::curry<decltype(op)>(op);
+        const auto curried_op = yafl::curry(op);
         const auto caesar_cypher = yafl::compose(validate_seed, curried_op);
         const auto result = caesar_cypher(seedString)(filename);
+        std::cout << result.isOk() << std::endl;
+    }
+
+    {
+        // curry / uncurry
+        const auto op = validate_operation(operation).value();
+        const auto curried_op = yafl::curry(op);
+        const auto result = validate_seed(seedString).fmap(curried_op)(filename);
+        std::cout << result.isOk() << std::endl;
+
+        const auto uncurried_op = yafl::uncurry(curried_op);
+        const auto validatedSeed = validate_seed(seedString);
+        if (validatedSeed.isOk()) {
+            const auto result2 = uncurried_op(validatedSeed.value(), filename);
+            std::cout << result2.isOk() << std::endl;
+        }
+    }
+
+    {
+        // lifted maybe
+        const auto validate_filename = [](const std::string& fn) { return fn;};
+        const auto lifted = yafl::lift<yafl::Maybe>(validate_filename);
+        const auto fn = lifted(yafl::Just<std::string>(filename));
+
+        const auto result = validate_seed(seedString)
+                .bind(validate_operation(operation))
+                (fn.value());
         std::cout << result.isOk() << std::endl;
     }
 

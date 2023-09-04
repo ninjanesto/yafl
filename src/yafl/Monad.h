@@ -45,8 +45,6 @@ template <template <typename...> typename MonadType, typename ...Args>
 struct IsMonadBase<MonadType<Args...>> {
     using BaseType = Monad<MonadType, Args...>;
     using DerivedType = MonadType<Args...>;
-    using ArgTypes = std::tuple<yafl::detail::remove_cvref_t<Args>...>;
-    using ArgType = std::tuple_element_t<0, ArgTypes>;
     static constexpr bool value = std::is_base_of_v<BaseType, DerivedType>;
 };
 
