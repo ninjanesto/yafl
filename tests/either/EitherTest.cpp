@@ -243,78 +243,58 @@ TYPED_TEST(EitherTest, validateErrorThrowsExceptionWhenEitherIsValue) {
 
 TEST(EitherTest, assertApply) {
     {
-        const auto multBy42 = Ok<void>([](const int &x) { return x * 42; });
+        const auto multBy42 = Ok<void>([](int x) { return x * 42; });
         const auto result = multBy42(Ok<void>(2));
         ASSERT_EQ(result.value(), 84);
         const auto result2 = multBy42(Error<void, int>());
         ASSERT_TRUE(result2.isError());
     }
-//    {
-//        const auto void42 = Just([]() { return 42; });
-//        const auto result = void42();
-//        ASSERT_EQ(result.value(), 42);
-//    }
-//    {
-//        const auto voidFunc = []() { return ;};
-//        const auto nothingVoid = Nothing<decltype(voidFunc)>();
-//        const auto result = nothingVoid();
-//        ASSERT_FALSE(result.hasValue());
-//    }
-//    {
-//        const auto intFunc = []() { return 42;};
-//        const auto nothingInt = Nothing<decltype(intFunc)>();
-//        const auto result = nothingInt();
-//        ASSERT_FALSE(result.hasValue());
-//    }
-//    {
-//        const auto justVoidFunc = Just([]() { return ;});
-//        const auto result = justVoidFunc();
-//        ASSERT_TRUE(result.hasValue());
-//    }
-//    {
-//        const auto justIntFunc = Just([]() { return 42;});
-//        const auto result = justIntFunc();
-//        ASSERT_TRUE(result.hasValue());
-//    }
-//    {
-//        const auto printX = Just([](int x){ std::cout << x << std::endl;});
-//        const auto result = printX(Just(42));
-//        ASSERT_TRUE(result.hasValue());
-//        const auto result2 = printX(Nothing<int>());
-//        ASSERT_FALSE(result2.hasValue());
-//    }
-//    {
-//        const auto partialApply = Just([](int x, float f, const std::string& s){ return std::to_string(x*f*42) + s;});
-//        const auto resultPartialFunc = partialApply(Just(2));
-//        const auto resultPartialFunc2 = resultPartialFunc(Just(0.5));
-//        const auto resultPartialFunc3 = resultPartialFunc2(Just<std::string>("Text"));
-//
-//        ASSERT_EQ(resultPartialFunc3.value(), "42.000000Text");
-//
-//        const auto resultPartialFunc4 = partialApply(Just(1), Just(2.0))(Just(std::string("Text")));
-//        ASSERT_EQ(resultPartialFunc4.value(), "84.000000Text");
-//
-//        const auto resultPartialFunc5 = partialApply(Just(1))(Just(0.5))(Just(std::string("Text")));
-//        ASSERT_EQ(resultPartialFunc5.value(), "21.000000Text");
-//
-//        const auto resultPartialFunc6 = partialApply(Just(1), Just(0.5), Just(std::string("Text")));
-//        ASSERT_EQ(resultPartialFunc6.value(), "21.000000Text");
-//
-//        const auto resultPartialFunc7 = partialApply.value()(1,3, std::string("Text"));
-//        ASSERT_EQ(resultPartialFunc7, "126.000000Text");
-//    }
-//    {
-//        const auto partialApply = Just([](int x, float f, const std::string& s){ return std::to_string(x*f*42) + s;});
-//        const auto resultPartialNothing = partialApply(Nothing<int>());
-//        const auto resultPartialFunc2 = resultPartialNothing(Just(0.5));
-//        const auto resultPartialFunc3 = resultPartialFunc2(Just<std::string>("Text"));
-//
-//        ASSERT_FALSE(resultPartialFunc3.hasValue());
-//    }
-//    {
-//        const auto func = [](int){ return;};
-//        const auto partialApply = Nothing<decltype(func)>();
-//        const auto resultPartialJust = partialApply(Nothing<int>());
-//        ASSERT_FALSE(resultPartialJust.hasValue());
-//    }
+    {
+        const auto func = [](int x) { return x * 42; };
+        const auto applmultBy42 = Ok<int, decltype(func)>(func);
+        const auto result = applmultBy42(Ok<int, int>(2));
+        ASSERT_EQ(result.value(), 84);
+        const auto result2 = applmultBy42(Error<int, int>(2));
+        ASSERT_TRUE(result2.isError());
+    }
+    {
+        const auto func = [](int x, int f) { return x * f; };
+        const auto applmultBy42 = Ok<void, decltype(func)>(func);
+        const auto result = applmultBy42(Ok<void, int>(2))(Ok<void, int>(2));
+        ASSERT_EQ(result.value(), 4);
+        const auto result2 = applmultBy42(Error<void, int>());
+        ASSERT_TRUE(result2.isError());
+        const auto result3 = result2(Error<void, int>());
+        ASSERT_TRUE(result3.isError());
+    }
+    {
+        const auto func = [](int x, int f) { return x * f; };
+        const auto applmultBy42 = Error<void, decltype(func)>();
+        const auto result = applmultBy42(Ok<void, int>(2))(Ok<void, int>(2));
+        ASSERT_TRUE(result.isError());
+        const auto result2 = applmultBy42(Error<void, int>())(Ok<void, int>(2));
+        ASSERT_TRUE(result2.isError());
+    }
+    {
+        const auto func = [](const std::string &s, float f) {
+            std::stringstream ss;
+            ss << s << std::fixed << std::setprecision(2) << f * 42;
+            return ss.str();
+        };
+        const auto applmultBy42 = Ok<int, decltype(func)>(func);
+        const auto result = applmultBy42(Ok<int, std::string>("OlaOla"))(Ok<int, float>(2.2));
+        ASSERT_EQ(result.value(), "OlaOla92.40");
+        const auto result2 = applmultBy42(Error<int, std::string>(2))(Ok<int, float>(2.2));
+        ASSERT_TRUE(result2.isError());
+        const auto result3 = applmultBy42(Error<int, std::string>(2))(Error<int, float>(2));
+        ASSERT_TRUE(result3.isError());
+    }
+    {
+        const auto func = [](const std::string &s, float f) {return std::string();};
+        const auto applmultBy42 = Error<int, decltype(func)>(2);
+        const auto result = applmultBy42(Ok<int, std::string>("OlaOla"));
+        ASSERT_TRUE(result.isError());
+        const auto result2 = result(Ok<int, float>(2.2));
+        ASSERT_TRUE(result2.isError());
+    }
 }

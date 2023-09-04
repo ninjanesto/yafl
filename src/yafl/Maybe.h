@@ -232,6 +232,6 @@ template<typename ...T>
 Maybe<T...> Nothing() { return Maybe<T...>::Nothing(); }
 
 template<typename ...T>
-Maybe<T...> Just(T&& ...args) { return Maybe<T...>::Just(std::forward<T...>(args)...); }
+Maybe<T...> Just(T&& ...args) { return Maybe<T...>::Just(std::forward<T>(args)...); }
 
 } // namespace yafl
