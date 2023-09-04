@@ -58,12 +58,12 @@ decltype(auto) function_compose(TLeft&& lhs, TRight&& rhs) {
         using InputArg = typename function::Details<TLeft>::template ArgType<0>;
         if constexpr (std::is_void_v<LhsReturnType>) {
             return [rhs = std::forward<TRight>(rhs), lhs = std::forward<TLeft>(lhs)](InputArg&& arg) {
-                lhs(std::move(arg));
+                lhs(std::forward<InputArg>(arg));
                 return rhs();
             };
         } else {
             return [rhs = std::forward<TRight>(rhs), lhs = std::forward<TLeft>(lhs)](InputArg&& arg) {
-                return rhs(lhs(std::move(arg)));
+                return rhs(lhs(std::forward<InputArg>(arg)));
             };
         }
     } else {

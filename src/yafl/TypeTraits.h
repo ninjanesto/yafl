@@ -171,5 +171,24 @@ public:
     static constexpr bool value = decltype(test<T>(0))::value;
 };
 
+/**
+ * @ingroup Type
+ * Helper class that introspects whether a type T is a Callable with the provided Args or not
+ * @tparam T Type to check
+ * @tparam Args function argument types
+ */
+template <typename Callable, typename... Args>
+struct IsCallableWithArgs {
+private:
+    template <typename C, typename... A>
+    static auto test(int) -> decltype(std::declval<C>()(std::declval<A>()...), std::true_type());
+
+    template <typename C, typename... A>
+    static std::false_type test(...);
+
+public:
+    static constexpr bool value = decltype(test<Callable, Args...>(0))::value;
+};
+
 } // namespace type
 } // namespace yafl

@@ -363,38 +363,28 @@ private:
     template<typename Arg>
     decltype(auto) internal_apply_non_monad(Arg&& arg) const {
         static_assert(!std::is_invocable_v<T>, "Function that takes 0 arguments cannot be called with arguments");
-        if constexpr (std::is_invocable_v<T, Arg>) {
-            using ReturnType = yafl::function::remove_cvref_t<std::invoke_result_t<T, Arg>>;
+        if constexpr (std::is_invocable_v<T, function::remove_cvref_t<Arg>>) {
+            using ReturnType = function::remove_cvref_t<std::invoke_result_t<T, function::remove_cvref_t<Arg>>>;
             if (!hasValue()) {
                 return Maybe<ReturnType>::Nothing();
             } else {
                 if constexpr (std::is_void_v<ReturnType>) {
-                    std::invoke<T>(value(), std::forward<Arg>(arg));
+                    std::invoke<T>(value(), std::move(arg));
                     return Maybe<ReturnType>::Just();
                 } else {
-                    return Maybe<ReturnType>::Just(std::invoke<T>(value(), std::forward<Arg>(arg)));
+                    return Maybe<ReturnType>::Just(std::invoke<T>(value(), std::move(arg)));
                 }
             }
         } else {
             using PartialFunctionType = typename function::Details<T>::PartialApplyFirst;
 
             if (hasValue()) {
-                auto result = Maybe<PartialFunctionType>::Just([callable = value(), first = std::forward<Arg>(arg)](auto&& ...args) mutable {
-                    return callable(std::move(first), std::forward<decltype(args)>(args)...);
-                });
-
-                if constexpr (function::Details<PartialFunctionType>::ArgCount == 0) {
-                    return result();
-                } else {
-                    return result;
-                }
+                return Maybe<PartialFunctionType>::Just(
+                        [callable = value(), first = std::forward<Arg>(arg)](auto&& ...args) mutable {
+                            return callable(std::move(first), std::forward<decltype(args)>(args)...);
+                        });
             } else {
-                if constexpr (function::Details<PartialFunctionType>::ArgCount == 0) {
-                    using FuncReturnType = std::invoke_result_t<PartialFunctionType>;
-                    return Maybe<FuncReturnType>::Nothing();
-                } else {
-                    return Maybe<PartialFunctionType>::Nothing();
-                }
+                return Maybe<PartialFunctionType>::Nothing();
             }
         }
     }

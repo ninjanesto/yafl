@@ -1,5 +1,5 @@
 /**
- * \brief       CAPI Clients Factory
+ * \brief       Yet Another Functional Library
  *
  * \copyright   2023, Ernesto Festas.
  *              Distributed under MIT license (See accompanying LICENSE file)
@@ -136,6 +136,15 @@ int main(int argc, char** argv) {
         const auto curried_op = yafl::curry(op);
         const auto caesar_cypher = validate_seed(seedString).fmap(curried_op);
         const auto result = caesar_cypher(filename);
+        std::cout << result.isOk() << std::endl;
+    }
+
+    {
+        // Method 5
+        const auto op = validate_operation(operation).value();
+        const auto curried_op = yafl::curry(op);
+        const auto caesar_cypher = yafl::compose(validate_seed, yafl::either::lift(curried_op));
+        const auto result = caesar_cypher(seedString)(filename);
         std::cout << result.isOk() << std::endl;
     }
 

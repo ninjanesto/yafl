@@ -415,3 +415,5 @@ It provides a structured way to handle errors, compose computations, and ensure 
 ## Example
 
 ## Future
+ - Add BiFunctor implementation to Either type
+ - Add Continuation monad
