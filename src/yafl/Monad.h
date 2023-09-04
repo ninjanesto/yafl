@@ -42,15 +42,6 @@ namespace monad {
 
 /**
  * @ingroup Monad
- * Maybe monad traits
- */
-template<typename>
-struct Details {
-    ///boolean flag that states whether type T is a monad or not
-    static constexpr bool hasMonadicBase = false;
-};
-
-/**
  * This function is used to bind (flatmap) a callable type to a value of type Monad
  * @tparam Callable callable type
  * @tparam MonadT monad type
@@ -60,11 +51,12 @@ struct Details {
  */
 template<typename Callable, typename MonadT>
 decltype(auto) bind(Callable&& callable, const MonadT& monad) {
-    static_assert(monad::Details<yafl::function::remove_cvref_t<MonadT>>::hasMonadicBase, "MonadT argument not a Monad");
+    static_assert(type::Details<yafl::function::remove_cvref_t<MonadT>>::hasMonadicBase, "MonadT argument not a Monad");
     return monad.bind(std::forward<Callable>(callable));
 }
 
 /**
+ * @ingroup Monad
  * This function is used to bind (flatmap) a callable type to a value of type Monad
  * In this case the provided function is lifted to work at Monad level an so,
  * this function returns a new callable that receives a Monad as argument and returns
@@ -80,12 +72,12 @@ decltype(auto) bind(Callable&& callable) {
         using FirstArg = typename function::Details<Callable>::template ArgType<0>;
 
         return [callable = std::forward<Callable>(callable)](const MonadType<FirstArg> &monad) {
-            static_assert(monad::Details<MonadType<FirstArg>>::hasMonadicBase, "Argument not a Functor");
+            static_assert(type::Details<MonadType<FirstArg>>::hasMonadicBase, "Argument not a Functor");
             return monad.bind(callable);
         };
     } else {
         return [callable = std::forward<Callable>(callable)](const MonadType<void> &monad) {
-            static_assert(monad::Details<MonadType<void>>::hasMonadicBase, "Argument not a Functor");
+            static_assert(type::Details<MonadType<void>>::hasMonadicBase, "Argument not a Functor");
             return monad.bind(callable);
         };
     }

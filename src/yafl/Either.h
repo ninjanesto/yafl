@@ -16,42 +16,6 @@
 #include "yafl/Applicative.h"
 
 namespace yafl {
-    
-namespace either {
-/**
- * @ingroup Either
- * Either monad traits
- */
-template<typename>
-struct Details;
-
-/**
- * @ingroup Either
- * Either monad traits specialization that enable getting the inner error and value types
- * @tparam EitherT Either monad type
- * @tparam InnerError Error type
- * @tparam InnerValue Value type
- */
-template<template<typename, typename> typename EitherT, typename InnerError, typename InnerValue>
-struct Details<EitherT<InnerError, InnerValue>> {
-    using ErrorType = InnerError;
-    using ValueType = InnerValue;
-};
-
-/**
- * @ingroup Either
- * Either monad traits specialization for const types that enable getting the inner error and value types
- * @tparam EitherT Either monad type
- * @tparam InnerError Error type
- * @tparam InnerValue Value type
- */
-template<template<typename, typename> typename EitherT, typename InnerError, typename InnerValue>
-struct Details<const EitherT<InnerError, InnerValue>> {
-    using ErrorType = InnerError;
-    using ValueType = InnerValue;
-};
-
-} // namespace either
 
 /**
  * @ingroup Either
@@ -61,6 +25,91 @@ struct Details<const EitherT<InnerError, InnerValue>> {
  */
 template<typename Error, typename Value>
 class Either;
+
+namespace type {
+
+/**
+ * @ingroup Type
+ * Either monad traits specialization that enable getting the inner error and value types
+ * @tparam InnerError Error type
+ * @tparam InnerValue Value type
+ */
+template<typename InnerError, typename InnerValue>
+struct Details<Either<InnerError, InnerValue>> {
+    /// Functor Base type
+    using FBaseType = core::Functor<Either, InnerError, InnerValue>;
+    /// Applicative Base type
+    using ABaseType = core::Applicative<Either, InnerError, InnerValue>;
+    /// Monad Base type
+    using MBaseType = core::Monad<Either, InnerError, InnerValue>;
+
+    /// Value Type
+    using ValueType = InnerValue;
+
+    /// Error Type
+    using ErrorType = InnerError;
+
+    /// Derived type
+    using DerivedType = Either<InnerError, InnerValue>;
+
+    ///boolean flag that states whether type T is a Functor or not
+    static constexpr bool hasFunctorBase = std::is_base_of_v<FBaseType, DerivedType>;
+    ///boolean flag that states whether type T is an Applicative or not
+    static constexpr bool hasApplicativeBase = std::is_base_of_v<ABaseType, DerivedType>;
+    ///boolean flag that states whether type T is a Monad or not
+    static constexpr bool hasMonadicBase = std::is_base_of_v<MBaseType, DerivedType>;
+
+    ///Callback responsible for handling errors
+    static constexpr auto handleError = [](const auto& arg) {
+        if constexpr (std::is_void_v<typename type::Details<yafl::function::remove_cvref_t<decltype(arg)>>::ErrorType>) {
+            return DerivedType::Error();
+        } else {
+            return DerivedType::Error(arg.error());
+        }
+    };
+};
+
+/**
+ * @ingroup Type
+ * Either monad traits specialization for const types that enable getting the inner error and value types
+ * @tparam InnerError Error type
+ * @tparam InnerValue Value type
+ */
+template<typename InnerError, typename InnerValue>
+struct Details<const Either<InnerError, InnerValue>> {
+    /// Functor Base type
+    using FBaseType = core::Functor<Either, InnerError, InnerValue>;
+    /// Applicative Base type
+    using ABaseType = core::Applicative<Either, InnerError, InnerValue>;
+    /// Monad Base type
+    using MBaseType = core::Monad<Either, InnerError, InnerValue>;
+
+    /// Value Type
+    using ValueType = InnerValue;
+
+    /// Error Type
+    using ErrorType = InnerError;
+
+    /// Derived type
+    using DerivedType = Either<InnerError, InnerValue>;
+
+    ///boolean flag that states whether type T is a Functor or not
+    static constexpr bool hasFunctorBase = std::is_base_of_v<FBaseType, DerivedType>;
+    ///boolean flag that states whether type T is an Applicative or not
+    static constexpr bool hasApplicativeBase = std::is_base_of_v<ABaseType, DerivedType>;
+    ///boolean flag that states whether type T is a Monad or not
+    static constexpr bool hasMonadicBase = std::is_base_of_v<MBaseType, DerivedType>;
+
+    ///Callback responsible for handling errors
+    static constexpr auto handleError = [](const auto& arg) {
+        if constexpr (std::is_void_v<typename type::Details<yafl::function::remove_cvref_t<decltype(arg)>>::ErrorType>) {
+            return DerivedType::Error();
+        } else {
+            return DerivedType::Error(arg.error());
+        }
+    };
+};
+} // namespace type
 
 /**
  * @ingroup Either
@@ -76,6 +125,49 @@ private:
     explicit Either(bool v) : _value(v) {}
 
 public:
+    /**
+     * Copy constructor
+     * @param other argument to be copied
+     */
+    Either(const Either<void, void>& other) = default;
+
+    /**
+     * Move constructor
+     * @param other argument to be moved
+     */
+    Either(Either<void, void>&& other) noexcept = default;
+
+    /**
+     * Assignment operator
+     * @param other argument to be copied
+     * @return Either with the value copied
+     */
+    Either<void, void>& operator=(const Either<void, void>& other) = default;
+
+    /**
+     * Move operator
+     * @param other argument to be moved
+     * @return Either with the value moved
+     */
+    Either<void, void>& operator=(Either<void, void>&& other) noexcept = default;
+
+    /**
+     * Comparison operator overload
+     * @param other instance of either to compare to
+     * @return true if objects are equal and false otherwise
+     */
+    bool operator==(const Either<void, void>& other) const noexcept {
+        return _value == other._value;
+    }
+
+    /**
+     * Logical not operator
+     * @return false if either has value and true otherwise
+     */
+    bool operator!() const {
+        return !_value;
+    }
+
     /**
      * Constructs an Either type that is an Error
      * @return Either with error defined
@@ -106,32 +198,32 @@ public:
 
 private:
     template <typename Callable>
-    decltype(auto) internal_fmap(Callable&& callable) const {
+    decltype(auto) internal_bind(Callable&& callable) const {
         static_assert(std::is_invocable_v<Callable>, "Input argument is not invocable");
         using ReturnType = std::remove_reference_t<std::invoke_result_t<Callable>>;
-        if (this->isOk()) {
-            if constexpr (std::is_void_v<ReturnType>) {
-                callable();
-                return Either<void, ReturnType>::Ok();
-            } else {
-                return Either<void, ReturnType>::Ok(callable());
-            }
+        using InnerTypeError = typename type::Details<ReturnType>::ErrorType;
+        static_assert(std::is_same_v<void, InnerTypeError>, "Error type does not match");
+        using InnerTypeOK = typename type::Details<ReturnType>::ValueType;
+        if (isOk()) {
+            return std::invoke<Callable>(std::forward<Callable>(callable));
         } else {
-            return Either<void, ReturnType>::Error();
+            return Either<InnerTypeError, InnerTypeOK>::Error();
         }
     }
 
     template <typename Callable>
-    decltype(auto) internal_bind(Callable&& callable) const {
+    decltype(auto) internal_fmap(Callable&& callable) const {
         static_assert(std::is_invocable_v<Callable>, "Input argument is not invocable");
         using ReturnType = std::remove_reference_t<std::invoke_result_t<Callable>>;
-        using InnerTypeError = typename either::Details<ReturnType>::ErrorType;
-        static_assert(std::is_same_v<void, InnerTypeError>, "Error type does not match");
-        using InnerTypeOK = typename either::Details<ReturnType>::ValueType;
-        if (this->isOk()) {
-            return callable();
+        if (isOk()) {
+            if constexpr (std::is_void_v<ReturnType>) {
+                std::invoke<Callable>(std::forward<Callable>(callable));
+                return Either<void, ReturnType>::Ok();
+            } else {
+                return Either<void, ReturnType>::Ok(std::invoke<Callable>(std::forward<Callable>(callable)));
+            }
         } else {
-            return Either<InnerTypeError, InnerTypeOK>::Error();
+            return Either<void, ReturnType>::Error();
         }
     }
 
@@ -152,15 +244,59 @@ class Either<void, ValueType> : public core::Functor<Either, void, ValueType>
     friend class core::Monad<Either, void, ValueType>;
 
 private:
-    explicit Either(bool isError) : _isError{isError} {}
+    Either() : _value{}{}
+    explicit Either(const ValueType& value) : _value{value}{}
 
 public:
+    /**
+     * Copy constructor
+     * @param other argument to be copied
+     */
+    Either(const Either<void, ValueType>& other) = default;
+
+    /**
+     * Move constructor
+     * @param other argument to be moved
+     */
+    Either(Either<void, ValueType>&& other) noexcept = default;
+
+    /**
+     * Assignment operator
+     * @param other argument to be copied
+     * @return Either with the value copied
+     */
+    Either<void, ValueType>& operator=(const Either<void, ValueType>& other) = default;
+
+    /**
+     * Move operator
+     * @param other argument to be moved
+     * @return Either with the value moved
+     */
+    Either<void, ValueType>& operator=(Either<void, ValueType>&& other) noexcept = default;
+
+    /**
+     * Comparison operator overload
+     * @param other instance of either to compare to
+     * @return true if objects are equal and false otherwise
+     */
+    bool operator==(const Either<void, ValueType>& other) const noexcept {
+        return _value == other._value;
+    }
+
+    /**
+     * Logical not operator
+     * @return false if either has value and true otherwise
+     */
+    bool operator!() const {
+        return !_value.has_value();
+    }
+
     /**
      * Constructs an Either type that is an Error
      * @return Either with error defined
      */
     static Either<void, ValueType> Error() {
-        return Either<void, ValueType>(true);
+        return Either<void, ValueType>();
     }
 
     /**
@@ -169,22 +305,20 @@ public:
      * @return Either with value defined
      */
     static Either<void, ValueType> Ok(const ValueType& value) {
-        Either<void, ValueType> result(false);
-        result._right = std::make_unique<ValueType>(value);
-        return result;
+        return Either<void, ValueType>(value);
     }
 
     /**
      * Returns whether Either is an Error or a Value
      * @return true if error and false otherwise
      */
-    [[nodiscard]] bool isError() const { return _isError; }
+    [[nodiscard]] bool isError() const { return !_value.has_value(); }
 
     /**
      * Returns whether Either is an Error or a Value
      * @return true if value and false otherwise
      */
-    [[nodiscard]] bool isOk() const { return !_isError; }
+    [[nodiscard]] bool isOk() const { return _value.has_value(); }
 
     /**
      * Extracts the wrapped value from the Either
@@ -192,8 +326,8 @@ public:
      * @throws std::runtime_error when either contains error
      */
     [[nodiscard]] ValueType value() const {
-        if (!_isError) return *(_right.get());
-        throw std::runtime_error("Ok not defined");
+        if (isOk()) return _value.value();
+        throw std::runtime_error("ValueType not defined");
     }
 
     /**
@@ -203,113 +337,151 @@ public:
      * @return the value wrapped or default
      */
     [[nodiscard]] ValueType valueOr(const ValueType& defaultValue) const {
-        return (!_isError) ? *(_right.get()) : defaultValue;
+        return (isOk()) ? value() : defaultValue;
     }
 
 private:
     template <typename Callable>
-    decltype(auto) internal_fmap(Callable&& callable) const {
-        static_assert(std::is_invocable_v<Callable, ValueType>, "Input argument is not invocable");
-        using ReturnType = std::remove_reference_t<std::invoke_result_t<Callable, ValueType>>;
-        if (this->isOk()) {
-            if constexpr (std::is_void_v<ReturnType>) {
-                callable(value());
-                return Either<void, ReturnType>::Ok();
-            } else {
-                return Either<void, ReturnType>::Ok(callable(value()));
-            }
-        } else {
-            return Either<void, ReturnType>::Error();
-        }
-    }
-
-    template <typename Callable>
     decltype(auto) internal_bind(Callable&& callable) const {
         static_assert(std::is_invocable_v<Callable, ValueType>, "Input argument is not invocable");
         using ReturnType = std::remove_reference_t<std::invoke_result_t<Callable, ValueType>>;
-        using InnerTypeError = typename either::Details<ReturnType>::ErrorType;
+        using InnerTypeError = typename type::Details<ReturnType>::ErrorType;
         static_assert(std::is_same_v<void, InnerTypeError>, "Error type does not match");
-        using InnerTypeOK = typename either::Details<ReturnType>::ValueType;
-        if (this->isOk()) {
-            return callable(this->value());
+        using InnerTypeOK = typename type::Details<ReturnType>::ValueType;
+        if (isOk()) {
+            return std::invoke<Callable>(std::forward<Callable>(callable), value());
         } else {
             return Either<InnerTypeError, InnerTypeOK>::Error();
         }
     }
 
-    template<typename Head>
-    decltype(auto) internal_apply(Either<void, Head>&& arg) const {
-        const auto var{std::move(arg)};
-        if constexpr (std::is_invocable_v<ValueType, Head>) {
-            using ReturnType = std::remove_reference_t<std::invoke_result_t<ValueType, Head>>;
-            if (this->isError()) {
-                return Either<void, ReturnType>::Error();
+    template <typename Callable>
+    decltype(auto) internal_fmap(Callable&& callable) const {
+        static_assert(std::is_invocable_v<Callable, ValueType>, "Input argument is not invocable");
+        using ReturnType = std::remove_reference_t<std::invoke_result_t<Callable, ValueType>>;
+        if (isOk()) {
+            if constexpr (std::is_void_v<ReturnType>) {
+                std::invoke<Callable>(std::forward<Callable>(callable), value());
+                return Either<void, ReturnType>::Ok();
             } else {
-                if (var.isOk()) {
-                    if constexpr (std::is_void_v<ReturnType>) {
-                        value()(var.value());
-                        return Either<void, ReturnType>::Ok();
-                    } else {
-                        return Either<void, ReturnType>::Ok(value()(var.value()));
-                    }
-                } else {
-                    return Either<void, ReturnType>::Error();
-                }
+                return Either<void, ReturnType>::Ok(std::invoke<Callable>(std::forward<Callable>(callable), value()));
             }
         } else {
-            if (var.isOk() && this->isOk()) {
-                return Either<void, typename FunctionTraits<ValueType>::PartialApplyFirst>::Ok([callable = value(), first = var.value()](auto&& ...args) {
-                    return std::apply(callable, std::tuple_cat(std::make_tuple(first), std::make_tuple(args...)));
-                });
-            } else {
-                return Either<void, typename FunctionTraits<ValueType>::PartialApplyFirst>::Error();
-            }
+            return Either<void, ReturnType>::Error();
         }
     }
 
-    template<typename Head>
-    decltype(auto) internal_apply(Head&& arg) const {
-        if constexpr (std::is_invocable_v<ValueType, Head>) {
-            using ReturnType = std::remove_reference_t<std::invoke_result_t<ValueType, Head>>;
-            if (this->isError()) {
+    template<typename Arg>
+    decltype(auto) internal_apply(Arg&& arg) const {
+        if constexpr (type::Details<yafl::function::remove_cvref_t<Arg>>::hasMonadicBase) {
+            using ArgValueType = yafl::function::remove_cvref_t<typename yafl::type::Details<yafl::function::remove_cvref_t<Arg>>::ValueType>;
+            if constexpr (std::is_invocable_v<ValueType, ArgValueType>) {
+                using ReturnType = std::remove_reference_t<std::invoke_result_t<ValueType, ArgValueType>>;
+                if (isError()) {
+                    return Either<void, ReturnType>::Error();
+                } else {
+                    if (arg.isOk()) {
+                        if constexpr (std::is_void_v<ReturnType>) {
+                            std::invoke<ValueType>(value(), arg.value());
+                            return Either<void, ReturnType>::Ok();
+                        } else {
+                            return Either<void, ReturnType>::Ok(std::invoke<ValueType>(value(), arg.value()));
+                        }
+                    } else {
+                        return Either<void, ReturnType>::Error();
+                    }
+                }
+            } else if constexpr (std::is_invocable_v<ValueType>) {
+                using RT = std::invoke_result_t<ValueType>;
+                if constexpr (std::is_invocable_v<RT, ArgValueType>) {
+                    using RTT = std::invoke_result_t<RT, ArgValueType>;
+                    if (isOk() && arg.isOk()) {
+                        if constexpr (std::is_void_v<RTT>) {
+                            std::invoke<RT>(value()(), std::forward<ArgValueType>(arg.value()));
+                            return Either<void, RTT>::Ok();
+                        } else {
+                            return Either<void, RTT>::Ok(std::invoke<RT>(value()(), std::forward<ArgValueType>(arg.value())));
+                        }
+                    } else {
+                        return Either<void, RTT>::Nothing();
+                    }
+                } else {
+                    return Either<void, RT>::Nothing();
+                }
+            } else {
+                if (arg.isOk() && isOk()) {
+                    return Either<void, typename function::Details<ValueType>::PartialApplyFirst>::Ok(
+                            [callable = value(), first = std::forward<ArgValueType>(arg.value())](auto&& ...args) {
+                                return std::apply(callable, std::tuple_cat(std::make_tuple(first), std::make_tuple(args...)));
+                            });
+                } else {
+                    return Either<void, typename function::Details<ValueType>::PartialApplyFirst>::Error();
+                }
+            }
+        } else {
+            return internal_apply_non_monad(std::forward<Arg>(arg));
+        }
+    }
+
+    template<typename Arg>
+    decltype(auto) internal_apply_non_monad(Arg&& arg) const {
+        if constexpr (std::is_invocable_v<ValueType, Arg>) {
+            using ReturnType = yafl::function::remove_cvref_t<std::invoke_result_t<ValueType, Arg>>;
+            if (isError()) {
                 return Either<void, ReturnType>::Error();
             } else {
                 if constexpr (std::is_void_v<ReturnType>) {
-                    value()(std::forward<Head>(arg));
+                    std::invoke<ValueType>(value(), std::forward<Arg>(arg));
                     return Either<void, ReturnType>::Ok();
                 } else {
-                    return Either<void, ReturnType>::Ok(value()(std::forward<Head>(arg)));
+                    return Either<void, ReturnType>::Ok(value()(std::forward<Arg>(arg)));
                 }
             }
-        } else {
-            if (this->isOk()) {
-                return Either<void, typename FunctionTraits<ValueType>::PartialApplyFirst>::Ok([callable = value(), first = std::forward<Head>(arg)](auto&& ...args) {
-                    return std::apply(callable, std::tuple_cat(std::make_tuple(first), std::make_tuple(args...)));
-                });
+        } else if constexpr (std::is_invocable_v<ValueType>) {
+            using RT = std::invoke_result_t<ValueType>;
+            if constexpr (std::is_invocable_v<RT, Arg>) {
+                using RTT = std::invoke_result_t<RT, Arg>;
+                if (isOk()) {
+                    if constexpr (std::is_void_v<RTT>) {
+                        std::invoke<RT>(value()(), std::forward<Arg>(arg));
+                        return Either<void, RTT>::Ok();
+                    } else {
+                        return Either<void, RTT>::Ok(std::invoke<RT>(value()(), std::forward<Arg>(arg)));
+                    }
+                } else {
+                    return Either<void, RTT>::Error();
+                }
             } else {
-                return Either<void, typename FunctionTraits<ValueType>::PartialApplyFirst>::Error();
+                return Either<void, RT>::Error();
+            }
+        } else {
+            if (isOk()) {
+                return Either<void, typename function::Details<ValueType>::PartialApplyFirst>::Ok(
+                        [callable = value(), first = std::forward<Arg>(arg)](auto&& ...args) mutable {
+                            return callable(std::move(first), std::forward<decltype(args)>(args)...);
+                        });
+            } else {
+                return Either<void, typename function::Details<ValueType>::PartialApplyFirst>::Error();
             }
         }
     }
 
-    template<typename std::enable_if<std::is_invocable_v<ValueType>>* = nullptr>
     decltype(auto) internal_apply() const {
         using ReturnType = std::remove_reference_t<std::invoke_result_t<ValueType>>;
-        if (this->isError()) {
+        if (isError()) {
             return Either<void, ReturnType>::Error();
         } else {
             if constexpr (std::is_void_v<ReturnType>) {
-                value()();
+                std::invoke<ValueType>(value());
                 return Either<void, ReturnType>::Ok();
             } else {
-                return Either<void, ReturnType>::Ok(value()());
+                return Either<void, ReturnType>::Ok(std::invoke<ValueType>(value()));
             }
         }
     }
 
 private:
-    std::unique_ptr<ValueType> _right{nullptr};
-    bool _isError;
+    std::optional<ValueType> _value;
 };
 
 /**
@@ -323,39 +495,81 @@ class Either<ErrorType, void> : public core::Functor<Either, ErrorType, void>
     friend class core::Monad<Either, ErrorType, void>;
 
 private:
-    explicit Either(bool isError) : _isError{isError} {}
+    Either() : _error{}{}
+    explicit Either(const ErrorType& error) : _error{error}{}
 
 public:
+    /**
+     * Copy constructor
+     * @param other argument to be copied
+     */
+    Either(const Either<ErrorType, void>& other) = default;
+
+    /**
+     * Move constructor
+     * @param other argument to be moved
+     */
+    Either(Either<ErrorType, void>&& other) noexcept = default;
+
+    /**
+     * Assignment operator
+     * @param other argument to be copied
+     * @return Either with the value copied
+     */
+    Either<ErrorType, void>& operator=(const Either<ErrorType, void>& other) = default;
+
+    /**
+     * Move operator
+     * @param other argument to be moved
+     * @return Either with the value moved
+     */
+    Either<ErrorType, void>& operator=(Either<ErrorType, void>&& other) noexcept = default;
+
+    /**
+     * Comparison operator overload
+     * @param other instance of either to compare to
+     * @return true if objects are equal and false otherwise
+     */
+    bool operator==(const Either<ErrorType, void>& other) const noexcept {
+        return _error == other._error;
+    }
+
+    /**
+     * Logical not operator
+     * @return true if either has error and false otherwise
+     */
+    bool operator!() const {
+        return _error.has_value();
+    }
+
     /**
      * Constructs an Either type that is an Ok
      * @return Either with value defined
      */
     static Either<ErrorType, void> Ok() {
-        return Either<ErrorType, void>(false);
+        return Either<ErrorType, void>();
     }
 
     /**
      * Constructs an Either type that is an Error
-     * @param value to be wrapped as error
+     * @param error to be wrapped as error
      * @return Either with error defined
      */
-    static Either<ErrorType, void> Error(const ErrorType& value) {
-        Either<ErrorType, void> result(true);
-        result._left = std::make_unique<ErrorType>(value);
-        return result;
+    static Either<ErrorType, void> Error(const ErrorType& error) {
+        return Either<ErrorType, void>(error);
     }
 
     /**
      * Returns whether Either is an Error or a Value
      * @return true if error and false otherwise
      */
-    [[nodiscard]] bool isError() const { return _isError; }
+    [[nodiscard]] bool isError() const { return _error.has_value(); }
 
     /**
      * Returns whether Either is an Error or a Value
      * @return true if value and false otherwise
      */
-    [[nodiscard]] bool isOk() const { return !_isError; }
+    [[nodiscard]] bool isOk() const { return !_error.has_value(); }
 
     /**
      * Extracts the wrapped error from the Either
@@ -363,44 +577,53 @@ public:
      * @throws std::runtime_error when either contains value
      */
     [[nodiscard]] ErrorType error() const {
-        if (_isError) return *(_left.get());
-        throw std::runtime_error("Ok not defined");
+        if (isError()) return _error.value();
+        throw std::runtime_error("Error not defined");
+    }
+
+    /**
+     * Extracts the wrapped error from the Either if exists
+     * otherwise return the provided default error
+     * @param defaultError Default error
+     * @return the error wrapped
+     */
+    [[nodiscard]] ErrorType errorOr(const ErrorType& defaultError) const {
+        return isError() ? _error.value() : defaultError;
     }
 
 private:
     template <typename Callable>
+    decltype(auto) internal_bind(Callable&& callable) const {
+        static_assert(std::is_invocable_v<Callable>, "Input argument is not invocable");
+        using ReturnType = std::remove_reference_t<std::invoke_result_t<Callable>>;
+        using InnerTypeError = typename type::Details<ReturnType>::ErrorType;
+        static_assert(std::is_same_v<ErrorType, InnerTypeError>, "Error type does not match");
+        using InnerTypeOK = typename type::Details<ReturnType>::ValueType;
+        if (isOk()) {
+            return std::invoke<Callable>(std::forward<Callable>(callable));
+        } else {
+            return Either<ErrorType, InnerTypeOK>::Error(error());
+        }
+    }
+
+    template <typename Callable>
     decltype(auto) internal_fmap(Callable&& callable) const {
         static_assert(std::is_invocable_v<Callable>, "Input argument is not invocable");
         using ReturnType = std::remove_reference_t<std::invoke_result_t<Callable>>;
-        if (this->isOk()) {
+        if (isOk()) {
             if constexpr (std::is_void_v<ReturnType>) {
-                callable();
+                std::invoke<Callable>(std::forward<Callable>(callable));
                 return Either<ErrorType, ReturnType>::Ok();
             } else {
-                return Either<ErrorType, ReturnType>::Ok(callable());
+                return Either<ErrorType, ReturnType>::Ok(std::invoke<Callable>(std::forward<Callable>(callable)));
             }
         } else {
             return Either<ErrorType, ReturnType>::Error(error());
         }
     }
 
-    template <typename Callable>
-    decltype(auto) internal_bind(Callable&& callable) const {
-        static_assert(std::is_invocable_v<Callable>, "Input argument is not invocable");
-        using ReturnType = std::remove_reference_t<std::invoke_result_t<Callable>>;
-        using InnerTypeError = typename either::Details<ReturnType>::ErrorType;
-        static_assert(std::is_same_v<ErrorType, InnerTypeError>, "Error type does not match");
-        using InnerTypeOK = typename either::Details<ReturnType>::ValueType;
-        if (this->isOk()) {
-            return callable();
-        } else {
-            return Either<InnerTypeError, InnerTypeOK>::Error(this->error());
-        }
-    }
-
 private:
-    std::unique_ptr<ErrorType> _left{nullptr};
-    bool _isError;
+    std::optional<ErrorType> _error;
 };
 
 /**
@@ -416,17 +639,65 @@ class Either : public core::Functor<Either, ErrorType, ValueType>
     friend class core::Monad<Either, ErrorType, ValueType>;
 
 private:
-    explicit Either(bool isError): _isError{isError}{}
+    enum Type {
+        EitherError = 0,
+        EitherValue = 1
+    };
+
+    explicit Either(Type type): _type{type}{}
 
 public:
+    /**
+     * Copy constructor
+     * @param other argument to be copied
+     */
+    Either(const Either<ErrorType, ValueType>& other) = default;
+
+    /**
+     * Move constructor
+     * @param other argument to be moved
+     */
+    Either(Either<ErrorType, ValueType>&& other) noexcept = default;
+
+    /**
+     * Assignment operator
+     * @param other argument to be copied
+     * @return Either with the value copied
+     */
+    Either<ErrorType, ValueType>& operator=(const Either<ErrorType, ValueType>& other) = default;
+
+    /**
+     * Move operator
+     * @param other argument to be moved
+     * @return Either with the value moved
+     */
+    Either<ErrorType, ValueType>& operator=(Either<ErrorType, ValueType>&& other) noexcept = default;
+
+    /**
+     * Comparison operator overload
+     * @param other instance of either to compare to
+     * @return true if objects are equal and false otherwise
+     */
+    bool operator==(const Either<ErrorType, ValueType>& other) const noexcept {
+        return _type == other._type && _value == other._value;
+    }
+
+    /**
+     * Logical not operator
+     * @return false if either has value and true otherwise
+     */
+    bool operator!() const {
+        return (_type == Type::EitherValue) ? false : true;
+    }
+
     /**
      * Constructs an Either type that is an Error
      * @param value to be wrapped as error
      * @return Either with error defined
      */
     static Either<ErrorType, ValueType> Error(const ErrorType& value) {
-        Either<ErrorType, ValueType> result{true};
-        result._value.template emplace<0>(value);
+        Either<ErrorType, ValueType> result{Type::EitherError};
+        result._value.template emplace<Type::EitherError>(value);
         return result;
     }
 
@@ -436,8 +707,8 @@ public:
      * @return Either with value defined
      */
     static Either<ErrorType,ValueType> Ok(const ValueType& value) {
-        Either<ErrorType, ValueType> result{false};
-        result._value.template emplace<1>(value);
+        Either<ErrorType, ValueType> result{Type::EitherValue};
+        result._value.template emplace<Type::EitherValue>(value);
         return result;
     }
 
@@ -445,13 +716,13 @@ public:
      * Returns whether Either is an Error or a Value
      * @return true if error and false otherwise
      */
-    [[nodiscard]] bool isError() const { return _isError; }
+    [[nodiscard]] bool isError() const { return _type == Type::EitherError; }
 
     /**
      * Returns whether Either is an Error or a Value
      * @return true if value and false otherwise
      */
-    [[nodiscard]] bool isOk() const { return !_isError; }
+    [[nodiscard]] bool isOk() const { return _type == Type::EitherValue; }
 
     /**
      * Extracts the wrapped error from the Either
@@ -459,7 +730,7 @@ public:
      * @throws std::runtime_error when either contains value
      */
     [[nodiscard]] ErrorType error() const {
-        if (isError()) return std::get<0>(_value);
+        if (isError()) return std::get<Type::EitherError>(_value);
         throw std::runtime_error("Error not defined");
     }
 
@@ -469,7 +740,7 @@ public:
      * @throws std::runtime_error when either contains error
      */
     [[nodiscard]] ValueType value() const {
-        if (isOk()) return std::get<1>(_value);
+        if (isOk()) return std::get<Type::EitherValue>(_value);
         throw std::runtime_error("Ok not defined");
     }
 
@@ -477,120 +748,165 @@ public:
      * Extracts the wrapped value from the Either if exists or returns
      * te provided default value if either contains error
      * @param defaultValue Default value
-     * @return the value wrapped or default
+     * @return the wrapped value or default
      */
     [[nodiscard]] ValueType valueOr(const ValueType& defaultValue) const {
-        return (isOk()) ? std::get<1>(_value) : defaultValue;
+        return (isOk()) ? std::get<Type::EitherValue>(_value) : defaultValue;
+    }
+
+    /**
+     * Extracts the wrapped error from the Either if exists or returns
+     * te provided default error if either contains a value
+     * @param defaultError Default value
+     * @return the wrapped error or default
+     */
+    [[nodiscard]] ErrorType errorOr(const ErrorType& defaultError) const {
+        return (isError()) ? std::get<Type::EitherError>(_value) : defaultError;
     }
 
 private:
     template <typename Callable>
+    decltype(auto) internal_bind(Callable&& callable) const {
+        static_assert(std::is_invocable_v<Callable, ValueType>, "Input argument is not invocable");
+        using ReturnType = std::remove_reference_t<std::invoke_result_t<Callable, ValueType>>;
+        using InnerTypeError = typename type::Details<ReturnType>::ErrorType;
+        static_assert(std::is_same_v<ErrorType, InnerTypeError>, "Error type does not match");
+        using InnerTypeOK = typename type::Details<ReturnType>::ValueType;
+        if (isOk()) {
+            return std::invoke<Callable>(std::forward<Callable>(callable), value());
+        } else {
+            return Either<ErrorType, InnerTypeOK>::Error(error());
+        }
+    }
+
+    template <typename Callable>
     decltype(auto) internal_fmap(Callable&& callable) const {
         static_assert(std::is_invocable_v<Callable, ValueType>, "Input argument is not invocable");
         using ReturnType = std::remove_reference_t<std::invoke_result_t<Callable, ValueType>>;
-        if (this->isOk()) {
+        if (isOk()) {
             if constexpr (std::is_void_v<ReturnType>) {
-                callable(value());
+                std::invoke<Callable>(std::forward<Callable>(callable), value());
                 return Either<ErrorType, ReturnType>::Ok();
             } else {
-                return Either<ErrorType, ReturnType>::Ok(callable(value()));
+                return Either<ErrorType, ReturnType>::Ok(std::invoke<Callable>(std::forward<Callable>(callable), value()));
             }
         } else {
             return Either<ErrorType, ReturnType>::Error(error());
         }
     }
 
-    template <typename Callable>
-    decltype(auto) internal_bind(Callable&& callable) const {
-        static_assert(std::is_invocable_v<Callable, ValueType>, "Input argument is not invocable");
-        using ReturnType = std::remove_reference_t<std::invoke_result_t<Callable, ValueType>>;
-        using InnerTypeError = typename either::Details<ReturnType>::ErrorType;
-        static_assert(std::is_same_v<ErrorType, InnerTypeError>, "Error type does not match");
-        using InnerTypeOK = typename either::Details<ReturnType>::ValueType;
-        if (this->isOk()) {
-            return callable(this->value());
-        } else {
-            return Either<ErrorType, InnerTypeOK>::Error(this->error());
-        }
-    }
-
-    template<typename Head>
-    decltype(auto) internal_apply(Either<ErrorType, Head>&& arg) const {
-        const auto var{std::move(arg)};
-        if constexpr (std::is_invocable_v<ValueType, Head>) {
-            using ReturnType = std::remove_reference_t<std::invoke_result_t<ValueType, Head>>;
-            if (this->isError()) {
-                return Either<ErrorType, ReturnType>::Error(this->error());
-            } else {
-                if (var.isOk()) {
-                    if constexpr (std::is_void_v<ReturnType>) {
-                        value()(var.value());
-                        return Either<ErrorType, ReturnType>::Ok();
+    template<typename Arg>
+    decltype(auto) internal_apply(Arg&& arg) const {
+        if constexpr (type::Details<yafl::function::remove_cvref_t<Arg>>::hasMonadicBase) {
+            using Head = yafl::function::remove_cvref_t<typename yafl::type::Details<yafl::function::remove_cvref_t<Arg>>::ValueType>;
+            if constexpr (std::is_invocable_v<ValueType, Head>) {
+                using ReturnType = std::remove_reference_t<std::invoke_result_t<ValueType, Head>>;
+                if (isError()) {
+                    return Either<ErrorType, ReturnType>::Error(error());
+                } else {
+                    if (arg.isOk()) {
+                        if constexpr (std::is_void_v<ReturnType>) {
+                            std::invoke<ValueType>(value(), arg.value());
+                            return Either<ErrorType, ReturnType>::Ok();
+                        } else {
+                            return Either<ErrorType, ReturnType>::Ok(std::invoke<ValueType>(value(), arg.value()));
+                        }
                     } else {
-                        return Either<ErrorType, ReturnType>::Ok(value()(var.value()));
+                        return Either<ErrorType, ReturnType>::Error(error());
+                    }
+                }
+            } else if constexpr (std::is_invocable_v<ValueType>) {
+                using RT = std::invoke_result_t<ValueType>;
+                if constexpr (std::is_invocable_v<RT, Head>) {
+                    using RTT = std::invoke_result_t<RT, Head>;
+                    if (isOk() && arg.isOk()) {
+                        if constexpr (std::is_void_v<RTT>) {
+                            std::invoke<RT>(value()(), std::forward<Head>(arg.value()));
+                            return Either<ErrorType, RTT>::Ok();
+                        } else {
+                            return Either<ErrorType, RTT>::Ok(std::invoke<RT>(value()(), std::forward<Head>(arg.value())));
+                        }
+                    } else {
+                        return Either<ErrorType, RTT>::Error(error());
                     }
                 } else {
-                    return Either<ErrorType, ReturnType>::Error(var.error());
+                    return Either<ErrorType, RT>::Error(error());
+                }
+            } else {
+                if (arg.isOk() && isOk()) {
+                    return Either<ErrorType, typename function::Details<ValueType>::PartialApplyFirst>::Ok(
+                            [callable = value(), first = std::forward<Head>(arg.value())](auto&& ...args) {
+                                return std::apply(callable, std::tuple_cat(std::make_tuple(first), std::make_tuple(args...)));
+                            });
+                } else {
+                    return Either<ErrorType, typename function::Details<ValueType>::PartialApplyFirst>::Error(error());
                 }
             }
         } else {
-            if (this->isOk()) {
-                if (var.isOk()) {
-                    return Either<ErrorType, typename FunctionTraits<ValueType>::PartialApplyFirst>::Ok([callable = value(), first = var.value()](auto&& ...args) {
-                        return std::apply(callable, std::tuple_cat(std::make_tuple(first), std::make_tuple(args...)));
-                    });
-                } else {
-                    return Either<ErrorType, typename FunctionTraits<ValueType>::PartialApplyFirst>::Error(var.error());
-                }
-            } else {
-                return Either<ErrorType, typename FunctionTraits<ValueType>::PartialApplyFirst>::Error(this->error());
-            }
+            return internal_apply_non_monad(std::forward<Arg>(arg));
         }
     }
 
-    template<typename Head>
-    decltype(auto) internal_apply(Head&& arg) const {
-        if constexpr (std::is_invocable_v<ValueType, Head>) {
-            using ReturnType = std::remove_reference_t<std::invoke_result_t<ValueType, Head>>;
-            if (this->isError()) {
-                return Either<ErrorType, ReturnType>::Error(this->error());
+    template<typename Arg>
+    decltype(auto) internal_apply_non_monad(Arg&& arg) const {
+        if constexpr (std::is_invocable_v<ValueType, Arg>) {
+            using ReturnType = yafl::function::remove_cvref_t<std::invoke_result_t<ValueType, Arg>>;
+            if (isError()) {
+                return Either<ErrorType, ReturnType>::Error(error());
             } else {
                 if constexpr (std::is_void_v<ReturnType>) {
-                    value()(std::forward<Head>(arg));
+                    std::invoke<ValueType>(value(), std::forward<Arg>(arg));
                     return Either<ErrorType, ReturnType>::Ok();
                 } else {
-                    return Either<ErrorType, ReturnType>::Ok(value()(std::forward<Head>(arg)));
+                    return Either<ErrorType, ReturnType>::Ok(value()(std::forward<Arg>(arg)));
                 }
             }
-        } else {
-            if (this->isOk()) {
-                return Either<ErrorType, typename FunctionTraits<ValueType>::PartialApplyFirst>::Ok([callable = value(), first = std::forward<Head>(arg)](auto&& ...args) {
-                    return std::apply(callable, std::tuple_cat(std::make_tuple(first), std::make_tuple(args...)));
-                });
+        } else if constexpr (std::is_invocable_v<ValueType>) {
+            using RT = std::invoke_result_t<ValueType>;
+            if constexpr (std::is_invocable_v<RT, Arg>) {
+                using RTT = std::invoke_result_t<RT, Arg>;
+                if (isOk()) {
+                    if constexpr (std::is_void_v<RTT>) {
+                        std::invoke<RT>(value()(), std::forward<Arg>(arg));
+                        return Either<ErrorType, RTT>::Ok();
+                    } else {
+                        return Either<ErrorType, RTT>::Ok(std::invoke<RT>(value()(), std::forward<Arg>(arg)));
+                    }
+                } else {
+                    return Either<ErrorType, RTT>::Error();
+                }
             } else {
-                return Either<ErrorType, typename FunctionTraits<ValueType>::PartialApplyFirst>::Error(this->error());
+                return Either<ErrorType, RT>::Error();
+            }
+        } else {
+            if (isOk()) {
+                return Either<ErrorType, typename function::Details<ValueType>::PartialApplyFirst>::Ok(
+                        [callable = value(), first = std::forward<Arg>(arg)](auto&& ...args) mutable {
+                            return callable(std::move(first), std::forward<decltype(args)>(args)...);
+                        });
+            } else {
+                return Either<ErrorType, typename function::Details<ValueType>::PartialApplyFirst>::Error(error());
             }
         }
     }
 
-    template<typename std::enable_if<std::is_invocable_v<ValueType>>* = nullptr>
     decltype(auto) internal_apply() const {
         using ReturnType = std::remove_reference_t<std::invoke_result_t<ValueType>>;
-        if (this->isError()) {
-            return Either<ErrorType, ReturnType>::Error(this->error());
+        if (isError()) {
+            return Either<ErrorType, ReturnType>::Error(error());
         } else {
             if constexpr (std::is_void_v<ReturnType>) {
-                value()();
+                std::invoke<ValueType>(value());
                 return Either<ErrorType, ReturnType>::Ok();
             } else {
-                return Either<ErrorType, ReturnType>::Ok(value()());
+                return Either<ErrorType, ReturnType>::Ok(std::invoke<ValueType>(value()));
             }
         }
     }
 
 private:
     std::variant<ErrorType, ValueType> _value;
-    bool _isError;
+    Type _type;
 };
 
 namespace either {
@@ -718,11 +1034,11 @@ decltype(auto) lift(Callable&& callable) {
             };
         }
     } else {
-        using ReturnType = typename yafl::FunctionTraits<Callable>::ReturnType;
+        using ReturnType = typename yafl::function::Details<Callable>::ReturnType;
 
         return [callable = std::forward<Callable>(callable)](auto ...args) -> Either<void, ReturnType> {
-            if (detail::all_true([](auto&& v){ return v.isOk();}, args...)) {
-                const auto tp = detail::map_tuple_append([](auto&& arg){ return arg.value();}, std::make_tuple(), args...);
+            if (details::all_true([](auto&& v){ return v.isOk();}, args...)) {
+                const auto tp = details::map_tuple_append([](auto&& arg){ return arg.value();}, std::make_tuple(), args...);
 
                 if constexpr (std::is_void_v<ReturnType>) {
                     std::apply(callable, tp);

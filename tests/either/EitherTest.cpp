@@ -55,6 +55,15 @@ Either<E, V> createOk() {
 
 using EitherTypes = ::testing::Types<VoidVoid, IntVoid, IntInt, VoidInt>;
 
+template <typename E>
+struct FixedErrorType {
+    template <typename T>
+    using Type = Either<E, T>;
+};
+
+template<typename T>
+using NoErrorEither = Either<void, T>;
+
 TYPED_TEST_SUITE(EitherTest, EitherTypes);
 
 TYPED_TEST(EitherTest, assertErrorCreateAValidEitherForAnyType) {
@@ -89,13 +98,7 @@ TYPED_TEST(EitherTest, assertFmapComputesCorrectType) {
         }
         {
             const auto either = createOk<typename TypeParam::Error, typename TypeParam::Ok>();
-            const auto resultVoid = fmap([](){}, either);
-            ASSERT_TRUE(resultVoid.isOk());
-        }
-        {
-            const auto either = createOk<typename TypeParam::Error, typename TypeParam::Ok>();
-            const auto f = fmap([](){});
-            const auto resultVoid = f(either);
+            const auto resultVoid = functor::fmap([](){}, either);
             ASSERT_TRUE(resultVoid.isOk());
         }
         {
@@ -114,12 +117,12 @@ TYPED_TEST(EitherTest, assertFmapComputesCorrectType) {
         }
         {
             const auto either = createOk<typename TypeParam::Error, typename TypeParam::Ok>();
-            const auto resultVoid = fmap([](const typename TypeParam::Ok&){}, either);
+            const auto resultVoid = functor::fmap([](const typename TypeParam::Ok&){}, either);
             ASSERT_TRUE(resultVoid.isOk());
         }
         {
             const auto either = createOk<typename TypeParam::Error, typename TypeParam::Ok>();
-            const auto f = fmap([](const typename TypeParam::Ok&){});
+            const auto f = functor::fmap<FixedErrorType<typename TypeParam::Error>::template Type>([](const typename TypeParam::Ok&){});
             const auto resultVoid = f(either);
             ASSERT_TRUE(resultVoid.isOk());
         }
@@ -167,12 +170,12 @@ TYPED_TEST(EitherTest, assertBindComputesCorrectType) {
         }
         {
             const auto either = createOk<void, void>();
-            const auto resultOk = bind([]() { return either::Ok<void, void>(); }, either);
+            const auto resultOk = monad::bind([]() { return either::Ok<void, void>(); }, either);
             ASSERT_TRUE(resultOk.isOk());
         }
         {
             const auto either = createOk<void, void>();
-            const auto f = bind([]() { return either::Ok<void, void>(); });
+            const auto f = monad::bind<FixedErrorType<void>::template Type>([]() { return either::Ok<void, void>(); });
             const auto resultOk = f(either);
             ASSERT_TRUE(resultOk.isOk());
         }
@@ -202,12 +205,12 @@ TYPED_TEST(EitherTest, assertBindComputesCorrectType) {
         }
         {
             const auto either = createOk<typename TypeParam::Error, void>();
-            const auto resultOk = bind([]() { return either::Ok<typename TypeParam::Error, void>(); }, either);
+            const auto resultOk = monad::bind([]() { return either::Ok<typename TypeParam::Error, void>(); }, either);
             ASSERT_TRUE(resultOk.isOk());
         }
         {
             const auto either = createOk<typename TypeParam::Error, void>();
-            const auto f = bind([]() { return either::Ok<typename TypeParam::Error, void>(); });
+            const auto f = monad::bind<FixedErrorType<typename TypeParam::Error>::template Type>([]() { return either::Ok<typename TypeParam::Error, void>(); });
             const auto resultOk = f(either);
             ASSERT_TRUE(resultOk.isOk());
         }
@@ -238,14 +241,14 @@ TYPED_TEST(EitherTest, assertBindComputesCorrectType) {
         }
         {
             const auto either = createOk<void, typename TypeParam::Ok>();
-            const auto resultOk = bind([](const typename TypeParam::Ok &) { return either::Ok<void, std::string>("42"); }, either);
+            const auto resultOk = monad::bind([](const typename TypeParam::Ok &) { return either::Ok<void, std::string>("42"); }, either);
             ASSERT_TRUE(resultOk.isOk());
             constexpr const auto areSameType = std::is_same_v<std::string, decltype(resultOk.value())>;
             ASSERT_TRUE(areSameType);
         }
         {
             const auto either = createOk<void, typename TypeParam::Ok>();
-            const auto f = bind([](const typename TypeParam::Ok &) { return either::Ok<void, std::string>("42"); });
+            const auto f = monad::bind<FixedErrorType<void>::template Type>([](const typename TypeParam::Ok &) { return either::Ok<void, std::string>("42"); });
             const auto resultOk = f(either);
             ASSERT_TRUE(resultOk.isOk());
             constexpr const auto areSameType = std::is_same_v<std::string, decltype(resultOk.value())>;
@@ -284,14 +287,14 @@ TYPED_TEST(EitherTest, assertBindComputesCorrectType) {
         }
         {
             const auto either = createOk<typename TypeParam::Error, typename TypeParam::Ok>();
-            const auto resultOk = bind([](const typename TypeParam::Ok&){ return either::Ok<typename TypeParam::Error, std::string>(std::string("42")); }, either);
+            const auto resultOk = monad::bind([](const typename TypeParam::Ok&){ return either::Ok<typename TypeParam::Error, std::string>(std::string("42")); }, either);
             ASSERT_TRUE(resultOk.isOk());
             constexpr const auto areSameType = std::is_same_v<std::string, decltype(resultOk.value())>;
             ASSERT_TRUE(areSameType);
         }
         {
             const auto either = createOk<typename TypeParam::Error, typename TypeParam::Ok>();
-            const auto f = bind([](const typename TypeParam::Ok&){ return either::Ok<typename TypeParam::Error, std::string>(std::string("42")); });
+            const auto f = monad::bind<FixedErrorType<typename TypeParam::Error>::template Type>([](const typename TypeParam::Ok&){ return either::Ok<typename TypeParam::Error, std::string>(std::string("42")); });
             const auto resultOk = f(either);
             ASSERT_TRUE(resultOk.isOk());
             constexpr const auto areSameType = std::is_same_v<std::string, decltype(resultOk.value())>;
@@ -391,9 +394,7 @@ TEST(EitherTest, assertApply) {
         const auto multBy42 = either::Ok<int>([](int) { return; });
         const auto result = multBy42(either::Ok<int>(2));
         ASSERT_TRUE(result.isOk());
-        const auto result2 = multBy42(either::Error<int, int>(29));
-        ASSERT_TRUE(result2.isError());
-        ASSERT_EQ(result2.error(), 29);
+        EXPECT_THROW(multBy42(either::Error<int, int>(29)), std::runtime_error);
     }
     {
         const auto multBy42 = either::Ok<void>([](int) { return; });
@@ -418,8 +419,7 @@ TEST(EitherTest, assertApply) {
         const auto applmultBy42 = either::Ok<int, decltype(func)>(func);
         const auto result = applmultBy42(either::Ok<int, int>(2));
         ASSERT_EQ(result.value(), 84);
-        const auto result2 = applmultBy42(either::Error<int, int>(2));
-        ASSERT_TRUE(result2.isError());
+        EXPECT_THROW(applmultBy42(either::Error<int, int>(2)), std::runtime_error);
     }
     {
         const auto func = [](int x, int f) { return x * f; };
@@ -483,10 +483,8 @@ TEST(EitherTest, assertApply) {
         const auto applmultBy42 = either::Ok<int, decltype(func)>(func);
         const auto result = applmultBy42(either::Ok<int, std::string>("OlaOla"))(either::Ok<int, float>(2.2));
         ASSERT_EQ(result.value(), "OlaOla92.40");
-        const auto result2 = applmultBy42(either::Error<int, std::string>(2))(either::Ok<int, float>(2.2));
-        ASSERT_TRUE(result2.isError());
-        const auto result3 = applmultBy42(either::Error<int, std::string>(2))(either::Error<int, float>(2));
-        ASSERT_TRUE(result3.isError());
+        EXPECT_THROW(applmultBy42(either::Error<int, std::string>(2))(either::Ok<int, float>(2.2)), std::runtime_error);
+        EXPECT_THROW(applmultBy42(either::Error<int, std::string>(2))(either::Error<int, float>(2)), std::runtime_error);
     }
     {
         const auto func = [](const std::string&, float) {return std::string();};
@@ -509,50 +507,50 @@ TEST(EitherTest, assertApply) {
 
 TEST(EitherTest, validate_kleisli_compose){
     {
-        const auto f1 = [](int i) { return either::Ok<int>(i*2);};
-        const auto f2 = [](int i) { return i * 2;};
-        const auto f = compose(f1, f2);
-        ASSERT_EQ(f(2).value(), 8);
-    }
-    {
-        const auto f1 = [](int i) { return either::Ok<int>(i*2);};
-        const auto f2 = [](int i) { return either::Ok<int>(std::to_string(i * 2));};
+        const auto f1 = [](int i) { return either::Ok<void>(i * 2);};
+        const auto f2 = [](int i) { return either::Ok<void>(std::to_string(i * 2));};
         const auto f = compose(f1, f2);
         ASSERT_EQ(f(2).value(), "8");
     }
     {
-        const auto f1 = [](int) { return either::Ok<std::string, void>();};
-        const auto f2 = []() { return 2;};
+        const auto f1 = [](const Either<void, int>& i) { return either::Ok<void>(i.value() * 2);};
+        const auto f2 = [](int i) { return either::Ok<void>(std::to_string(i * 2));};
         const auto f = compose(f1, f2);
-        ASSERT_EQ(f(2).value(), 2);
+        ASSERT_EQ(f(either::Ok<void>(2)).value(), "8");
     }
     {
-        const auto f1 = [](int) { return either::Ok<std::string, void>();};
-        const auto f2 = []() { return either::Ok<std::string, std::string>("2");};
+        const auto f1 = [](int i) { return either::Ok<std::string>(i * 2);};
+        const auto f2 = [](int i) { return either::Ok<std::string>(std::to_string(i * 2));};
         const auto f = compose(f1, f2);
-        ASSERT_EQ(f(2).value(), "2");
+        ASSERT_EQ(f(2).value(), "8");
     }
     {
-        const auto f1 = [](int) { return either::Error<int, int>(2);};
-        const auto f2 = [](int i) { return i * 2;};
+        const auto f1 = [](const Either<std::string, int>& i) { return either::Ok<std::string>(i.value() * 2);};
+        const auto f2 = [](int i) { return either::Ok<std::string>(std::to_string(i * 2));};
+        const auto f = compose(f1, f2);
+        ASSERT_EQ(f(either::Ok<std::string>(2)).value(), "8");
+    }
+    {
+        const auto f1 = [](int i) { return either::Ok<int>(i * 2);};
+        const auto f2 = [](const Either<int, int>& i) { return either::Ok<int>(std::to_string(i.value() * 2));};
+        const auto f = compose(f1, f2);
+        ASSERT_EQ(f(2).value(), "8");
+    }
+    {
+        const auto f1 = [](const Either<int, int>& i) { return either::Ok<int>(i.value() * 2);};
+        const auto f2 = [](const Either<int, int>& i) { return either::Ok<int>(std::to_string(i.value() * 2));};
+        const auto f = compose(f1, f2);
+        ASSERT_EQ(f(either::Ok<int>(2)).value(), "8");
+    }
+    {
+        const auto f1 = [](int) { return either::Error<void, int>();};
+        const auto f2 = [](int i) { return either::Ok<void>(i * 2);};
         const auto f = compose(f1, f2);
         ASSERT_FALSE(f(2).isOk());
     }
     {
-        const auto f1 = [](int) { return either::Error<std::string, int>("2");};
-        const auto f2 = [](int i) { return either::Ok<std::string, int>(i * 2);};
-        const auto f = compose(f1, f2);
-        ASSERT_FALSE(f(2).isOk());
-    }
-    {
-        const auto f1 = [](int i) { return either::Ok<void, int>(i * 2);};
+        const auto f1 = [](int i) { return either::Ok<void>(i * 2);};
         const auto f2 = [](int) { return either::Error<void, int>();};
-        const auto f = compose(f1, f2);
-        ASSERT_FALSE(f(2).isOk());
-    }
-    {
-        const auto f1 = [](int) { return either::Error<void, void>();};
-        const auto f2 = []() { return 2;};
         const auto f = compose(f1, f2);
         ASSERT_FALSE(f(2).isOk());
     }
@@ -561,6 +559,12 @@ TEST(EitherTest, validate_kleisli_compose){
         const auto f2 = []() { return either::Ok<void, void>();};
         const auto f = compose(f1, f2);
         ASSERT_FALSE(f(2).isOk());
+    }
+    {
+        const auto f1 = [](int) { return either::Ok<int, void>();};
+        const auto f2 = []() { return either::Ok<int, void>();};
+        const auto f = compose(f1, f2);
+        ASSERT_TRUE(f(2).isOk());
     }
 }
 

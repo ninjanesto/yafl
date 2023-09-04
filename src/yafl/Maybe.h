@@ -28,17 +28,21 @@ namespace yafl {
 template <typename>
 class Maybe;
 
-namespace monad {
+namespace type {
 
 /**
- * @ingroup Monad
+ * @ingroup Type
  * Maybe monad traits specialization that enable getting the inner type
  * @tparam Inner Inner type
 */
 template<typename Inner>
 struct Details<Maybe<Inner>> {
-    /// Base type
-    using BaseType = core::Monad<Maybe, Inner>;
+    /// Functor Base type
+    using FBaseType = core::Functor<Maybe, Inner>;
+    /// Applicative Base type
+    using ABaseType = core::Applicative<Maybe, Inner>;
+    /// Monad Base type
+    using MBaseType = core::Monad<Maybe, Inner>;
 
     /// Value Type
     using ValueType = Inner;
@@ -46,19 +50,32 @@ struct Details<Maybe<Inner>> {
     /// Derived type
     using DerivedType = Maybe<Inner>;
 
-    ///boolean flag that states whether type T is a monad or not
-    static constexpr bool hasMonadicBase = std::is_base_of_v<BaseType, DerivedType>;
+    ///boolean flag that states whether type T is a Functor or not
+    static constexpr bool hasFunctorBase = std::is_base_of_v<FBaseType, DerivedType>;
+    ///boolean flag that states whether type T is an Applicative or not
+    static constexpr bool hasApplicativeBase = std::is_base_of_v<ABaseType, DerivedType>;
+    ///boolean flag that states whether type T is a Monad or not
+    static constexpr bool hasMonadicBase = std::is_base_of_v<MBaseType, DerivedType>;
+
+    ///Callback responsible for handling errors
+    static constexpr auto handleError = [](const auto&) {
+        return DerivedType::Nothing();
+    };
 };
 
 /**
- * @ingroup Monad
+ * @ingroup Type
  * Maybe monad traits specialization for const types that enable getting the inner type
  * @tparam Inner Inner type
  */
 template<typename Inner>
 struct Details<const Maybe<Inner>> {
-    /// Base type
-    using BaseType = core::Monad<Maybe, Inner>;
+    /// Functor Base type
+    using FBaseType = core::Functor<Maybe, Inner>;
+    /// Applicative Base type
+    using ABaseType = core::Applicative<Maybe, Inner>;
+    /// Monad Base type
+    using MBaseType = core::Monad<Maybe, Inner>;
 
     /// Value Type
     using ValueType = Inner;
@@ -66,10 +83,19 @@ struct Details<const Maybe<Inner>> {
     /// Derived type
     using DerivedType = Maybe<Inner>;
 
-    ///boolean flag that states whether type T is a monad or not
-    static constexpr bool hasMonadicBase = std::is_base_of_v<BaseType, DerivedType>;
+    ///boolean flag that states whether type T is a Functor or not
+    static constexpr bool hasFunctorBase = std::is_base_of_v<FBaseType, DerivedType>;
+    ///boolean flag that states whether type T is an Applicative or not
+    static constexpr bool hasApplicativeBase = std::is_base_of_v<ABaseType, DerivedType>;
+    ///boolean flag that states whether type T is a Monad or not
+    static constexpr bool hasMonadicBase = std::is_base_of_v<MBaseType, DerivedType>;
+
+    ///Callback responsible for handling errors
+    static constexpr auto handleError = [](const auto&) {
+        return DerivedType::Nothing();
+    };
 };
-} // namespace monad
+} // namespace type
 
 /**
  * @ingroup Maybe
@@ -317,8 +343,8 @@ private:
 
     template <typename Arg>
     decltype(auto) internal_apply(Arg&& arg) const {
-        if constexpr (monad::Details<yafl::function::remove_cvref_t<Arg>>::hasMonadicBase) {
-            using Head = yafl::function::remove_cvref_t<typename yafl::monad::Details<yafl::function::remove_cvref_t<Arg>>::ValueType>;
+        if constexpr (type::Details<yafl::function::remove_cvref_t<Arg>>::hasMonadicBase) {
+            using Head = yafl::function::remove_cvref_t<typename yafl::type::Details<yafl::function::remove_cvref_t<Arg>>::ValueType>;
             if constexpr (std::is_invocable_v<T, Head>) {
                 using ReturnType = std::remove_reference_t<std::invoke_result_t<T, Head>>;
                 if (!hasValue()) {
@@ -487,8 +513,8 @@ decltype(auto) lift(Callable &&callable) {
         using ReturnType = typename yafl::function::Details<Callable>::ReturnType;
 
         return [callable = std::forward<Callable>(callable)](auto ...args) -> Maybe<ReturnType> {
-            if (detail::all_true([](auto &&v) { return v.hasValue(); }, args...)) {
-                const auto tp = detail::map_tuple_append([](auto &&arg) { return arg.value(); }, std::make_tuple(),
+            if (details::all_true([](auto &&v) { return v.hasValue(); }, args...)) {
+                const auto tp = details::map_tuple_append([](auto &&arg) { return arg.value(); }, std::make_tuple(),
                                                          args...);
 
                 if constexpr (std::is_void_v<ReturnType>) {

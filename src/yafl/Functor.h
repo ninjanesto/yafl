@@ -16,6 +16,7 @@ namespace core {
 
 /**
  * @ingroup Core
+ * @ingroup Functor
  * Functional Functor class. Defines the fmap function that receives a function from a -> b and applies that function
  * to a given Functor by unwrapping the value inside the functor and applying the function. Result type will depend
  * on the given function
@@ -37,41 +38,11 @@ public:
     }
 };
 
-
-/**
- * @ingroup Core
- * Structure to validate if given type is derived from Functor. This class works as sinkhole for all
- * non functor based types and sets a value attribute as false
- *
- * @tparam T type to validate
- */
-template<typename T>
-struct HasFunctorBase {
-    ///boolean flag that states whether type T is a functor or not
-    static constexpr bool value = false;
-};
-
-/**
- * @ingroup Core
- * Structure to validate if given type is derived from Functor. This class validates if the given type
- * is derived from Functor and set the value attribute accordingly
- * @tparam FunctorType Functor type
- * @tparam Args functor type arguments
- */
-template<template<typename...> typename FunctorType, typename ...Args>
-struct HasFunctorBase<FunctorType<Args...>> {
-    /// Base type
-    using BaseType = Functor<FunctorType, Args...>;
-    /// Derived type
-    using DerivedType = FunctorType<Args...>;
-    ///boolean flag that states whether type T is a functor or not
-    static constexpr bool value = std::is_base_of_v<BaseType, DerivedType>;
-};
-
 } // namespace core
 
 namespace functor {
 /**
+ * @ingroup Functor
  * This function is used to apply a callable type to a value of type Functor
  * @tparam Callable callable type
  * @tparam FunctorT functor type
@@ -81,11 +52,12 @@ namespace functor {
  */
 template<typename Callable, typename FunctorT>
 decltype(auto) fmap(Callable&& callable, const FunctorT& functor) {
-    static_assert(core::HasFunctorBase<FunctorT>::value, "FunctorT argument not a Functor");
+    static_assert(type::Details<FunctorT>::hasFunctorBase, "FunctorT argument not a Functor");
     return functor.fmap(std::forward<Callable>(callable));
 }
 
 /**
+ * @ingroup Functor
  * This function is used to apply a callable type to a value of type Functor
  * In this case the provided function is lifted to work at Functor level an so,
  * this function returns a new callable that receives a Functor as argument and returns
@@ -101,12 +73,12 @@ decltype(auto) fmap(Callable&& callable) {
         using FirstArg = typename function::Details<Callable>::template ArgType<0>;
 
         return [callable = std::forward<Callable>(callable)](const FunctorType<FirstArg> &functor) {
-            static_assert(core::HasFunctorBase<FunctorType<FirstArg>>::value, "Argument not a Functor");
+            static_assert(type::Details<FunctorType<FirstArg>>::hasFunctorBase, "Argument not a Functor");
             return functor.fmap(callable);
         };
     } else {
         return [callable = std::forward<Callable>(callable)](const FunctorType<void> &functor) {
-            static_assert(core::HasFunctorBase<FunctorType<void>>::value, "Argument not a Functor");
+            static_assert(type::Details<FunctorType<void>>::hasFunctorBase, "Argument not a Functor");
             return functor.fmap(callable);
         };
     }
