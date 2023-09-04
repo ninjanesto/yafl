@@ -205,7 +205,7 @@ TEST(MaybeTest, assertApply) {
     {
         const auto partialApply = Just([](int x, float f, const std::string& s){ return std::to_string(x*f*42) + s;});
         const auto resultPartialFunc = partialApply(Just(2));
-        const auto resultPartialFunc2 = resultPartialFunc(Just(0.5));
+        const auto resultPartialFunc2 = resultPartialFunc(Just<float>(0.5));
         const auto resultPartialFunc3 = resultPartialFunc2(Just<std::string>("Text"));
 
         ASSERT_EQ(resultPartialFunc3.value(), "42.000000Text");
@@ -315,5 +315,63 @@ TEST(MaybeTest, validate_kleisli_compose){
         const auto f2 = []() { return Just<void>();};
         const auto f = compose(f1, f2);
         ASSERT_FALSE(f(2).hasValue());
+    }
+}
+
+TEST(MaybeTest, validate_lift) {
+    {
+        const auto funcNoArgRetVoid = []() { return;};
+        const auto lifted = yafl::lift<Maybe>(funcNoArgRetVoid);
+        const auto result = lifted();
+        ASSERT_TRUE(result.hasValue());
+    }
+    {
+        const auto funcNoArgRetInt = []() { return 42;};
+        const auto lifted = yafl::lift<Maybe>(funcNoArgRetInt);
+        const auto result = lifted();
+        ASSERT_TRUE(result.hasValue());
+        ASSERT_EQ(result.value(), 42);
+    }
+    {
+        const auto funcOneArgRetVoid = [](int) { return;};
+        const auto lifted = yafl::lift<Maybe>(funcOneArgRetVoid);
+        const auto result = lifted(yafl::Just(2));
+        ASSERT_TRUE(result.hasValue());
+        const auto result2 = lifted(yafl::Nothing<int>());
+        ASSERT_FALSE(result2.hasValue());
+    }
+    {
+        const auto funcOneArgRetInt = [](int i) { return 42 * i;};
+        const auto lifted = yafl::lift<Maybe>(funcOneArgRetInt);
+        const auto result = lifted(yafl::Just(1));
+        ASSERT_TRUE(result.hasValue());
+        ASSERT_EQ(result.value(), 42);
+        const auto result2 = lifted(yafl::Nothing<int>());
+        ASSERT_FALSE(result2.hasValue());
+    }
+    {
+        const auto funcMultiArgRetVoid = [](int, float, const std::string&) { return;};
+        const auto lifted = yafl::lift<Maybe>(funcMultiArgRetVoid);
+        const auto result = lifted(yafl::Just(2), yafl::Just(4.2), yafl::Just<std::string>("dummy"));
+        ASSERT_TRUE(result.hasValue());
+        const auto result2 = lifted(yafl::Nothing<int>(), yafl::Just(4.2), yafl::Just<std::string>("dummy"));
+        ASSERT_FALSE(result2.hasValue());
+        const auto result3 = lifted(yafl::Just(1), yafl::Nothing<float>(), yafl::Just<std::string>("dummy"));
+        ASSERT_FALSE(result3.hasValue());
+        const auto result4 = lifted(yafl::Just(1), yafl::Just(4.2), yafl::Nothing<std::string>());
+        ASSERT_FALSE(result4.hasValue());
+    }
+    {
+        const auto funcMultiArgRetString = [](int i, int j, const std::string& s) { return s + std::to_string(i + j);};
+        const auto lifted = yafl::lift<Maybe>(funcMultiArgRetString);
+        const auto result = lifted(yafl::Just(2), yafl::Just(4), yafl::Just<std::string>("dummy"));
+        ASSERT_TRUE(result.hasValue());
+        ASSERT_EQ(result.value(), "dummy6");
+        const auto result2 = lifted(yafl::Nothing<int>(), yafl::Just(4.2), yafl::Just<std::string>("dummy"));
+        ASSERT_FALSE(result2.hasValue());
+        const auto result3 = lifted(yafl::Just(1), yafl::Nothing<float>(), yafl::Just<std::string>("dummy"));
+        ASSERT_FALSE(result3.hasValue());
+        const auto result4 = lifted(yafl::Just(1), yafl::Just(4.2), yafl::Nothing<std::string>());
+        ASSERT_FALSE(result4.hasValue());
     }
 }

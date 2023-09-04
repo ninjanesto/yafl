@@ -476,4 +476,46 @@ template<typename ErrorType, typename ValueType>
 std::enable_if_t<std::is_void_v<ErrorType> && !std::is_void_v<ValueType>, Either<void, ValueType>>
 Error() { return Either<void, ValueType>::Error(); }
 
+/**
+ * Lift given callable into the given abstract monadic type
+ * @tparam MonadType Abstract type to lift function to
+ * @tparam Callable Callable type to lift
+ * @param callable Callable to lift
+ * @return callable lifted into the given abstract monadic type
+ */
+template<template <typename...> typename MonadType, typename Callable, typename = std::enable_if_t<std::is_same_v<yafl::Either<void, void>, MonadType<void, void>>
+                                                                                                   && IsMonadicBase<MonadType<void, void>>::value, void>>
+decltype(auto) lift(Callable&& callable) {
+    if constexpr (std::is_invocable_v<Callable>) {
+        using ReturnType = std::remove_reference_t<std::invoke_result_t<Callable>>;
+        if constexpr (std::is_void_v<ReturnType>) {
+            return [callable = std::forward<Callable>(callable)](){
+                callable();
+                return MonadType<void, ReturnType>::Ok();
+            };
+        } else {
+            return [callable = std::forward<Callable>(callable)](){
+                return MonadType<void, ReturnType>::Ok(callable());
+            };
+        }
+    } else {
+        using ReturnType = typename yafl::function_traits<Callable>::ReturnType;
+
+        return [callable = std::forward<Callable>(callable)](auto ...args) -> MonadType<void, ReturnType> {
+            if (detail::all_true([](auto&& v){ return v.isOk();}, args...)) {
+                const auto tp = detail::map_tuple_append([](auto&& arg){ return arg.value();}, std::make_tuple(), args...);
+
+                if constexpr (std::is_void_v<ReturnType>) {
+                    std::apply(callable, tp);
+                    return MonadType<void, ReturnType>::Ok();
+                } else {
+                    return MonadType<void, ReturnType>::Ok(std::apply(callable, tp));
+                }
+            } else {
+                return MonadType<void, ReturnType>::Error();
+            }
+        };
+    }
+}
+
 } // namespace yafl

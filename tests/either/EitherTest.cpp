@@ -420,7 +420,7 @@ TEST(EitherTest, assertApply) {
 }
 
 
-TEST(MaybeTest, validate_kleisli_compose){
+TEST(EitherTest, validate_kleisli_compose){
     {
         const auto f1 = [](int i) { return Ok<int>(i*2);};
         const auto f2 = [](int i) { return i * 2;};
@@ -474,5 +474,64 @@ TEST(MaybeTest, validate_kleisli_compose){
         const auto f2 = []() { return Ok<void, void>();};
         const auto f = compose(f1, f2);
         ASSERT_FALSE(f(2).isOk());
+    }
+}
+
+
+TEST(EitherTest, validate_lift) {
+    {
+        const auto funcNoArgRetVoid = []() { return;};
+        const auto lifted = yafl::lift<Either>(funcNoArgRetVoid);
+        const auto result = lifted();
+        ASSERT_TRUE(result.isOk());
+    }
+    {
+        const auto funcNoArgRetInt = []() { return 42;};
+        const auto lifted = yafl::lift<Either>(funcNoArgRetInt);
+        const auto result = lifted();
+        ASSERT_TRUE(result.isOk());
+        ASSERT_EQ(result.value(), 42);
+    }
+    {
+        const auto funcOneArgRetVoid = [](int) { return;};
+        const auto lifted = yafl::lift<Either>(funcOneArgRetVoid);
+        const auto result = lifted(yafl::Ok<void>(2));
+        ASSERT_TRUE(result.isOk());
+        const auto result2 = lifted(yafl::Error<void, int>());
+        ASSERT_FALSE(result2.isOk());
+    }
+    {
+        const auto funcOneArgRetInt = [](int i) { return 42 * i;};
+        const auto lifted = yafl::lift<Either>(funcOneArgRetInt);
+        const auto result = lifted(yafl::Ok<void>(1));
+        ASSERT_TRUE(result.isOk());
+        ASSERT_EQ(result.value(), 42);
+        const auto result2 = lifted(yafl::Error<void, int>());
+        ASSERT_FALSE(result2.isOk());
+    }
+    {
+        const auto funcMultiArgRetVoid = [](int, float, const std::string&) { return;};
+        const auto lifted = yafl::lift<Either>(funcMultiArgRetVoid);
+        const auto result = lifted(yafl::Ok<void>(2), yafl::Ok<void>(4.2), yafl::Ok<void, std::string>("dummy"));
+        ASSERT_TRUE(result.isOk());
+        const auto result2 = lifted(yafl::Error<void, int>(), yafl::Ok<void>(4.2), yafl::Ok<void, std::string>("dummy"));
+        ASSERT_FALSE(result2.isOk());
+        const auto result3 = lifted(yafl::Ok<void>(1), yafl::Error<void, float>(), yafl::Ok<void, std::string>("dummy"));
+        ASSERT_FALSE(result3.isOk());
+        const auto result4 = lifted(yafl::Ok<void>(1), yafl::Ok<void>(4.2), yafl::Error<void, std::string>());
+        ASSERT_FALSE(result4.isOk());
+    }
+    {
+        const auto funcMultiArgRetString = [](int i, int j, const std::string& s) { return s + std::to_string(i + j);};
+        const auto lifted = yafl::lift<Either>(funcMultiArgRetString);
+        const auto result = lifted(yafl::Ok<void>(2), yafl::Ok<void>(4), yafl::Ok<void, std::string>("dummy"));
+        ASSERT_TRUE(result.isOk());
+        ASSERT_EQ(result.value(), "dummy6");
+        const auto result2 = lifted(yafl::Error<void, int>(), yafl::Ok<void>(4.2), yafl::Ok<void, std::string>("dummy"));
+        ASSERT_FALSE(result2.isOk());
+        const auto result3 = lifted(yafl::Ok<void>(1), yafl::Error<void, float>(), yafl::Ok<void, std::string>("dummy"));
+        ASSERT_FALSE(result3.isOk());
+        const auto result4 = lifted(yafl::Ok<void>(1), yafl::Ok<void>(4.2), yafl::Error<void, std::string>());
+        ASSERT_FALSE(result4.isOk());
     }
 }

@@ -37,12 +37,12 @@ public:
 };
 
 template <typename T>
-struct IsMonadBase {
+struct IsMonadicBase {
     static constexpr bool value = false;
 };
 
 template <template <typename...> typename MonadType, typename ...Args>
-struct IsMonadBase<MonadType<Args...>> {
+struct IsMonadicBase<MonadType<Args...>> {
     using BaseType = Monad<MonadType, Args...>;
     using DerivedType = MonadType<Args...>;
     static constexpr bool value = std::is_base_of_v<BaseType, DerivedType>;

@@ -12,6 +12,35 @@
 
 namespace yafl {
 
+namespace detail {
+    template<typename Callable, typename Head>
+    decltype(auto) uncurry_impl(Callable&& f, const Head& value) {
+        return f(value);
+    }
+
+    template<typename Callable, typename Head, typename ...Tail>
+    decltype(auto) uncurry_impl(Callable&& f, const Head& value, Tail&&...ts) {
+        const auto f2 = f(value);
+        return uncurry_impl(f2, std::forward<Tail>(ts)...);
+    }
+
+    template<typename Predicate, typename ...Args>
+    decltype(auto) all_true(Predicate&& predicate, Args&& ...args) {
+        return (predicate(std::forward<Args>(args)) && ...);
+    }
+
+    template<typename Callable, typename Tuple, typename Head>
+    decltype(auto) map_tuple_append(Callable&& callable, const Tuple& tuple, const Head& value) {
+        return std::tuple_cat(tuple, std::make_tuple(callable(value)));
+    }
+
+    template<typename Callable, typename Tuple, typename Head, typename ...Tail>
+    decltype(auto) map_tuple_append(Callable&& callable, const Tuple& tuple, const Head& value, Tail&&...ts) {
+        const auto tp = std::tuple_cat(tuple, std::make_tuple(callable(value)));
+        return map_tuple_append(std::forward<Callable>(callable), std::move(tp), std::forward<Tail>(ts)...);
+    }
+}
+
 /**
  * Compose functions. Similar as piping shell commands. Output of first function is
  * piped as input to the second function, except when output is void
@@ -61,7 +90,7 @@ decltype(auto) function_compose(const TLeft& lhs, const TRight& rhs) {
 template <typename TLeft, typename TRight>
 decltype(auto) kleisli_compose(const TLeft& lhs, const TRight& rhs) {
     using RhsReturnType = typename yafl::function_traits<TRight>::ReturnType;
-    if constexpr (IsMonadBase<RhsReturnType>::value) {
+    if constexpr (IsMonadicBase<RhsReturnType>::value) {
         return [&rhs, &lhs](auto&&... args) {
             return lhs(args...).bind(rhs);
         };
@@ -83,7 +112,7 @@ decltype(auto) kleisli_compose(const TLeft& lhs, const TRight& rhs) {
 template <typename TLeft, typename TRight>
 decltype(auto) compose(const TLeft& lhs, const TRight& rhs) {
     using LhsReturnType = typename yafl::function_traits<TLeft>::ReturnType;
-    if constexpr (IsMonadBase<LhsReturnType>::value) {
+    if constexpr (IsMonadicBase<LhsReturnType>::value) {
         return kleisli_compose(lhs, rhs);
     } else {
         return function_compose(lhs, rhs);
@@ -97,14 +126,15 @@ decltype(auto) compose(const TLeft& lhs, const TRight& rhs) {
  * @return curried function
  */
 template <typename F>
-constexpr decltype(auto) curry(const F& f) {
-    if constexpr (std::is_invocable<F>()) {
+decltype(auto) curry(const F& f) {
+    if constexpr (std::is_invocable_v<F>) {
         return f();
     } else {
-        using ReturnFunType = typename function_traits<F>::PartialApplyFirst;
         using FirstArg = typename function_traits<F>::template ArgType<0>;
 
         return [f= std::move(f)](const FirstArg& arg) {
+            using ReturnFunType = typename function_traits<F>::PartialApplyFirst;
+
             const ReturnFunType inner_func = [f, arg = std::move(arg)](auto&& ...args) {
                 return std::apply(f, std::tuple_cat(std::make_tuple(arg), std::make_tuple(args...)));
             };
@@ -113,21 +143,6 @@ constexpr decltype(auto) curry(const F& f) {
         };
     }
 }
-
-
-namespace detail {
-    template<typename Callable, typename Head>
-    decltype(auto) uncurry_impl(Callable&& f, const Head& value) {
-        return f(value);
-    }
-
-    template<typename Callable, typename Head, typename ...Tail>
-    decltype(auto) uncurry_impl(Callable&& f, const Head& value, Tail&&...ts) {
-        const auto f2 = f(value);
-        return uncurry_impl(f2, std::forward<Tail>(ts)...);
-    }
-}
-
 /**
  * Uncurry given callable
  * @tparam F callable type
@@ -135,8 +150,8 @@ namespace detail {
  * @return Uncurried version of the given function
  */
 template <typename Callable>
-constexpr decltype(auto) uncurry(Callable&& f) {
-    return [f = std::forward<Callable>(f)](auto&& ...args) noexcept {
+decltype(auto) uncurry(Callable&& f) {
+    return [f = std::forward<Callable>(f)](auto&& ...args) {
             return detail::uncurry_impl(f, std::forward<decltype(args)>(args)...);
     };
 }
@@ -150,8 +165,8 @@ constexpr decltype(auto) uncurry(Callable&& f) {
  * @return partially applied function
  */
 template <typename F, typename ...Args>
-constexpr decltype(auto) partial(F&& f, Args&& ...args) {
-    if constexpr (std::is_invocable<F>{}) {
+decltype(auto) partial(F&& f, Args&& ...args) {
+    if constexpr (std::is_invocable_v<F>) {
         return f();
     } else {
         return [f=std::forward<F>(f), vargs = std::make_tuple(std::forward<Args>(args) ...)](auto&& ...inner_args) {

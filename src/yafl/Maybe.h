@@ -245,20 +245,46 @@ Maybe<T...> Just(T&& ...args) { return Maybe<T...>::Just(std::forward<T>(args)..
 template<typename = void>
 Maybe<void> Just() { return Maybe<void>::Just(); }
 
-//lift function
-template<template <typename> typename MaybeT, typename Callable>
+/**
+ * Lift given callable into the given abstract monadic type
+ * @tparam MonadType Abstract type to lift function to
+ * @tparam Callable Callable type to lift
+ * @param callable Callable to lift
+ * @return callable lifted into the given abstract monadic type
+ */
+template<template <typename> typename MonadType, typename Callable, typename = std::enable_if_t<std::is_same_v<yafl::Maybe<void>, MonadType<void>>
+                                                                                                && IsMonadicBase<MonadType<void>>::value, void>>
 decltype(auto) lift(Callable&& callable) {
-    //TODO make lift work with multiple argument functions
-    static_assert(function_traits<Callable>::ArgCount == 1, "Lift only work with single argument functions");
-    using Arg = typename function_traits<Callable>::template ArgType<0>;
-    using ReturnType = std::remove_reference_t<std::invoke_result_t<Callable, Arg>>;
+    if constexpr (std::is_invocable_v<Callable>) {
+        using ReturnType = std::remove_reference_t<std::invoke_result_t<Callable>>;
+        if constexpr (std::is_void_v<ReturnType>) {
+            return [callable = std::forward<Callable>(callable)](){
+                callable();
+                return MonadType<ReturnType>::Just();
+            };
+        } else {
+            return [callable = std::forward<Callable>(callable)](){
+                return MonadType<ReturnType>::Just(callable());
+            };
+        }
+    } else {
+        using ReturnType = typename yafl::function_traits<Callable>::ReturnType;
 
-    return [callable = std::forward<Callable>(callable)](const MaybeT<Arg>& arg) {
-        if (arg.hasValue())
-            return MaybeT<ReturnType>::Just(callable(arg.value()));
-        else
-            return MaybeT<ReturnType>::Nothing();
-    };
+        return [callable = std::forward<Callable>(callable)](auto ...args) -> MonadType<ReturnType> {
+            if (detail::all_true([](auto&& v){ return v.hasValue();}, args...)) {
+                const auto tp = detail::map_tuple_append([](auto&& arg){ return arg.value();}, std::make_tuple(), args...);
+
+                if constexpr (std::is_void_v<ReturnType>) {
+                    std::apply(callable, tp);
+                    return MonadType<ReturnType>::Just();
+                } else {
+                    return MonadType<ReturnType>::Just(std::apply(callable, tp));
+                }
+            } else {
+                return MonadType<ReturnType>::Nothing();
+            }
+        };
+    }
 }
 
 } // namespace yafl
