@@ -245,4 +245,20 @@ Maybe<T...> Just(T&& ...args) { return Maybe<T...>::Just(std::forward<T>(args)..
 template<typename = void>
 Maybe<void> Just() { return Maybe<void>::Just(); }
 
+//lift function
+template<template <typename> typename MaybeT, typename Callable>
+decltype(auto) lift(Callable&& callable) {
+    //TODO make lift work with multiple argument functions
+    static_assert(function_traits<Callable>::ArgCount == 1, "Lift only work with single argument functions");
+    using Arg = typename function_traits<Callable>::template ArgType<0>;
+    using ReturnType = std::remove_reference_t<std::invoke_result_t<Callable, Arg>>;
+
+    return [callable = std::forward<Callable>(callable)](const MaybeT<Arg>& arg) {
+        if (arg.hasValue())
+            return MaybeT<ReturnType>::Just(callable(arg.value()));
+        else
+            return MaybeT<ReturnType>::Nothing();
+    };
+}
+
 } // namespace yafl

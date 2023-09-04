@@ -36,20 +36,6 @@ public:
     decltype(auto) fmap(Callable&& callable) const {
         return static_cast<const TDerivedFunctor<Args...>*>(this)->internal_fmap(std::forward<Callable>(callable));
     }
-
-    /**
-     * Lifts a function from a -> b and returns a new function F a -> F b, i.e, it enables a function to work on the
-     * Functor abstraction level
-     * @tparam Callable Callable type
-     * @param callable Callback to be executed
-     * @return a new function with the input argument types lifted to Functor types
-     */
-    template<typename Callable>
-    static decltype(auto) lift(Callable&& callable) {
-        return [&callable](const TDerivedFunctor<Args...>& value){
-            return value.fmap(std::forward<Callable>(callable));
-        };
-    }
 };
 
 //fmap function
@@ -58,21 +44,5 @@ decltype(auto) fmap(Callable&& callable, const Functor<T, Args...>& value) {
     return value.fmap(std::forward<Callable>(callable));
 }
 
-//lift function
-template<typename T, typename Callable>
-decltype(auto) lift(Callable&& callable) {
-    return [&callable](const T& value){
-        return value.fmap(std::forward<Callable>(callable));
-    };
-}
-
-//template<template <typename...> typename T, typename Callable>
-//decltype(auto) lift(Callable&& callable) {
-//    using InputArgType = typename function_traits<Callable>::template ArgType<0>;
-//
-//    return [&callable](const T<InputArgType>& value){
-//        return value.fmap(std::forward<Callable>(callable));
-//    };
-//}
 
 } // namespace yafl
