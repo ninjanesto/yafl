@@ -26,12 +26,12 @@ decltype(auto) function_compose(const TLeft& lhs, const TRight& rhs) {
     using LhsReturnType = typename yafl::function_traits<TLeft>::ReturnType;
     if constexpr (yafl::function_traits<TLeft>::ArgCount > 0) {
         if constexpr (std::is_void_v<LhsReturnType>) {
-            return [&rhs, &lhs](auto ...args) {
+            return [&rhs, &lhs](auto&& ...args) {
                 lhs(args ...);
                 return rhs();
             };
         } else {
-            return [&rhs, &lhs](auto ...args) {
+            return [&rhs, &lhs](auto&& ...args) {
                 return rhs(lhs(args ...));
             };
         }
@@ -61,12 +61,12 @@ decltype(auto) function_compose(const TLeft& lhs, const TRight& rhs) {
 template <typename TLeft, typename TRight>
 decltype(auto) kleisli_compose(const TLeft& lhs, const TRight& rhs) {
     using RhsReturnType = typename yafl::function_traits<TRight>::ReturnType;
-    if constexpr (MonadTraits<RhsReturnType>::value) {
-        return [&rhs, &lhs](auto... args) {
+    if constexpr (IsMonadType<RhsReturnType>::value) {
+        return [&rhs, &lhs](auto&&... args) {
             return lhs(args...).bind(rhs);
         };
     } else {
-        return [&rhs, &lhs](auto... args) {
+        return [&rhs, &lhs](auto&&... args) {
             return lhs(args...).fmap(rhs);
         };
     }
@@ -83,11 +83,62 @@ decltype(auto) kleisli_compose(const TLeft& lhs, const TRight& rhs) {
 template <typename TLeft, typename TRight>
 decltype(auto) compose(const TLeft& lhs, const TRight& rhs) {
     using LhsReturnType = typename yafl::function_traits<TLeft>::ReturnType;
-    if constexpr (MonadTraits<LhsReturnType>::value) {
+    if constexpr (IsMonadType<LhsReturnType>::value) {
         return kleisli_compose(lhs, rhs);
     } else {
         return function_compose(lhs, rhs);
     }
+}
+
+/**
+ * Curry given callable
+ * @tparam F type of callable
+ * @param f function to execute
+ * @return curried function
+ */
+template <typename F>
+constexpr decltype(auto) curry(F&& f) {
+    if constexpr (std::is_invocable<F>{}) {
+        return f();
+    } else {
+        return [f=std::forward<F>(f)](auto&& arg) {
+            return curry(
+                [f, arg = std::forward<decltype(arg)>(arg)](auto&& ...args) {
+                    return std::apply(f, std::tuple_cat(std::make_tuple(arg), std::make_tuple(args...)));
+                }
+            );
+        };
+    }
+}
+
+/**
+ * Partial apply given function
+ * @tparam F type of callable
+ * @tparam Args type of args
+ * @param f function to partial apply given arguments
+ * @param args argument for the provided function
+ * @return partially applied function
+ */
+template <typename F, typename ...Args>
+constexpr decltype(auto) partial(F&& f, Args&& ...args) {
+    if constexpr (std::is_invocable<F>{}) {
+        return f();
+    } else {
+        return [f=std::forward<F>(f), vargs = std::make_tuple(std::forward<Args>(args) ...)](auto&& ...inner_args) {
+            return std::apply(f, std::tuple_cat(vargs, std::make_tuple(inner_args...)));
+        };
+    }
+}
+
+/**
+ * Identity function
+ * @tparam Arg Type of argument
+ * @param arg argument
+ * @return argument
+ */
+template<typename Arg>
+constexpr auto id(Arg&& arg) noexcept {
+    return std::forward<Arg>(arg);
 }
 
 } // namespace yafl

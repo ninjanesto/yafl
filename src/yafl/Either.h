@@ -58,7 +58,7 @@ public:
 
 private:
     template <typename Callable>
-    decltype(auto) internal_fmap(const Callable& callable) const {
+    decltype(auto) internal_fmap(Callable&& callable) const {
         static_assert(std::is_invocable_v<Callable>, "Input argument is not invocable");
         using ReturnType = std::invoke_result_t<Callable>;
         if (this->isOk()) {
@@ -74,7 +74,7 @@ private:
     }
 
     template <typename Callable>
-    decltype(auto) internal_bind(const Callable& callable) const {
+    decltype(auto) internal_bind(Callable&& callable) const {
         static_assert(std::is_invocable_v<Callable>, "Input argument is not invocable");
         using ReturnType = std::invoke_result_t<Callable>;
         using InnerTypeError = typename EitherTraits<ReturnType>::ErrorType;
@@ -121,7 +121,7 @@ public:
     }
 private:
     template <typename Callable>
-    decltype(auto) internal_fmap(const Callable& callable) const {
+    decltype(auto) internal_fmap(Callable&& callable) const {
         static_assert(std::is_invocable_v<Callable, ValueType>, "Input argument is not invocable");
         using ReturnType = std::invoke_result_t<Callable, ValueType>;
         if (this->isOk()) {
@@ -137,7 +137,7 @@ private:
     }
 
     template <typename Callable>
-    decltype(auto) internal_bind(const Callable& callable) const {
+    decltype(auto) internal_bind(Callable&& callable) const {
         static_assert(std::is_invocable_v<Callable, ValueType>, "Input argument is not invocable");
         using ReturnType = std::invoke_result_t<Callable, ValueType>;
         using InnerTypeError = typename EitherTraits<ReturnType>::ErrorType;
@@ -227,7 +227,7 @@ public:
     }
 private:
     template <typename Callable>
-    decltype(auto) internal_fmap(const Callable& callable) const {
+    decltype(auto) internal_fmap(Callable&& callable) const {
         static_assert(std::is_invocable_v<Callable>, "Input argument is not invocable");
         using ReturnType = std::invoke_result_t<Callable>;
         if (this->isOk()) {
@@ -243,7 +243,7 @@ private:
     }
 
     template <typename Callable>
-    decltype(auto) internal_bind(const Callable& callable) const {
+    decltype(auto) internal_bind(Callable&& callable) const {
         static_assert(std::is_invocable_v<Callable>, "Input argument is not invocable");
         using ReturnType = std::invoke_result_t<Callable>;
         using InnerTypeError = typename EitherTraits<ReturnType>::ErrorType;
@@ -298,7 +298,7 @@ public:
     }
 private:
     template <typename Callable>
-    decltype(auto) internal_fmap(const Callable& callable) const {
+    decltype(auto) internal_fmap(Callable&& callable) const {
         static_assert(std::is_invocable_v<Callable, ValueType>, "Input argument is not invocable");
         using ReturnType = std::invoke_result_t<Callable, ValueType>;
         if (this->isOk()) {
@@ -314,7 +314,7 @@ private:
     }
 
     template <typename Callable>
-    decltype(auto) internal_bind(const Callable& callable) const {
+    decltype(auto) internal_bind(Callable&& callable) const {
         static_assert(std::is_invocable_v<Callable, ValueType>, "Input argument is not invocable");
         using ReturnType = std::invoke_result_t<Callable, ValueType>;
         using InnerTypeError = typename EitherTraits<ReturnType>::ErrorType;
@@ -323,7 +323,7 @@ private:
         if (this->isOk()) {
             return callable(this->value());
         } else {
-            return Either<InnerTypeError, InnerTypeOK>::Error(this->error());
+            return Either<ErrorType, InnerTypeOK>::Error(this->error());
         }
     }
 

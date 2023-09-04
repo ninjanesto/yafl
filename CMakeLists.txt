@@ -31,3 +31,7 @@ if(BUILD_YAFL_TESTS OR BUILD_YAFL_COVERAGE)
     enable_testing()
     add_subdirectory(tests)
 endif()
+
+if(BUILD_YAFL_EXAMPLE)
+    add_subdirectory(example_app)
+endif()

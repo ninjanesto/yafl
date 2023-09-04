@@ -66,13 +66,13 @@ decltype(auto) lift(Callable&& callable) {
     };
 }
 
-template<template <typename...> typename T, typename Callable>
-decltype(auto) lift(Callable&& callable) {
-    using InputArgType = typename function_traits<Callable>::template ArgType<0>;
-
-    return [&callable](const T<InputArgType>& value){
-        return value.fmap(std::forward<Callable>(callable));
-    };
-}
+//template<template <typename...> typename T, typename Callable>
+//decltype(auto) lift(Callable&& callable) {
+//    using InputArgType = typename function_traits<Callable>::template ArgType<0>;
+//
+//    return [&callable](const T<InputArgType>& value){
+//        return value.fmap(std::forward<Callable>(callable));
+//    };
+//}
 
 } // namespace yafl

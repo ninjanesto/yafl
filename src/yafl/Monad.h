@@ -13,10 +13,10 @@
 namespace yafl {
 
 template <typename T>
-struct MonadTraits : public std::false_type {};
+struct IsMonadType : public std::false_type {};
 
 template <template <typename...> typename MonadType, typename ...Args>
-struct MonadTraits<MonadType<Args...>> : public std::true_type {};
+struct IsMonadType<MonadType<Args...>> : public std::true_type {};
 
 //mreturn :: a -> M a
 //bind :: (a -> M b) -> M a -> M b

@@ -97,6 +97,11 @@ TYPED_TEST(MaybeTest, assertFmapComputesCorrectType) {
         }
         {
             const auto maybe = createMaybe<TypeParam>();
+            const auto resultVoid = maybe.fmap([](TypeParam&&){});
+            ASSERT_TRUE(std::is_void_v<typename MaybeTraits<decltype(resultVoid)>::ValueType>);
+        }
+        {
+            const auto maybe = createMaybe<TypeParam>();
             const auto resultType = maybe.fmap([](const TypeParam&){return 42;});
             constexpr const auto areSameType = std::is_same_v<int, decltype(resultType.value())>;
             ASSERT_TRUE(areSameType);

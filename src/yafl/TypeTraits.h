@@ -28,7 +28,7 @@ template <typename ...>
 struct function_traits;
 
 template <typename Ret, typename FirstArg, typename... Args>
-struct function_traits< Ret,  FirstArg, Args...> {
+struct function_traits<Ret, FirstArg, Args...> {
     using Signature = std::function<Ret(FirstArg, Args...)>;
     using PartialApplyFirst = std::function<Ret(Args...)>;
     using ReturnType = Ret;

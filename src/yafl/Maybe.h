@@ -55,26 +55,26 @@ public:
 
 private:
     template <typename Callable>
-    decltype(auto) internal_bind(const Callable& callable) const {
+    decltype(auto) internal_bind(Callable&& callable) const {
         static_assert(std::is_invocable_v<Callable>, "Input argument is not invocable");
         using ReturnType = std::invoke_result_t<Callable>;
         if (this->hasValue()) {
-            return callable();
+            return std::invoke<Callable>(std::forward<Callable>(callable));
         } else {
             return ReturnType::Nothing();
         }
     }
 
     template <typename Callable>
-    decltype(auto) internal_fmap(const Callable& callable) const {
+    decltype(auto) internal_fmap(Callable&& callable) const {
         static_assert(std::is_invocable_v<Callable>, "Input argument is not invocable");
         using ReturnType = std::invoke_result_t<Callable>;
         if (this->hasValue()) {
             if constexpr (std::is_void_v<ReturnType>) {
-                callable();
+                std::invoke<Callable>(std::forward<Callable>(callable));
                 return Maybe<void>::Just();
             } else {
-                return Maybe<ReturnType>::Just(callable());
+                return Maybe<ReturnType>::Just(std::invoke<Callable>(std::forward<Callable>(callable)));
             }
         } else {
             return Maybe<ReturnType>::Nothing();
@@ -119,26 +119,26 @@ public:
     }
 private:
     template <typename Callable>
-    decltype(auto) internal_bind(const Callable& callable) const {
+    decltype(auto) internal_bind(Callable&& callable) const {
         static_assert(std::is_invocable_v<Callable, T>, "Input argument is not invocable");
-        using ReturnType = std::invoke_result_t<Callable, T>;
+        using ReturnType = std::remove_reference_t<std::invoke_result_t<Callable, T>>;
         if (this->hasValue()) {
-            return callable(this->value());
+            return std::invoke<Callable>(std::forward<Callable>(callable), this->value());
         } else {
             return ReturnType::Nothing();
         }
     }
 
     template <typename Callable>
-    decltype(auto) internal_fmap(const Callable& callable) const {
+    decltype(auto) internal_fmap(Callable&& callable) const {
         static_assert(std::is_invocable_v<Callable, T>, "Input argument is not invocable");
-        using ReturnType = std::invoke_result_t<Callable, T>;
+        using ReturnType = std::remove_reference_t<std::invoke_result_t<Callable, T>>;
         if (this->hasValue()) {
             if constexpr (std::is_void_v<ReturnType>) {
-                callable(this->value());
+                std::invoke<Callable>(std::forward<Callable>(callable), this->value());
                 return Maybe<ReturnType>::Just();
             } else {
-                return Maybe<ReturnType>::Just(callable(this->value()));
+                return Maybe<ReturnType>::Just(std::invoke<Callable>(std::forward<Callable>(callable), this->value()));
             }
         } else {
             return Maybe<ReturnType>::Nothing();
@@ -146,70 +146,71 @@ private:
     }
 
     template<typename Head>
-    decltype(auto) internal_apply(const Maybe<Head>& arg) const {
-        if constexpr (function_traits<T>::ArgCount > 1) {
-            if (arg.hasValue() && this->hasValue()) {
-                return Maybe<typename function_traits<T>::PartialApplyFirst>::Just([callable = value(), first = arg.value()](const auto& ...args) {
-                    return callable(first, args...);
-                });
-            } else {
-                return Maybe<typename function_traits<T>::PartialApplyFirst>::Nothing();
-            }
-        } else {
-            using ReturnType = std::invoke_result_t<T, Head>;
+    decltype(auto) internal_apply(Maybe<Head>&& arg) const {
+        const auto var{std::move(arg)};
+        if constexpr (std::is_invocable_v<T, Head>) {
+            using ReturnType = std::remove_reference_t<std::invoke_result_t<T, Head>>;
             if (!this->hasValue()) {
                 return Maybe<ReturnType>::Nothing();
             } else {
-                if (arg.hasValue()) {
+                if (var.hasValue()) {
                     if constexpr (std::is_void_v<ReturnType>) {
-                        value()(arg.value());
+                        std::invoke<T>(value(), var.value());
                         return Maybe<ReturnType>::Just();
                     } else {
-                        return Maybe<ReturnType>::Just(value()(arg.value()));
+                        return Maybe<ReturnType>::Just(std::invoke<T>(value(), var.value()));
                     }
                 } else {
                     return Maybe<ReturnType>::Nothing();
                 }
             }
-        }
-    }
-
-    template<typename Head>
-    decltype(auto) internal_apply(const Head& arg) const {
-        if constexpr (function_traits<T>::ArgCount > 1) {
-            if (this->hasValue()) {
-                return Maybe<typename function_traits<T>::PartialApplyFirst>::Just([callable = value(), first = arg](const auto& ...args) {
-                    return callable(first, args...);
+        } else {
+            if (var.hasValue() && this->hasValue()) {
+                return Maybe<typename function_traits<T>::PartialApplyFirst>::Just([callable = value(), first = var.value()](auto&& ...args) {
+                    return std::apply(callable, std::tuple_cat(std::make_tuple(first), std::make_tuple(args...)));
                 });
             } else {
                 return Maybe<typename function_traits<T>::PartialApplyFirst>::Nothing();
             }
-        } else {
-            using ReturnType = std::invoke_result_t<T, Head>;
+        }
+    }
+
+    template<typename Head>
+    decltype(auto) internal_apply(Head&& arg) const {
+        if constexpr (std::is_invocable_v<T, Head>) {
+            using ReturnType = std::remove_reference_t<std::invoke_result_t<T, Head>>;
             if (!this->hasValue()) {
                 return Maybe<ReturnType>::Nothing();
             } else {
                 if constexpr (std::is_void_v<ReturnType>) {
-                    value()(arg);
+                    std::invoke<T>(value(), std::forward<Head>(arg));
                     return Maybe<ReturnType>::Just();
                 } else {
-                    return Maybe<ReturnType>::Just(value()(arg));
+                    return Maybe<ReturnType>::Just(std::invoke<T>(value(), std::forward<Head>(arg)));
                 }
+            }
+        } else {
+            if (this->hasValue()) {
+                return Maybe<typename function_traits<T>::PartialApplyFirst>::Just([callable = value(), first = std::forward<Head>(arg)](auto&& ...args) {
+                    return std::apply(callable, std::tuple_cat(std::make_tuple(first), std::make_tuple(args...)));
+                });
+            } else {
+                return Maybe<typename function_traits<T>::PartialApplyFirst>::Nothing();
             }
         }
     }
 
     template<typename std::enable_if<std::is_invocable_v<T>>* = nullptr>
     decltype(auto) internal_apply() const {
-        using ReturnType = std::invoke_result_t<T>;
+        using ReturnType = std::remove_reference_t<std::invoke_result_t<T>>;
         if (!this->hasValue()) {
             return Maybe<ReturnType>::Nothing();
         } else {
             if constexpr (std::is_void_v<ReturnType>) {
-                value()();
+                std::invoke<T>(value());
                 return Maybe<ReturnType>::Just();
             } else {
-                return Maybe<ReturnType>::Just(value()());
+                return Maybe<ReturnType>::Just(std::invoke<T>(value()));
             }
         }
     }
