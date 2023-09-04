@@ -251,11 +251,80 @@ TYPED_TEST(EitherTest, validateErrorThrowsExceptionWhenEitherIsValue) {
 
 TEST(EitherTest, assertApply) {
     {
+        const auto func = []() { return 42; };
+        const auto funcOk = Ok<void>(func);
+        const auto result = funcOk();
+        ASSERT_EQ(result.value(), 42);
+        const auto funcError = Error<void, decltype(func)>();
+        const auto result2 = funcError();
+        ASSERT_TRUE(result2.isError());
+    }
+    {
+        const auto func = []() { return; };
+        const auto funcOk = Ok<void>(func);
+        const auto result = funcOk();
+        ASSERT_TRUE(result.isOk());
+        const auto funcError = Error<void, decltype(func)>();
+        const auto result2 = funcError();
+        ASSERT_TRUE(result2.isError());
+    }
+    {
+        const auto multBy42 = Ok<void>([](int x) { return x * 42; });
+        const auto result = multBy42(2);
+        ASSERT_EQ(result.value(), 84);
+    }
+    {
+        const auto func = []() { return 42; };
+        const auto funcOk = Ok<int>(func);
+        const auto result = funcOk();
+        ASSERT_EQ(result.value(), 42);
+        const auto funcError = Error<int, decltype(func)>(29);
+        const auto result2 = funcError();
+        ASSERT_TRUE(result2.isError());
+        ASSERT_EQ(result2.error(), 29);
+    }
+    {
+        const auto func = Ok<int>([]() { return; });
+        const auto result = func();
+        ASSERT_TRUE(result.isOk());
+    }
+    {
+        const auto multBy42 = Ok<int>([](int) { return; });
+        const auto result = multBy42(2);
+        ASSERT_TRUE(result.isOk());
+    }
+    {
         const auto multBy42 = Ok<void>([](int x) { return x * 42; });
         const auto result = multBy42(Ok<void>(2));
         ASSERT_EQ(result.value(), 84);
         const auto result2 = multBy42(Error<void, int>());
         ASSERT_TRUE(result2.isError());
+    }
+    {
+        const auto multBy42 = Ok<int>([](int) { return; });
+        const auto result = multBy42(Ok<int>(2));
+        ASSERT_TRUE(result.isOk());
+        const auto result2 = multBy42(Error<int, int>(29));
+        ASSERT_TRUE(result2.isError());
+        ASSERT_EQ(result2.error(), 29);
+    }
+    {
+        const auto multBy42 = Ok<void>([](int) { return; });
+        const auto result = multBy42(2);
+        ASSERT_TRUE(result.isOk());
+    }
+    {
+        const auto multBy42 = Ok<void>([](int) { return; });
+        const auto result = multBy42(Ok<void>(2));
+        ASSERT_TRUE(result.isOk());
+        const auto result2 = multBy42(Error<void, int>());
+        ASSERT_TRUE(result2.isError());
+    }
+    {
+        const auto func = [](int x) { return x * 42; };
+        const auto applmultBy42 = Ok<int, decltype(func)>(func);
+        const auto result = applmultBy42(2);
+        ASSERT_EQ(result.value(), 84);
     }
     {
         const auto func = [](int x) { return x * 42; };
@@ -268,12 +337,27 @@ TEST(EitherTest, assertApply) {
     {
         const auto func = [](int x, int f) { return x * f; };
         const auto applmultBy42 = Ok<void, decltype(func)>(func);
+        const auto result = applmultBy42(2)(2);
+        ASSERT_EQ(result.value(), 4);
+        const auto applmultBy42Error = Error<void, decltype(func)>();
+        const auto result2 = applmultBy42Error(2)(2);
+        ASSERT_TRUE(result2.isError());
+    }
+    {
+        const auto func = [](int x, int f) { return x * f; };
+        const auto applmultBy42 = Ok<void, decltype(func)>(func);
         const auto result = applmultBy42(Ok<void, int>(2))(Ok<void, int>(2));
         ASSERT_EQ(result.value(), 4);
         const auto result2 = applmultBy42(Error<void, int>());
         ASSERT_TRUE(result2.isError());
         const auto result3 = result2(Error<void, int>());
         ASSERT_TRUE(result3.isError());
+    }
+    {
+        const auto func = [](int x, int f) { return x * f; };
+        const auto applmultBy42 = Error<void, decltype(func)>();
+        const auto result = applmultBy42(Ok<void, int>(2))(2);
+        ASSERT_TRUE(result.isError());
     }
     {
         const auto func = [](int x, int f) { return x * f; };
@@ -290,12 +374,40 @@ TEST(EitherTest, assertApply) {
             return ss.str();
         };
         const auto applmultBy42 = Ok<int, decltype(func)>(func);
+        const auto result = applmultBy42(Ok<int, std::string>("OlaOla"))(2.2);
+        ASSERT_EQ(result.value(), "OlaOla92.40");
+    }
+    {
+        const auto func = [](const std::string &s, float f) {
+            std::stringstream ss;
+            ss << s << std::fixed << std::setprecision(2) << f * 42;
+            return ss.str();
+        };
+        const auto applmultBy42 = Ok<int, decltype(func)>(func);
+        const auto result = applmultBy42("OlaOla")(2.2);
+        ASSERT_EQ(result.value(), "OlaOla92.40");
+    }
+    {
+        const auto func = [](const std::string &s, float f) {
+            std::stringstream ss;
+            ss << s << std::fixed << std::setprecision(2) << f * 42;
+            return ss.str();
+        };
+        const auto applmultBy42 = Ok<int, decltype(func)>(func);
         const auto result = applmultBy42(Ok<int, std::string>("OlaOla"))(Ok<int, float>(2.2));
         ASSERT_EQ(result.value(), "OlaOla92.40");
         const auto result2 = applmultBy42(Error<int, std::string>(2))(Ok<int, float>(2.2));
         ASSERT_TRUE(result2.isError());
         const auto result3 = applmultBy42(Error<int, std::string>(2))(Error<int, float>(2));
         ASSERT_TRUE(result3.isError());
+    }
+    {
+        const auto func = [](const std::string&, float) {return std::string();};
+        const auto applmultBy42 = Error<int, decltype(func)>(2);
+        const auto result = applmultBy42("OlaOla");
+        ASSERT_TRUE(result.isError());
+        const auto result2 = result(2.2);
+        ASSERT_TRUE(result2.isError());
     }
     {
         const auto func = [](const std::string&, float) {return std::string();};

@@ -427,7 +427,7 @@ private:
     decltype(auto) internal_apply() const {
         using ReturnType = std::remove_reference_t<std::invoke_result_t<ValueType>>;
         if (this->isError()) {
-            return Either<ErrorType, ReturnType>::Error();
+            return Either<ErrorType, ReturnType>::Error(this->error());
         } else {
             if constexpr (std::is_void_v<ReturnType>) {
                 value()();
