@@ -26,7 +26,7 @@ namespace yafl {
 template<typename Error, typename Value>
 class Either;
 
-namespace type {
+namespace {
 
 /**
  * @ingroup Type
@@ -35,33 +35,28 @@ namespace type {
  * @tparam InnerValue Value type
  */
 template<typename InnerError, typename InnerValue>
-struct Details<Either<InnerError, InnerValue>> {
+struct DetailsImpl<Either < InnerError, InnerValue>> {
     /// Functor Base type
     using FBaseType = core::Functor<Either, InnerError, InnerValue>;
     /// Applicative Base type
     using ABaseType = core::Applicative<Either, InnerError, InnerValue>;
     /// Monad Base type
     using MBaseType = core::Monad<Either, InnerError, InnerValue>;
-
     /// Value Type
     using ValueType = InnerValue;
-
     /// Error Type
     using ErrorType = InnerError;
-
     /// Derived type
     using DerivedType = Either<InnerError, InnerValue>;
-
     ///boolean flag that states whether type T is a Functor or not
     static constexpr bool hasFunctorBase = std::is_base_of_v<FBaseType, DerivedType>;
     ///boolean flag that states whether type T is an Applicative or not
     static constexpr bool hasApplicativeBase = std::is_base_of_v<ABaseType, DerivedType>;
     ///boolean flag that states whether type T is a Monad or not
     static constexpr bool hasMonadicBase = std::is_base_of_v<MBaseType, DerivedType>;
-
     ///Callback responsible for handling errors
-    static constexpr auto handleError = []([[maybe_unused]] auto&& ...args) {
-        static_assert(std::is_same_v<typename type::Details<yafl::function::remove_cvref_t<decltype(args)>...>::ErrorType, ErrorType>, "Error types should match");
+    static constexpr auto handleError = []([[maybe_unused]] auto &&...args) {
+        static_assert(std::is_same_v<typename type::Details<decltype(args)...>::ErrorType, ErrorType>, "Error types should match");
         if constexpr (std::is_void_v<ErrorType>) {
             return DerivedType::Error();
         } else {
@@ -70,47 +65,9 @@ struct Details<Either<InnerError, InnerValue>> {
     };
 };
 
-/**
- * @ingroup Type
- * Either monad traits specialization for const types that enable getting the inner error and value types
- * @tparam InnerError Error type
- * @tparam InnerValue Value type
- */
-template<typename InnerError, typename InnerValue>
-struct Details<const Either<InnerError, InnerValue>> {
-    /// Functor Base type
-    using FBaseType = core::Functor<Either, InnerError, InnerValue>;
-    /// Applicative Base type
-    using ABaseType = core::Applicative<Either, InnerError, InnerValue>;
-    /// Monad Base type
-    using MBaseType = core::Monad<Either, InnerError, InnerValue>;
+}
 
-    /// Value Type
-    using ValueType = InnerValue;
-
-    /// Error Type
-    using ErrorType = InnerError;
-
-    /// Derived type
-    using DerivedType = Either<InnerError, InnerValue>;
-
-    ///boolean flag that states whether type T is a Functor or not
-    static constexpr bool hasFunctorBase = std::is_base_of_v<FBaseType, DerivedType>;
-    ///boolean flag that states whether type T is an Applicative or not
-    static constexpr bool hasApplicativeBase = std::is_base_of_v<ABaseType, DerivedType>;
-    ///boolean flag that states whether type T is a Monad or not
-    static constexpr bool hasMonadicBase = std::is_base_of_v<MBaseType, DerivedType>;
-
-    ///Callback responsible for handling errors
-    static constexpr auto handleError = []([[maybe_unused]] auto&& ...args) {
-        static_assert(std::is_same_v<typename type::Details<yafl::function::remove_cvref_t<decltype(args)>...>::ErrorType, ErrorType>, "Error types should match");
-        if constexpr (std::is_void_v<ErrorType>) {
-            return DerivedType::Error();
-        } else {
-            return DerivedType::Error(args.error()...);
-        }
-    };
-};
+namespace type {
 
 /**
  * Helper struct that enables fixing error type and
@@ -120,7 +77,7 @@ struct Details<const Either<InnerError, InnerValue>> {
 template <typename ErrorType>
 struct FixedErrorType {
     template <typename ValueType>
-    using Type = yafl::Either<ErrorType, ValueType>;
+    using Type = Either<ErrorType, ValueType>;
 };
 } // namespace type
 
@@ -212,8 +169,8 @@ public:
 private:
     template <typename Callable>
     decltype(auto) internal_bind(Callable&& callable) const {
-        static_assert(std::is_invocable_v<Callable>, "Input argument is not invocable");
-        using ReturnType = std::remove_reference_t<std::invoke_result_t<Callable>>;
+        static_assert(std::is_invocable_v<std::decay_t<Callable>>, "Input argument is not invocable");
+        using ReturnType = std::remove_reference_t<std::invoke_result_t<std::decay_t<Callable>>>;
         using InnerTypeError = typename type::Details<ReturnType>::ErrorType;
         static_assert(std::is_same_v<void, InnerTypeError>, "Error type does not match");
         using InnerTypeOK = typename type::Details<ReturnType>::ValueType;
@@ -226,8 +183,8 @@ private:
 
     template <typename Callable>
     decltype(auto) internal_fmap(Callable&& callable) const {
-        static_assert(std::is_invocable_v<Callable>, "Input argument is not invocable");
-        using ReturnType = std::remove_reference_t<std::invoke_result_t<Callable>>;
+        static_assert(std::is_invocable_v<std::decay_t<Callable>>, "Input argument is not invocable");
+        using ReturnType = std::remove_reference_t<std::invoke_result_t<std::decay_t<Callable>>>;
         if (isOk()) {
             if constexpr (std::is_void_v<ReturnType>) {
                 std::invoke<Callable>(std::forward<Callable>(callable));
@@ -356,8 +313,8 @@ public:
 private:
     template <typename Callable>
     decltype(auto) internal_bind(Callable&& callable) const {
-        static_assert(std::is_invocable_v<Callable, ValueType>, "Input argument is not invocable");
-        using ReturnType = std::remove_reference_t<std::invoke_result_t<Callable, ValueType>>;
+        static_assert(std::is_invocable_v<std::decay_t<Callable>, std::decay_t<ValueType>>, "Input argument is not invocable");
+        using ReturnType = std::remove_reference_t<std::invoke_result_t<std::decay_t<Callable>, std::decay_t<ValueType>>>;
         using InnerTypeError = typename type::Details<ReturnType>::ErrorType;
         static_assert(std::is_same_v<void, InnerTypeError>, "Error type does not match");
         using InnerTypeOK = typename type::Details<ReturnType>::ValueType;
@@ -370,8 +327,8 @@ private:
 
     template <typename Callable>
     decltype(auto) internal_fmap(Callable&& callable) const {
-        static_assert(std::is_invocable_v<Callable, ValueType>, "Input argument is not invocable");
-        using ReturnType = std::remove_reference_t<std::invoke_result_t<Callable, ValueType>>;
+        static_assert(std::is_invocable_v<std::decay_t<Callable>, std::decay_t<ValueType>>, "Input argument is not invocable");
+        using ReturnType = std::remove_reference_t<std::invoke_result_t<std::decay_t<Callable>, std::decay_t<ValueType>>>;
         if (isOk()) {
             if constexpr (std::is_void_v<ReturnType>) {
                 std::invoke<Callable>(std::forward<Callable>(callable), value());
@@ -386,16 +343,18 @@ private:
 
     template<typename Arg>
     decltype(auto) internal_apply(Arg&& arg) const {
-        static_assert(!std::is_invocable_v<ValueType>, "Function that takes 0 arguments cannot be called with arguments");
-        if constexpr (type::Details<yafl::function::remove_cvref_t<Arg>>::hasMonadicBase) {
+        static_assert(!std::is_invocable_v<std::decay_t<ValueType>>, "Function that takes 0 arguments cannot be called with arguments");
+        if constexpr (type::Details<Arg>::hasMonadicBase) {
             if (arg.isOk()) {
                 return internal_apply_non_monad(arg.value());
             } else {
-                using ArgInnerType = yafl::function::remove_cvref_t<typename yafl::type::Details<yafl::function::remove_cvref_t<Arg>>::ValueType>;
-                if constexpr (std::is_invocable_v<ValueType, ArgInnerType>) {
-                    return Either<void, std::invoke_result_t<ValueType, ArgInnerType>>::Error();
+                using ArgInnerType = std::remove_reference_t<typename type::Details<Arg>::ValueType>;
+                if constexpr (std::is_invocable_v<std::decay_t<ValueType>, std::decay_t<ArgInnerType>>) {
+                    using ReturnType = std::remove_reference_t<std::invoke_result_t<ValueType, ArgInnerType>>;
+                    return Either<void, ReturnType>::Error();
                 } else {
-                    return Either<void, typename function::Details<ValueType>::PartialApplyFirst>::Error();
+                    using ReturnType = std::remove_reference_t<typename function::Details<ValueType>::PartialApplyFirst>;
+                    return Either<void, ReturnType>::Error();
                 }
             }
         } else {
@@ -405,10 +364,10 @@ private:
 
     template<typename Arg>
     decltype(auto) internal_apply_non_monad(Arg&& arg) const {
-        static_assert(!std::is_invocable_v<ValueType>, "Function that takes 0 arguments cannot be called with arguments");
+        static_assert(!std::is_invocable_v<std::decay_t<ValueType>>, "Function that takes 0 arguments cannot be called with arguments");
 
-        if constexpr (std::is_invocable_v<ValueType, function::remove_cvref_t<Arg>>) {
-            using ReturnType = function::remove_cvref_t<std::invoke_result_t<ValueType, function::remove_cvref_t<Arg>>>;
+        if constexpr (std::is_invocable_v<std::decay_t<ValueType>, std::decay_t<Arg>>) {
+            using ReturnType = std::remove_reference_t<std::invoke_result_t<std::decay_t<ValueType>, std::decay_t<Arg>>>;
             if (isError()) {
                 return Either<void, ReturnType>::Error();
             } else {
@@ -420,7 +379,7 @@ private:
                 }
             }
         } else {
-            using PartialFunctionType = typename function::Details<ValueType>::PartialApplyFirst;
+            using PartialFunctionType = std::remove_reference_t<typename function::Details<ValueType>::PartialApplyFirst>;
 
             if (isOk()) {
                 return Either<void, PartialFunctionType>::Ok(
@@ -434,9 +393,9 @@ private:
         }
 
     decltype(auto) internal_apply() const {
-        static_assert(std::is_invocable_v<ValueType>, "Function that takes one or more arguments and therefore cannot be called without arguments");
+        static_assert(std::is_invocable_v<std::decay_t<ValueType>>, "Function that takes one or more arguments and therefore cannot be called without arguments");
 
-        using ReturnType = std::remove_reference_t<std::invoke_result_t<ValueType>>;
+        using ReturnType = std::remove_reference_t<std::invoke_result_t<std::decay_t<ValueType>>>;
         if (isError()) {
             return Either<void, ReturnType>::Error();
         } else {
@@ -563,8 +522,8 @@ public:
 private:
     template <typename Callable>
     decltype(auto) internal_bind(Callable&& callable) const {
-        static_assert(std::is_invocable_v<Callable>, "Input argument is not invocable");
-        using ReturnType = std::remove_reference_t<std::invoke_result_t<Callable>>;
+        static_assert(std::is_invocable_v<std::decay_t<Callable>>, "Input argument is not invocable");
+        using ReturnType = std::remove_reference_t<std::invoke_result_t<std::decay_t<Callable>>>;
         using InnerTypeError = typename type::Details<ReturnType>::ErrorType;
         static_assert(std::is_same_v<ErrorType, InnerTypeError>, "Error type does not match");
         using InnerTypeOK = typename type::Details<ReturnType>::ValueType;
@@ -577,8 +536,8 @@ private:
 
     template <typename Callable>
     decltype(auto) internal_fmap(Callable&& callable) const {
-        static_assert(std::is_invocable_v<Callable>, "Input argument is not invocable");
-        using ReturnType = std::remove_reference_t<std::invoke_result_t<Callable>>;
+        static_assert(std::is_invocable_v<std::decay_t<Callable>>, "Input argument is not invocable");
+        using ReturnType = std::remove_reference_t<std::invoke_result_t<std::decay_t<Callable>>>;
         if (isOk()) {
             if constexpr (std::is_void_v<ReturnType>) {
                 std::invoke<Callable>(std::forward<Callable>(callable));
@@ -736,8 +695,8 @@ public:
 private:
     template <typename Callable>
     decltype(auto) internal_bind(Callable&& callable) const {
-        static_assert(std::is_invocable_v<Callable, ValueType>, "Input argument is not invocable");
-        using ReturnType = std::remove_reference_t<std::invoke_result_t<Callable, ValueType>>;
+        static_assert(std::is_invocable_v<std::decay_t<Callable>, std::decay_t<ValueType>>, "Input argument is not invocable");
+        using ReturnType = std::remove_reference_t<std::invoke_result_t<std::decay_t<Callable>, std::decay_t<ValueType>>>;
         using InnerTypeError = typename type::Details<ReturnType>::ErrorType;
         static_assert(std::is_same_v<ErrorType, InnerTypeError>, "Error type does not match");
         using InnerTypeOK = typename type::Details<ReturnType>::ValueType;
@@ -750,8 +709,8 @@ private:
 
     template <typename Callable>
     decltype(auto) internal_fmap(Callable&& callable) const {
-        static_assert(std::is_invocable_v<Callable, ValueType>, "Input argument is not invocable");
-        using ReturnType = std::remove_reference_t<std::invoke_result_t<Callable, ValueType>>;
+        static_assert(std::is_invocable_v<std::decay_t<Callable>, std::decay_t<ValueType>>, "Input argument is not invocable");
+        using ReturnType = std::remove_reference_t<std::invoke_result_t<std::decay_t<Callable>, std::decay_t<ValueType>>>;
         if (isOk()) {
             if constexpr (std::is_void_v<ReturnType>) {
                 std::invoke<Callable>(std::forward<Callable>(callable), value());
@@ -766,16 +725,18 @@ private:
 
     template<typename Arg>
     decltype(auto) internal_apply(Arg&& arg) const {
-        static_assert(!std::is_invocable_v<ValueType>, "Function that takes 0 arguments cannot be called with arguments");
-        if constexpr (type::Details<yafl::function::remove_cvref_t<Arg>>::hasMonadicBase) {
+        static_assert(!std::is_invocable_v<std::decay_t<ValueType>>, "Function that takes 0 arguments cannot be called with arguments");
+        if constexpr (type::Details<Arg>::hasMonadicBase) {
             if (arg.isOk()) {
                 return internal_apply_non_monad(arg.value());
             } else {
-                using ArgInnerType = yafl::function::remove_cvref_t<typename yafl::type::Details<yafl::function::remove_cvref_t<Arg>>::ValueType>;
-                if constexpr (std::is_invocable_v<ValueType, ArgInnerType>) {
-                    return Either<ErrorType, std::invoke_result_t<ValueType, ArgInnerType>>::Error(arg.error());
+                using ArgInnerType = std::remove_reference_t<typename type::Details<Arg>::ValueType>;
+                if constexpr (std::is_invocable_v<std::decay_t<ValueType>, std::decay_t<ArgInnerType>>) {
+                    using ReturnType = std::remove_reference_t<std::invoke_result_t<std::decay_t<ValueType>, std::decay_t<ArgInnerType>>>;
+                    return Either<ErrorType, ReturnType>::Error(arg.error());
                 } else {
-                    return Either<ErrorType, typename function::Details<ValueType>::PartialApplyFirst>::Error(arg.error());
+                    using ReturnType = std::remove_reference_t<typename function::Details<ValueType>::PartialApplyFirst>;
+                    return Either<ErrorType, ReturnType>::Error(arg.error());
                 }
             }
         } else {
@@ -785,8 +746,8 @@ private:
 
     template<typename Arg>
     decltype(auto) internal_apply_non_monad(Arg&& arg) const {
-        if constexpr (std::is_invocable_v<ValueType, function::remove_cvref_t<Arg>>) {
-            using ReturnType = function::remove_cvref_t<std::invoke_result_t<ValueType, function::remove_cvref_t<Arg>>>;
+        if constexpr (std::is_invocable_v<std::decay_t<ValueType>, std::decay_t<Arg>>) {
+            using ReturnType = std::remove_reference_t<std::invoke_result_t<std::decay_t<ValueType>, std::decay_t<Arg>>>;
             if (isError()) {
                 return Either<ErrorType, ReturnType>::Error(error());
             } else {
@@ -798,7 +759,7 @@ private:
                 }
             }
         } else {
-            using PartialFunctionType = typename function::Details<ValueType>::PartialApplyFirst;
+            using PartialFunctionType = std::remove_reference_t<typename function::Details<ValueType>::PartialApplyFirst>;
 
             if (isOk()) {
                 return Either<ErrorType, PartialFunctionType>::Ok([callable = value(), first = std::forward<Arg>(arg)](auto&& ...args) {
@@ -811,9 +772,9 @@ private:
     }
 
     decltype(auto) internal_apply() const {
-        static_assert(std::is_invocable_v<ValueType>, "Function that takes one or more arguments and therefore cannot be called without arguments");
-        if constexpr (std::is_invocable_v<ValueType>) {
-            using ReturnType = std::remove_reference_t<std::invoke_result_t<ValueType>>;
+        static_assert(std::is_invocable_v<std::decay_t<ValueType>>, "Function that takes one or more arguments and therefore cannot be called without arguments");
+        if constexpr (std::is_invocable_v<std::decay_t<ValueType>>) {
+            using ReturnType = std::remove_reference_t<std::invoke_result_t<std::decay_t<ValueType>>>;
             if (isError()) {
                 return Either<ErrorType, ReturnType>::Error(error());
             } else {
@@ -959,9 +920,9 @@ decltype(auto) lift(Callable&& callable) {
             };
         }
     } else {
-        using ReturnType = typename yafl::function::Details<Callable>::ReturnType;
+        using ReturnType = typename function::Details<Callable>::ReturnType;
         using FixedErrorType = typename type::FixedErrorType<void>;
-        using ReturnFunctionType = typename yafl::function::Details<Callable>::template LiftedSignature<FixedErrorType::template Type>;
+        using ReturnFunctionType = typename function::Details<Callable>::template LiftedSignature<FixedErrorType::template Type>;
 
         const ReturnFunctionType function =  [callable = std::forward<Callable>(callable)](auto ...args) -> Either<void, ReturnType> {
             if (details::all_true([](auto&& v){ return v.isOk();}, args...)) {

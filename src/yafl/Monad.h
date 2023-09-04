@@ -51,7 +51,7 @@ namespace monad {
  */
 template<typename Callable, typename MonadT>
 decltype(auto) bind(Callable&& callable, const MonadT& monad) {
-    static_assert(type::Details<yafl::function::remove_cvref_t<MonadT>>::hasMonadicBase, "MonadT argument not a Monad");
+    static_assert(type::Details<std::decay_t<MonadT>>::hasMonadicBase, "MonadT argument not a Monad");
     return monad.bind(std::forward<Callable>(callable));
 }
 

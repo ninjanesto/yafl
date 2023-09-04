@@ -30,14 +30,15 @@ namespace details {
     }
 
     template<typename Callable, typename Tuple, typename Head>
-    decltype(auto) map_tuple_append(Callable&& callable, const Tuple& tuple, const Head& value) {
-        return std::tuple_cat(tuple, std::make_tuple(callable(value)));
+    decltype(auto) map_tuple_append(Callable&& callable, Tuple&& tuple, Head&& value) {
+        return std::tuple_cat(std::forward<Tuple>(tuple), std::make_tuple(callable(std::forward<Head>(value))));
     }
 
     template<typename Callable, typename Tuple, typename Head, typename ...Tail>
-    decltype(auto) map_tuple_append(Callable&& callable, const Tuple& tuple, const Head& value, Tail&&...ts) {
-        const auto tp = std::tuple_cat(tuple, std::make_tuple(callable(value)));
-        return map_tuple_append(std::forward<Callable>(callable), std::move(tp), std::forward<Tail>(ts)...);
+    decltype(auto) map_tuple_append(Callable&& callable, Tuple&& tuple, Head&& value, Tail&&...ts) {
+        return map_tuple_append(std::forward<Callable>(callable),
+                                std::tuple_cat(std::forward<Tuple>(tuple), std::make_tuple(callable(std::forward<Head>(value)))),
+                                std::forward<Tail>(ts)...);
     }
 }
 
@@ -53,20 +54,8 @@ namespace details {
  */
 template <typename TLeft, typename TRight>
 decltype(auto) function_compose(TLeft&& lhs, TRight&& rhs) {
-    using LhsReturnType = typename yafl::function::Details<TLeft>::ReturnType;
-    if constexpr (yafl::function::Details<TLeft>::ArgCount > 0) {
-        using InputArg = typename function::Details<TLeft>::template ArgType<0>;
-        if constexpr (std::is_void_v<LhsReturnType>) {
-            return [rhs = std::forward<TRight>(rhs), lhs = std::forward<TLeft>(lhs)](InputArg&& arg) {
-                lhs(std::forward<InputArg>(arg));
-                return rhs();
-            };
-        } else {
-            return [rhs = std::forward<TRight>(rhs), lhs = std::forward<TLeft>(lhs)](InputArg&& arg) {
-                return rhs(lhs(std::forward<InputArg>(arg)));
-            };
-        }
-    } else {
+    using LhsReturnType = typename function::Details<TLeft>::ReturnType;
+    if constexpr (std::is_invocable_v<TLeft>) {
         if constexpr (std::is_void_v<LhsReturnType>) {
             return [rhs = std::forward<TRight>(rhs), lhs = std::forward<TLeft>(lhs)]() {
                 lhs();
@@ -75,6 +64,18 @@ decltype(auto) function_compose(TLeft&& lhs, TRight&& rhs) {
         } else {
             return [rhs = std::forward<TRight>(rhs), lhs = std::forward<TLeft>(lhs)]() {
                 return rhs(lhs());
+            };
+        }
+    } else {
+        using InputArg = typename function::Details<TLeft>::template ArgType<0>;
+        if constexpr (std::is_void_v<LhsReturnType>) {
+            return [rhs = std::forward<TRight>(rhs), lhs = std::forward<TLeft>(lhs)](InputArg&& arg) {
+                lhs(std::move(arg));
+                return rhs();
+            };
+        } else {
+            return [rhs = std::forward<TRight>(rhs), lhs = std::forward<TLeft>(lhs)](InputArg&& arg) {
+                return rhs(lhs(std::move(arg)));
             };
         }
     }
@@ -97,7 +98,7 @@ decltype(auto) kleisli_compose(TLeft&& lhs, TRight&& rhs) {
     static_assert(type::Details<RhsReturnType>::hasMonadicBase, "Right hand side needs to have Monadic base");
 
     return [rhs = std::forward<TRight>(rhs), lhs = std::forward<TLeft>(lhs)](const FirstArg& arg) -> RhsReturnType {
-        using LhsReturnType = typename yafl::function::Details<TLeft>::ReturnType;
+        using LhsReturnType = typename function::Details<TLeft>::ReturnType;
         const LhsReturnType intermediate_result = lhs(arg);
 
         if constexpr (std::is_void_v<typename type::Details<LhsReturnType>::ValueType>) {
@@ -130,7 +131,7 @@ decltype(auto) kleisli_compose(TLeft&& lhs, TRight&& rhs) {
  */
 template <typename TLeft, typename TRight>
 decltype(auto) compose(TLeft&& lhs, TRight&& rhs) {
-    using LhsReturnType = typename yafl::function::Details<TLeft>::ReturnType;
+    using LhsReturnType = typename function::Details<TLeft>::ReturnType;
     if constexpr (type::Details<LhsReturnType>::hasMonadicBase) {
         return kleisli_compose(std::forward<TLeft>(lhs), std::forward<TRight>(rhs));
     } else {
@@ -147,7 +148,7 @@ decltype(auto) compose(TLeft&& lhs, TRight&& rhs) {
  */
 template <typename Callable>
 decltype(auto) curry(Callable&& callable) {
-    if constexpr (std::is_invocable_v<Callable>) {
+    if constexpr (std::is_invocable_v<std::decay_t<Callable>>) {
         return callable();
     } else {
         using FirstArg = typename function::Details<Callable>::template ArgType<0>;
@@ -188,7 +189,7 @@ decltype(auto) uncurry(Callable&& callable) {
  */
 template <typename Callable, typename ...Args>
 decltype(auto) partial(Callable&& callable, Args&& ...args) {
-    if constexpr (std::is_invocable_v<Callable, Args...>) {
+        if constexpr (std::is_invocable_v<std::decay_t<Callable>, std::decay_t<Args>...>) {
         return std::invoke(callable, std::forward<Args>(args)...);
     } else {
         return [callable = std::forward<Callable>(callable), vargs = std::make_tuple(std::forward<Args>(args)...)](auto&& ...inner_args) {

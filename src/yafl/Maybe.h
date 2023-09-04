@@ -28,7 +28,7 @@ namespace yafl {
 template <typename>
 class Maybe;
 
-namespace type {
+namespace {
 
 /**
  * @ingroup Type
@@ -36,66 +36,30 @@ namespace type {
  * @tparam Inner Inner type
 */
 template<typename Inner>
-struct Details<Maybe<Inner>> {
+struct DetailsImpl<Maybe<Inner>> {
     /// Functor Base type
     using FBaseType = core::Functor<Maybe, Inner>;
     /// Applicative Base type
     using ABaseType = core::Applicative<Maybe, Inner>;
     /// Monad Base type
     using MBaseType = core::Monad<Maybe, Inner>;
-
     /// Value Type
     using ValueType = Inner;
-
     /// Derived type
     using DerivedType = Maybe<Inner>;
-
     ///boolean flag that states whether type T is a Functor or not
     static constexpr bool hasFunctorBase = std::is_base_of_v<FBaseType, DerivedType>;
     ///boolean flag that states whether type T is an Applicative or not
     static constexpr bool hasApplicativeBase = std::is_base_of_v<ABaseType, DerivedType>;
     ///boolean flag that states whether type T is a Monad or not
     static constexpr bool hasMonadicBase = std::is_base_of_v<MBaseType, DerivedType>;
-
     ///Callback responsible for handling errors
     static constexpr auto handleError = [](auto&& ...) {
         return DerivedType::Nothing();
     };
 };
 
-/**
- * @ingroup Type
- * Maybe monad traits specialization for const types that enable getting the inner type
- * @tparam Inner Inner type
- */
-template<typename Inner>
-struct Details<const Maybe<Inner>> {
-    /// Functor Base type
-    using FBaseType = core::Functor<Maybe, Inner>;
-    /// Applicative Base type
-    using ABaseType = core::Applicative<Maybe, Inner>;
-    /// Monad Base type
-    using MBaseType = core::Monad<Maybe, Inner>;
-
-    /// Value Type
-    using ValueType = Inner;
-
-    /// Derived type
-    using DerivedType = Maybe<Inner>;
-
-    ///boolean flag that states whether type T is a Functor or not
-    static constexpr bool hasFunctorBase = std::is_base_of_v<FBaseType, DerivedType>;
-    ///boolean flag that states whether type T is an Applicative or not
-    static constexpr bool hasApplicativeBase = std::is_base_of_v<ABaseType, DerivedType>;
-    ///boolean flag that states whether type T is a Monad or not
-    static constexpr bool hasMonadicBase = std::is_base_of_v<MBaseType, DerivedType>;
-
-    ///Callback responsible for handling errors
-    static constexpr auto handleError = [](auto&& ...) {
-        return DerivedType::Nothing();
-    };
-};
-} // namespace type
+} // namespace
 
 /**
  * @ingroup Maybe
@@ -180,8 +144,8 @@ public:
 private:
     template <typename Callable>
     decltype(auto) internal_bind(Callable&& callable) const {
-        static_assert(std::is_invocable_v<Callable>, "Input argument is not invocable");
-        using ReturnType = std::remove_reference_t<std::invoke_result_t<Callable>>;
+        static_assert(std::is_invocable_v<std::decay_t<Callable>>, "Input argument is not invocable");
+        using ReturnType = std::remove_reference_t<std::invoke_result_t<std::decay_t<Callable>>>;
         if (hasValue()) {
             return std::invoke<Callable>(std::forward<Callable>(callable));
         } else {
@@ -191,8 +155,8 @@ private:
 
     template <typename Callable>
     decltype(auto) internal_fmap(Callable&& callable) const {
-        static_assert(std::is_invocable_v<Callable>, "Input argument is not invocable");
-        using ReturnType = std::remove_reference_t<std::invoke_result_t<Callable>>;
+        static_assert(std::is_invocable_v<std::decay_t<Callable>>, "Input argument is not invocable");
+        using ReturnType = std::remove_reference_t<std::invoke_result_t<std::decay_t<Callable>>>;
         if (hasValue()) {
             if constexpr (std::is_void_v<ReturnType>) {
                 std::invoke<Callable>(std::forward<Callable>(callable));
@@ -316,8 +280,8 @@ public:
 private:
     template <typename Callable>
     decltype(auto) internal_bind(Callable&& callable) const {
-        static_assert(std::is_invocable_v<Callable, T>, "Input argument is not invocable");
-        using ReturnType = std::remove_reference_t<std::invoke_result_t<Callable, T>>;
+        static_assert(std::is_invocable_v<std::decay_t<Callable>, std::decay_t<T>>, "Input argument is not invocable");
+        using ReturnType = std::remove_reference_t<std::invoke_result_t<std::decay_t<Callable>, std::decay_t<T>>>;
         if (hasValue()) {
             return std::invoke<Callable>(std::forward<Callable>(callable), value());
         } else {
@@ -327,8 +291,8 @@ private:
 
     template <typename Callable>
     decltype(auto) internal_fmap(Callable&& callable) const {
-        static_assert(std::is_invocable_v<Callable, T>, "Input argument is not invocable");
-        using ReturnType = std::remove_reference_t<std::invoke_result_t<Callable, T>>;
+        static_assert(std::is_invocable_v<std::decay_t<Callable>, std::decay_t<T>>, "Input argument is not invocable");
+        using ReturnType = std::remove_reference_t<std::invoke_result_t<std::decay_t<Callable>, std::decay_t<T>>>;
         if (hasValue()) {
             if constexpr (std::is_void_v<ReturnType>) {
                 std::invoke<Callable>(std::forward<Callable>(callable), value());
@@ -343,16 +307,18 @@ private:
 
     template <typename Arg>
     decltype(auto) internal_apply(Arg&& arg) const {
-        static_assert(!std::is_invocable_v<T>, "Function that takes 0 arguments cannot be called with arguments");
-        if constexpr (type::Details<yafl::function::remove_cvref_t<Arg>>::hasMonadicBase) {
+        static_assert(!std::is_invocable_v<std::decay_t<T>>, "Function that takes 0 arguments cannot be called with arguments");
+        if constexpr (type::Details<Arg>::hasMonadicBase) {
             if (arg.hasValue()) {
                 return internal_apply_non_monad(arg.value());
             } else {
-                using ArgInnerType = yafl::function::remove_cvref_t<typename yafl::type::Details<yafl::function::remove_cvref_t<Arg>>::ValueType>;
-                if constexpr (std::is_invocable_v<T, ArgInnerType>) {
-                    return Maybe<std::invoke_result_t<T, ArgInnerType>>::Nothing();
+                using ArgInnerType = std::remove_reference_t<typename type::Details<Arg>::ValueType>;
+                if constexpr (std::is_invocable_v<std::decay_t<T>, std::decay_t<ArgInnerType>>) {
+                    using ReturnType = std::remove_reference_t<std::invoke_result_t<std::decay_t<T>, std::decay_t<ArgInnerType>>>;
+                    return Maybe<ReturnType>::Nothing();
                 } else {
-                    return Maybe<typename function::Details<T>::PartialApplyFirst>::Nothing();
+                    using ReturnType = std::remove_reference_t<typename function::Details<T>::PartialApplyFirst>;
+                    return Maybe<ReturnType>::Nothing();
                 }
             }
         } else {
@@ -362,9 +328,9 @@ private:
 
     template<typename Arg>
     decltype(auto) internal_apply_non_monad(Arg&& arg) const {
-        static_assert(!std::is_invocable_v<T>, "Function that takes 0 arguments cannot be called with arguments");
-        if constexpr (std::is_invocable_v<T, function::remove_cvref_t<Arg>>) {
-            using ReturnType = function::remove_cvref_t<std::invoke_result_t<T, function::remove_cvref_t<Arg>>>;
+        static_assert(!std::is_invocable_v<std::decay_t<T>>, "Function that takes 0 arguments cannot be called with arguments");
+        if constexpr (std::is_invocable_v<std::decay_t<T>, std::decay_t<Arg>>) {
+            using ReturnType = std::remove_reference_t<std::invoke_result_t<std::decay_t<T>, std::decay_t<Arg>>>;
             if (!hasValue()) {
                 return Maybe<ReturnType>::Nothing();
             } else {
@@ -376,7 +342,7 @@ private:
                 }
             }
         } else {
-            using PartialFunctionType = typename function::Details<T>::PartialApplyFirst;
+            using PartialFunctionType = std::remove_reference_t<typename function::Details<T>::PartialApplyFirst>;
 
             if (hasValue()) {
                 return Maybe<PartialFunctionType>::Just(
@@ -390,7 +356,7 @@ private:
     }
 
     decltype(auto) internal_apply() const {
-        using ReturnType = std::remove_reference_t<std::invoke_result_t<T>>;
+        using ReturnType = std::remove_reference_t<std::invoke_result_t<std::decay_t<T>>>;
         if (!hasValue()) {
             return Maybe<ReturnType>::Nothing();
         } else {
@@ -450,8 +416,8 @@ Maybe<std::remove_reference_t<ValueType>> Just(ValueType&& args) {
  */
 template<typename Callable>
 decltype(auto) lift(Callable &&callable) {
-    if constexpr (std::is_invocable_v<Callable>) {
-        using ReturnType = std::remove_reference_t<std::invoke_result_t<Callable>>;
+    if constexpr (std::is_invocable_v<std::decay_t<Callable>>) {
+        using ReturnType = std::remove_reference_t<std::invoke_result_t<std::decay_t<Callable>>>;
         if constexpr (std::is_void_v<ReturnType>) {
             return [callable = std::forward<Callable>(callable)]() {
                 callable();
@@ -463,8 +429,8 @@ decltype(auto) lift(Callable &&callable) {
             };
         }
     } else {
-        using ReturnType = typename yafl::function::Details<Callable>::ReturnType;
-        using ReturnFunctionType =  typename yafl::function::Details<Callable>::template LiftedSignature<yafl::Maybe>;
+        using ReturnType = typename function::Details<Callable>::ReturnType;
+        using ReturnFunctionType = typename function::Details<Callable>::template LiftedSignature<Maybe>;
 
         const ReturnFunctionType function = [callable = std::forward<Callable>(callable)](auto&& ...args) -> Maybe<ReturnType> {
             if (details::all_true([](auto&& v) { return v.hasValue(); }, args...)) {

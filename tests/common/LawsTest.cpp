@@ -48,9 +48,9 @@ TEST(LawsTest, validatePartialApplication) {
 
     ASSERT_EQ(result, 42);
 
-    const auto partial_2arg_app = yafl::partial(f, 1, 2);
+    const std::function<int(float f, const std::string&, const Xpto&)> partial_2arg_app = yafl::partial(f, 1, 2);
     // Here we need to explicitly declare the correct type
-    const auto partial_4arg_app = yafl::partial<std::function<int(float f, const std::string&, const Xpto&)>>(partial_2arg_app, 3.14, "");
+    const auto partial_4arg_app = yafl::partial(partial_2arg_app, 3.14, "");
     const auto result2 = partial_4arg_app(Xpto{""});
     ASSERT_EQ(result2, 42);
 }

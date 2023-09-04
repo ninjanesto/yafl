@@ -15,14 +15,6 @@ namespace yafl {
 
 namespace function {
 
-/**
- * @ingroup Function
- * Remove const volatile reference from input argument type T
- * @tparam T
- */
-template<typename T>
-using remove_cvref_t = typename std::remove_cv_t<std::remove_reference_t<T>>;
-
 namespace {
 
 /**
@@ -47,13 +39,13 @@ struct TraitDetails<Ret, FirstArg, Args...> {
     using Signature = std::function<Ret(FirstArg, Args...)>;
     ///Function Signature lifted to TLift
     template<template<typename...> typename TLift>
-    using LiftedSignature = std::function<TLift<Ret>(const TLift<remove_cvref_t<FirstArg>>&, const TLift<remove_cvref_t<Args>>&...)>;
+    using LiftedSignature = std::function<TLift<Ret>(const TLift<std::decay_t<FirstArg>>&, const TLift<std::decay_t<Args>>&...)>;
     ///Function Signature after applying first argument
     using PartialApplyFirst = std::function<Ret(Args...)>;
     ///Return type
     using ReturnType = Ret;
     ///Function argument types, provided in a tuple
-    using ArgTypes = std::tuple<remove_cvref_t<FirstArg>, remove_cvref_t<Args>...>;
+    using ArgTypes = std::tuple<std::decay_t<FirstArg>, std::decay_t<Args>...>;
     ///Number of arguments
     static constexpr std::size_t ArgCount = sizeof...(Args) + 1;
     ///Getter for argument with ID idx
@@ -115,7 +107,7 @@ struct Traits<std::function<Ret (*)(Args...)>> : function::TraitDetails<Ret, Arg
  * @tparam Callable Callable type to inspect
  */
 template<typename Callable>
-struct Details : function::Traits<decltype(std::function{std::declval<function::remove_cvref_t<Callable>>()})> {};
+struct Details : function::Traits<decltype(std::function{std::declval<std::decay_t<Callable>>()})> {};
 
 /**
  * @ingroup Function
@@ -128,6 +120,23 @@ struct Details<std::function<Ret(Args...)>> : function::Traits<std::function<Ret
 
 } // namespace function
 
+namespace {
+
+template<typename>
+struct DetailsImpl {
+    ///boolean flag that states whether type T is a Functor or not
+    static constexpr bool hasFunctorBase = false;
+    ///boolean flag that states whether type T is a Applicative or not
+    static constexpr bool hasApplicativeBase = false;
+    ///boolean flag that states whether type T is a Monad or not
+    static constexpr bool hasMonadicBase = false;
+};
+}
+
+/**
+ * @ingroup Type
+ * Yafl Type traits
+ */
 namespace type {
 
 /**
@@ -140,18 +149,11 @@ template<typename T>
 struct WhatIsThis;
 
 /**
- * @ingroup Type
- * Yafl Type traits
+ * Type details for Yafl types
+ * @tparam T
  */
-template<typename>
-struct Details {
-    ///boolean flag that states whether type T is a Functor or not
-    static constexpr bool hasFunctorBase = false;
-    ///boolean flag that states whether type T is a Applicative or not
-    static constexpr bool hasApplicativeBase = false;
-    ///boolean flag that states whether type T is a Monad or not
-    static constexpr bool hasMonadicBase = false;
-};
+template<typename T>
+struct Details : public DetailsImpl<std::decay_t<T>>{};
 
 /**
  * @ingroup Type
@@ -166,9 +168,8 @@ private:
 
     template <typename>
     static auto test(...) -> std::false_type;
-
 public:
-    static constexpr bool value = decltype(test<T>(0))::value;
+    static constexpr bool value = decltype(test<std::decay_t<T>>(0))::value;
 };
 
 /**
@@ -185,9 +186,8 @@ private:
 
     template <typename C, typename... A>
     static std::false_type test(...);
-
 public:
-    static constexpr bool value = decltype(test<Callable, Args...>(0))::value;
+    static constexpr bool value = decltype(test<std::decay_t<Callable>, Args...>(0))::value;
 };
 
 } // namespace type
