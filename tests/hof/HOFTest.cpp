@@ -56,25 +56,20 @@ TEST(HOFTest, validate_compose_id) {
 
 TEST(HOFTest, validate_compose_constf) {
     {
-        const auto f1 = [](int i) { return 2 * i;};
-        const auto ff = curry(constf<int, int>);
-        const auto f = compose(ff(42), f1);
-        ASSERT_EQ(f(42), 84);
+        const auto ff = constf(42);
+        ASSERT_EQ(ff(), 42);
+        ASSERT_EQ(ff(1), 42);
+        ASSERT_EQ(ff(1,2,3), 42);
     }
     {
         const auto f1 = [](int i) { return 2 * i;};
-        const std::function<int(int)> ff = constf<int>(42);
-        const auto f = compose(ff, f1);
+        const auto ff = constf(42);
+        const auto f = compose<std::function<int(int)>>(ff, f1);
         ASSERT_EQ(f(123), 84);
     }
     {
-        const auto f1 = [](const std::string&) { return 42;};
-        const auto f = compose(f1, curry(constf<int, int>));
-        ASSERT_EQ(f("2")(2), 42);
-    }
-    {
         const auto f1 = [](const std::string& ) { return 24;};
-        const auto f = compose(f1, constf<int>(42));
+        const auto f = compose(f1, constf(42));
         ASSERT_EQ(f("2"), 42);
     }
 }

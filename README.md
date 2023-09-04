@@ -27,18 +27,16 @@ Function composition is a mechanism that combines simple functions to build more
 Is an operation that takes two functions as arguments and returns a new function where th result of each function is passed as the argument of the next, and the result of the last one is the result of the whole.
 
 ```c++
-{
-    struct Xpto { std::string value; };
+struct Xpto { std::string value; };
 
-    const auto f1 =[](int i) { return i*42;};
-    const auto f2 =[](int i) { return std::to_string(i);};
-    const auto f3 =[](const std::string& s) { return Xpto{ s };};
-    
-    const auto comp_f1_f2 = yafl::compose(f1, f2);
-    //Here we need to explicitly use the correct type
-    const auto threeway = yafl::compose<std::function<std::string(int)>>(comp_f1_f2, f3);
-    std::cout << threeway(1).value << std::endl;
-}
+const auto f1 =[](int i) { return i*42;};
+const auto f2 =[](int i) { return std::to_string(i);};
+const auto f3 =[](const std::string& s) { return Xpto{ s };};
+
+const auto comp_f1_f2 = yafl::compose(f1, f2);
+//Here we need to explicitly use the correct type
+const auto threeway = yafl::compose<std::function<std::string(int)>>(comp_f1_f2, f3);
+std::cout << threeway(1).value << std::endl;
 ```
 
 In mathmatics, function composition is associative. 
@@ -48,36 +46,34 @@ f . (g . h) = (f . g) . h
 The above example is implemented following left associativity.
 We can implement the above example expressing right associativity. Note that in this example there's no need to explicitly declare the function type
 ```c++
-{
-    struct Xpto { std::string value; };
+struct Xpto { std::string value; };
 
-    const auto f1 =[](int i) { return i*42;};
-    const auto f2 =[](int i) { return std::to_string(i);};
-    const auto f3 =[](const std::string& s) { return Xpto{ s };};
-    
-    const auto comp_f2_f3 = yafl::compose(f2, f3);
-    const auto threeway = yafl::compose(f1, comp_f2_f3);
-    std::cout << threeway(1).value << std::endl;
-}
+const auto f1 =[](int i) { return i*42;};
+const auto f2 =[](int i) { return std::to_string(i);};
+const auto f3 =[](const std::string& s) { return Xpto{ s };};
+
+const auto comp_f2_f3 = yafl::compose(f2, f3);
+const auto threeway = yafl::compose(f1, comp_f2_f3);
+std::cout << threeway(1).value << std::endl;
 ```
 
 #### Partial Function Application
 Partial application (or partial function application) refers to the process of fixing a number of arguments to a function, producing another function of smaller arity (less input arguments).
 
 ```c++
-    struct Xpto { std::string value;};
+struct Xpto { std::string value;};
 
-    const auto f = [](int i, int j, float f, const std::string& s, const Xpto& x) {return 42;};
+const auto f = [](int i, int j, float f, const std::string& s, const Xpto& x) {return 42;};
 
-    const auto partial_3arg_app = yafl::partial(f, 1, 2, 3.14);
-    const auto result = partial_3arg_app("s", Xpto{""});
-    std::cout << result << std::endl;
+const auto partial_3arg_app = yafl::partial(f, 1, 2, 3.14);
+const auto result = partial_3arg_app("s", Xpto{""});
+std::cout << result << std::endl;
 
-    const auto partial_2arg_app = yafl::partial(f, 1, 2);
-    // Here we need to explicitly declare the correct type
-    const auto partial_4arg_app = yafl::partial<std::function<int(float f, const std::string&, const Xpto&)>>(partial_2arg_app, 3.14, "");
-    const auto result2 = partial_4arg_app(Xpto{""});
-    std::cout << result2 << std::endl;
+const auto partial_2arg_app = yafl::partial(f, 1, 2);
+// Here we need to explicitly declare the correct type
+const auto partial_4arg_app = yafl::partial<std::function<int(float f, const std::string&, const Xpto&)>>(partial_2arg_app, 3.14, "");
+const auto result2 = partial_4arg_app(Xpto{""});
+std::cout << result2 << std::endl;
 ```
 
 #### Currying / Uncurrying
@@ -111,10 +107,19 @@ uncurried_function1(1, 2, 3, 4);
 ```
 
 #### Identity and Const functions
-
+The identity function always returns the value that was used as its argument, unchanged.
+The const function returns a function that may receive 0 or more arguments but will always evaluate to the value configured when it was invoked
 ```c++
+//v is 42
+const auto v = yafl::id(42);
 
+const auto ff = yafl::constf(42);
+// all the following invocations will evaluate to 42
+ff();
+ff("");
+ff(1,"",3);
 ```
+
 ## Functor, Applicative Functor and Monad
 ### Maybe monad
 

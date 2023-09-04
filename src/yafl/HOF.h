@@ -198,27 +198,12 @@ Arg id(const Arg& arg) {
  * @ingroup HOF
  * Function that always evaluates to the first argument, ignoring its second argument.
  * @tparam First Type of argument
- * @tparam Second Type of argument
- * @param first argument
- * @param second argument
- * @return Returns the first argument
- */
-template<typename First, typename Second>
-First constf(const First& first, const Second& second) {
-    std::ignore = second;
-    return first;
-}
-
-/**
- * @ingroup HOF
- * Function that always evaluates to the first argument, ignoring its second argument.
- * @tparam First Type of argument
  * @param first argument
  * @return Returns a function that always returns the configured first argument
  */
 template<typename First>
 decltype(auto) constf(First&& first) {
-    return [first = std::forward<First>(first)](auto&&) {
+    return [first = std::forward<First>(first)](auto&& ...) {
         return first;
     };
 }
