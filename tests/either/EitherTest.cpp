@@ -172,7 +172,7 @@ TYPED_TEST(EitherTest, assertFmapComputesCorrectType) {
             ASSERT_TRUE(resultType.isOk());
             constexpr const auto areSameType = std::is_same_v<std::string, decltype(resultType.value())>;
             ASSERT_TRUE(areSameType);
-
+            ASSERT_EQ(resultType.value(), "42");
         }
     } else {
         {
@@ -196,6 +196,7 @@ TYPED_TEST(EitherTest, assertFmapComputesCorrectType) {
             const auto resultType = either.fmap([](const typename TypeParam::Ok&){return std::to_string(42);});
             constexpr const auto areSameType = std::is_same_v<std::string, decltype(resultType.value())>;
             ASSERT_TRUE(areSameType);
+            ASSERT_EQ(resultType.value(), "42");
         }
     }
 
@@ -283,6 +284,7 @@ TYPED_TEST(EitherTest, assertBindComputesCorrectType) {
             const auto either = createOk<typename TypeParam::Error, void>();
             const auto resultError = either.bind([]() { return either::Error<typename TypeParam::Error, void>(42); });
             ASSERT_TRUE(resultError.isError());
+            ASSERT_EQ(resultError.error(), 42);
         }
         {
             const auto either = createError<typename TypeParam::Error, void>();
@@ -293,6 +295,7 @@ TYPED_TEST(EitherTest, assertBindComputesCorrectType) {
             const auto either = createError<typename TypeParam::Error, void>();
             const auto resultError = either.bind([]() { return either::Error<typename TypeParam::Error, void>(42); });
             ASSERT_TRUE(resultError.isError());
+            ASSERT_EQ(resultError.error(), 0);
         }
     }
 
@@ -303,6 +306,7 @@ TYPED_TEST(EitherTest, assertBindComputesCorrectType) {
             ASSERT_TRUE(resultOk.isOk());
             constexpr const auto areSameType = std::is_same_v<std::string, decltype(resultOk.value())>;
             ASSERT_TRUE(areSameType);
+            ASSERT_EQ(resultOk.value(), "42");
         }
         {
             const auto either = createOk<void, typename TypeParam::Ok>();
@@ -310,6 +314,7 @@ TYPED_TEST(EitherTest, assertBindComputesCorrectType) {
             ASSERT_TRUE(resultOk.isOk());
             constexpr const auto areSameType = std::is_same_v<std::string, decltype(resultOk.value())>;
             ASSERT_TRUE(areSameType);
+            ASSERT_EQ(resultOk.value(), "42");
         }
         {
             const auto either = createOk<void, typename TypeParam::Ok>();
@@ -318,6 +323,7 @@ TYPED_TEST(EitherTest, assertBindComputesCorrectType) {
             ASSERT_TRUE(resultOk.isOk());
             constexpr const auto areSameType = std::is_same_v<std::string, decltype(resultOk.value())>;
             ASSERT_TRUE(areSameType);
+            ASSERT_EQ(resultOk.value(), "42");
         }
         {
             const auto either = createOk<void, typename TypeParam::Ok>();
@@ -364,6 +370,7 @@ TYPED_TEST(EitherTest, assertBindComputesCorrectType) {
             ASSERT_TRUE(resultOk.isOk());
             constexpr const auto areSameType = std::is_same_v<std::string, decltype(resultOk.value())>;
             ASSERT_TRUE(areSameType);
+            ASSERT_EQ(resultOk.value(), "42");
         }
         {
             const auto either = createOk<typename TypeParam::Error, typename TypeParam::Ok>();
@@ -371,6 +378,7 @@ TYPED_TEST(EitherTest, assertBindComputesCorrectType) {
             ASSERT_TRUE(resultError.isError());
             constexpr const auto areSameType = std::is_same_v<std::string, decltype(resultError.value())>;
             ASSERT_TRUE(areSameType);
+            ASSERT_EQ(resultError.error(), 29);
         }
         {
             const auto either = createError<typename TypeParam::Error, typename TypeParam::Ok>();
@@ -378,14 +386,15 @@ TYPED_TEST(EitherTest, assertBindComputesCorrectType) {
             ASSERT_TRUE(resultError.isError());
             constexpr const auto areSameType = std::is_same_v<std::string, decltype(resultError.value())>;
             ASSERT_TRUE(areSameType);
+            ASSERT_EQ(resultError.error(), 0);
         }
         {
             const auto either = createError<typename TypeParam::Error, typename TypeParam::Ok>();
-            const auto resultError = either.bind([](const typename TypeParam::Ok &) { return either::Error<typename TypeParam::Error, std::string>(29);
-            });
+            const auto resultError = either.bind([](const typename TypeParam::Ok &) { return either::Error<typename TypeParam::Error, std::string>(29); });
             ASSERT_TRUE(resultError.isError());
             constexpr const auto areSameType = std::is_same_v<std::string, decltype(resultError.value())>;
             ASSERT_TRUE(areSameType);
+            ASSERT_EQ(resultError.error(), 0);
         }
     }
 }
@@ -828,6 +837,16 @@ TEST(EitherTest, validate_lift) {
         ASSERT_FALSE(result2.isOk());
     }
     {
+        const auto funcOneArgRetInt = [](int i) { return 42 * i;};
+        const auto lifted = yafl::either::lift<int>(funcOneArgRetInt);
+        const auto result = lifted(either::Ok<int>(1));
+        ASSERT_TRUE(result.isOk());
+        ASSERT_EQ(result.value(), 42);
+        const auto result2 = lifted(either::Error<int, int>(29));
+        ASSERT_FALSE(result2.isOk());
+        ASSERT_EQ(result2.error(), 29);
+    }
+    {
         const auto funcMultiArgRetVoid = [](int, float, const std::string&) { return;};
         const auto lifted = yafl::either::lift(funcMultiArgRetVoid);
         const auto result = lifted(either::Ok<void>(2), either::Ok<void, float>(4.2f), either::Ok<void, std::string>("dummy"));
@@ -851,5 +870,27 @@ TEST(EitherTest, validate_lift) {
         ASSERT_FALSE(result3.isOk());
         const auto result4 = lifted(either::Ok<void>(1), either::Ok<void, int>(4), either::Error<void, std::string>());
         ASSERT_FALSE(result4.isOk());
+    }
+    {
+        const auto funcMultiArgRetString = [](int i, int j, const std::string& s) { return s + std::to_string(i + j);};
+        const auto lifted = yafl::either::lift<int>(funcMultiArgRetString);
+        const auto result = lifted(either::Ok<int>(2), either::Ok<int>(4), either::Ok<int, std::string>("dummy"));
+        ASSERT_TRUE(result.isOk());
+        ASSERT_EQ(result.value(), "dummy6");
+        const auto result2 = lifted(either::Error<int, int>(29), either::Ok<int, int>(4), either::Ok<int, std::string>("dummy"));
+        ASSERT_FALSE(result2.isOk());
+        ASSERT_EQ(result2.error(), 29);
+        const auto result3 = lifted(either::Ok<int>(1), either::Error<int, int>(32), either::Ok<int, std::string>("dummy"));
+        ASSERT_FALSE(result3.isOk());
+        ASSERT_EQ(result3.error(), 32);
+        const auto result4 = lifted(either::Ok<int>(1), either::Ok<int, int>(4), either::Error<int, std::string>(12));
+        ASSERT_FALSE(result4.isOk());
+        ASSERT_EQ(result4.error(), 12);
+        const auto result5 = lifted(either::Ok<int>(1), either::Error<int, int>(29), either::Error<int, std::string>(29));
+        ASSERT_FALSE(result5.isOk());
+        ASSERT_EQ(result5.error(), 29);
+        const auto result6 = lifted(either::Error<int, int>(1), either::Error<int, int>(29), either::Error<int, std::string>(29));
+        ASSERT_FALSE(result6.isOk());
+        ASSERT_EQ(result6.error(), 1);
     }
 }

@@ -902,45 +902,66 @@ template<typename ErrorType, typename ValueType>
 std::enable_if_t<std::is_void_v<ErrorType> && !std::is_void_v<ValueType>, Either<void, ValueType>>
 Error() { return Either<void, ValueType>::Error(); }
 
+
+namespace details {
+    template<typename ErrorType, typename Head>
+    ErrorType getFailedValue(const Head& head) {
+        return head.error();
+    }
+
+    template<typename ErrorType, typename Head, typename ...Tail>
+    ErrorType getFailedValue(const Head& head, Tail&& ...tail) {
+        if (head.isError()) {
+            return head.error();
+        } else {
+            return getFailedValue<ErrorType>(std::forward<Tail>(tail)...);
+        }
+    }
+}
+
+
 /**
  * @ingroup Either
- * Lift given callable into the given abstract monadic type
- * @tparam MonadType Abstract type to lift function to
+ * Lift given callable into the Either monad realm
+ * @tparam ErrorType Type of Error
  * @tparam Callable Callable type to lift
  * @param callable Callable to lift
- * @return callable lifted into the given abstract monadic type
+ * @return callable lifted into the Either monad realm
  */
-template<typename Callable>
+template<typename ErrorType = void, typename Callable>
 decltype(auto) lift(Callable&& callable) {
     if constexpr (std::is_invocable_v<Callable>) {
         using ReturnType = std::remove_reference_t<std::invoke_result_t<Callable>>;
         if constexpr (std::is_void_v<ReturnType>) {
             return [callable = std::forward<Callable>(callable)](){
                 callable();
-                return Either<void, ReturnType>::Ok();
+                return Either<ErrorType, ReturnType>::Ok();
             };
         } else {
             return [callable = std::forward<Callable>(callable)](){
-                return Either<void, ReturnType>::Ok(callable());
+                return Either<ErrorType, ReturnType>::Ok(callable());
             };
         }
     } else {
         using ReturnType = typename function::Info<Callable>::ReturnType;
-        using FixedErrorType = typename type::FixedErrorType<void>;
+        using FixedErrorType = typename type::FixedErrorType<ErrorType>;
         using ReturnFunctionType = typename function::Info<Callable>::template LiftedSignature<FixedErrorType::template Type>;
 
-        const ReturnFunctionType function =  [callable = std::forward<Callable>(callable)](auto ...args) -> Either<void, ReturnType> {
-            if (all_true([](auto&& v){ return v.isOk();}, args...)) {
+        const ReturnFunctionType function =  [callable = std::forward<Callable>(callable)](auto&& ...args) -> Either<ErrorType, ReturnType> {
+            if (all_true([](const auto& v){ return v.isOk();}, args...)) {
                 const auto tp = tuple::map_append([](auto&& arg){ return arg.value();}, std::make_tuple(), args...);
-
                 if constexpr (std::is_void_v<ReturnType>) {
                     std::apply(callable, tp);
-                    return Either<void, ReturnType>::Ok();
+                    return Either<ErrorType, ReturnType>::Ok();
                 } else {
-                    return Either<void, ReturnType>::Ok(std::apply(callable, tp));
+                    return Either<ErrorType, ReturnType>::Ok(std::apply(callable, tp));
                 }
             } else {
-                return Either<void, ReturnType>::Error();
+                if constexpr (std::is_void_v<ErrorType>) {
+                    return Either<ErrorType, ReturnType>::Error();
+                } else {
+                    return Either<ErrorType, ReturnType>::Error(details::getFailedValue<ErrorType>(args...));
+                }
             }
         };
 

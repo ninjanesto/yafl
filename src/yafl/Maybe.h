@@ -409,10 +409,10 @@ Maybe<std::remove_reference_t<ValueType>> Just(ValueType&& args) {
 
 /**
  * @ingroup Maybe
- * Lift given callable into the given abstract monadic type
+ * Lift given callable into Maybe monad realm
  * @tparam Callable Callable type to lift
  * @param callable Callable to lift
- * @return callable lifted into the given abstract monadic type
+ * @return callable lifted into into Maybe monad realm
  */
 template<typename Callable>
 decltype(auto) lift(Callable &&callable) {

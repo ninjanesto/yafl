@@ -426,7 +426,46 @@ It provides a structured way to handle errors, compose computations, and ensure 
 - Improved Readability: Makes code more readable by explicitly handling success and failure cases.
 
 ### Function lift
-TODO
+Lifting is a technique in functional programming that involves transforming regular functions into functions 
+that can operate on values wrapped within special types, such as our Maybe or Either types. 
+
+Function lifting is a fundamental concept in functional programming, allowing one to work with values in a more 
+expressive and safe manner within the context of these functors/monads. 
+It helps one avoid explicitly handling null values (Maybe) or error propagation (Either) by encapsulating 
+such behavior within the functor/monad itself.
+
+We provide a function lift, within namespace maybe, that lifts the provided function into the Maybe monad realm.
+#### Maybe Lift:
+```c++
+const auto funcOneArgRetInt = [](int i) { return 42 * i;};
+const auto liftedFunction = maybe::lift(funcOneArgRetInt);
+const auto result = liftedFunction(maybe::Just(1));
+const auto result2 = lifted(maybe::Nothing<int>());
+
+const auto funcMultiArgRetString = [](int i, int j, const std::string& s) { return s + std::to_string(i + j);};
+const auto liftedFunctionMArg = maybe::lift(funcMultiArgRetString);
+const auto result  = liftedFunctionMArg(maybe::Just(2), maybe::Just(4), maybe::Just<std::string>("dummy"));
+const auto result2 = liftedFunctionMArg(maybe::Nothing<int>(), maybe::Just<int>(4), maybe::Just<std::string>("dummy"));
+const auto result3 = liftedFunctionMArg(maybe::Just(1), maybe::Nothing<int>(), maybe::Just<std::string>("dummy"));
+const auto result4 = liftedFunctionMArg(maybe::Just(1), maybe::Just<int>(4), maybe::Nothing<std::string>());
+```
+
+We provide a function lift, within namespace either, that lifts the provided function into the Either monad realm.
+In this case one needs to explicitly specify the Error type since it cannot be deduced.
+#### Either Lift:
+```c++
+const auto funcOneArgRetInt = [](int i) { return 42 * i;};
+const auto liftedFunc_voiderror = yafl::either::lift(funcOneArgRetInt);
+const auto result = liftedFunc_voiderror(either::Ok<void>(1));
+const auto result_witherror = liftedFunc_voiderror(either::Nothing<void>());
+
+const auto liftedFunc_interror = yafl::either::lift<int>(funcOneArgRetInt);
+const auto result = liftedFunc_interror(either::Ok<int>(1));
+
+const auto funcMultiArgRetString = [](int i, int j, const std::string& s) { return s + std::to_string(i + j);};
+const auto liftedFuncMArg = yafl::either::lift<int>(funcMultiArgRetString);
+const auto result = liftedFuncMArg(either::Ok<int>(2), either::Ok<int>(4), either::Ok<int, std::string>("dummy"));
+```
 
 ## Build
 Currently, YAFL supports CMake and Bazel build tools
@@ -486,7 +525,6 @@ Usage: `./ACC <-e|-d> <seed> <filename>`
 Note: Seed can be a value between 0 and 255
 
 ## Future
- - Function Lift documentation
  - Add BiFunctor implementation to Either type
  - Add other monads (Reader, Writer, State, Continuation, ...)
  - Bazel input flags and install targets
