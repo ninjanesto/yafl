@@ -653,46 +653,67 @@ $(document).ready(function(){initNavTree('Either_8h_source.html',''); initResiza
 <div class="line"><a name="l00902"></a><span class="lineno">  902</span>&#160;std::enable_if_t&lt;std::is_void_v&lt;ErrorType&gt; &amp;&amp; !std::is_void_v&lt;ValueType&gt;, Either&lt;void, ValueType&gt;&gt;</div>
 <div class="line"><a name="l00903"></a><span class="lineno">  903</span>&#160;<a class="code" href="group__Either.html#ga03578d8a8cc49afc90bb0edcc2d3defb">Error</a>() { <span class="keywordflow">return</span> <a class="code" href="group__Either.html#abfa4933b50fe5e8ab7bf27bdb0553841">Either&lt;void, ValueType&gt;::Error</a>(); }</div>
 <div class="line"><a name="l00904"></a><span class="lineno">  904</span>&#160; </div>
-<div class="line"><a name="l00913"></a><span class="lineno">  913</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> Callable&gt;</div>
-<div class="line"><a name="l00914"></a><span class="lineno"><a class="line" href="group__Either.html#gafc79279c000bef41fd79dd20c4681012">  914</a></span>&#160;decltype(<span class="keyword">auto</span>) <a class="code" href="group__Either.html#gafc79279c000bef41fd79dd20c4681012">lift</a>(Callable&amp;&amp; callable) {</div>
-<div class="line"><a name="l00915"></a><span class="lineno">  915</span>&#160;    <span class="keywordflow">if</span> constexpr (std::is_invocable_v&lt;Callable&gt;) {</div>
-<div class="line"><a name="l00916"></a><span class="lineno">  916</span>&#160;        <span class="keyword">using</span> ReturnType = std::remove_reference_t&lt;std::invoke_result_t&lt;Callable&gt;&gt;;</div>
-<div class="line"><a name="l00917"></a><span class="lineno">  917</span>&#160;        <span class="keywordflow">if</span> constexpr (std::is_void_v&lt;ReturnType&gt;) {</div>
-<div class="line"><a name="l00918"></a><span class="lineno">  918</span>&#160;            <span class="keywordflow">return</span> [callable = std::forward&lt;Callable&gt;(callable)](){</div>
-<div class="line"><a name="l00919"></a><span class="lineno">  919</span>&#160;                callable();</div>
-<div class="line"><a name="l00920"></a><span class="lineno">  920</span>&#160;                <span class="keywordflow">return</span> <a class="code" href="group__Either.html#a19b394d2b00fdcde9fa6bc9aac23223a">Either&lt;void, ReturnType&gt;::Ok</a>();</div>
-<div class="line"><a name="l00921"></a><span class="lineno">  921</span>&#160;            };</div>
-<div class="line"><a name="l00922"></a><span class="lineno">  922</span>&#160;        } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00923"></a><span class="lineno">  923</span>&#160;            <span class="keywordflow">return</span> [callable = std::forward&lt;Callable&gt;(callable)](){</div>
-<div class="line"><a name="l00924"></a><span class="lineno">  924</span>&#160;                <span class="keywordflow">return</span> <a class="code" href="group__Either.html#a19b394d2b00fdcde9fa6bc9aac23223a">Either&lt;void, ReturnType&gt;::Ok</a>(callable());</div>
-<div class="line"><a name="l00925"></a><span class="lineno">  925</span>&#160;            };</div>
-<div class="line"><a name="l00926"></a><span class="lineno">  926</span>&#160;        }</div>
-<div class="line"><a name="l00927"></a><span class="lineno">  927</span>&#160;    } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00928"></a><span class="lineno">  928</span>&#160;        <span class="keyword">using</span> ReturnType = <span class="keyword">typename</span> <a class="code" href="group__Function.html#structyafl_1_1function_1_1Info">function::Info&lt;Callable&gt;::ReturnType</a>;</div>
-<div class="line"><a name="l00929"></a><span class="lineno">  929</span>&#160;        <span class="keyword">using</span> FixedErrorType = <span class="keyword">typename</span> <a class="code" href="structyafl_1_1type_1_1FixedErrorType.html">type::FixedErrorType&lt;void&gt;</a>;</div>
-<div class="line"><a name="l00930"></a><span class="lineno">  930</span>&#160;        <span class="keyword">using</span> ReturnFunctionType = <span class="keyword">typename</span> <a class="code" href="group__Function.html#structyafl_1_1function_1_1Info">function::Info&lt;Callable&gt;::template</a> LiftedSignature&lt;FixedErrorType::template Type&gt;;</div>
-<div class="line"><a name="l00931"></a><span class="lineno">  931</span>&#160; </div>
-<div class="line"><a name="l00932"></a><span class="lineno">  932</span>&#160;        <span class="keyword">const</span> ReturnFunctionType <span class="keyword">function</span> =  [callable = std::forward&lt;Callable&gt;(callable)](<span class="keyword">auto</span> ...args) -&gt; <a class="code" href="group__Either.html#classyafl_1_1Either">Either&lt;void, ReturnType&gt;</a> {</div>
-<div class="line"><a name="l00933"></a><span class="lineno">  933</span>&#160;            <span class="keywordflow">if</span> (<a class="code" href="group__HOF.html#ga3805a64bc19cdbc827589b4e2e4f19b9">all_true</a>([](<span class="keyword">auto</span>&amp;&amp; v){ <span class="keywordflow">return</span> v.isOk();}, args...)) {</div>
-<div class="line"><a name="l00934"></a><span class="lineno">  934</span>&#160;                <span class="keyword">const</span> <span class="keyword">auto</span> tp = <a class="code" href="group__Tuple.html#ga76f2437175096df13a20a7e5f42cbd45">tuple::map_append</a>([](<span class="keyword">auto</span>&amp;&amp; arg){ <span class="keywordflow">return</span> arg.value();}, std::make_tuple(), args...);</div>
-<div class="line"><a name="l00935"></a><span class="lineno">  935</span>&#160; </div>
-<div class="line"><a name="l00936"></a><span class="lineno">  936</span>&#160;                <span class="keywordflow">if</span> constexpr (std::is_void_v&lt;ReturnType&gt;) {</div>
-<div class="line"><a name="l00937"></a><span class="lineno">  937</span>&#160;                    std::apply(callable, tp);</div>
-<div class="line"><a name="l00938"></a><span class="lineno">  938</span>&#160;                    <span class="keywordflow">return</span> <a class="code" href="group__Either.html#a19b394d2b00fdcde9fa6bc9aac23223a">Either&lt;void, ReturnType&gt;::Ok</a>();</div>
-<div class="line"><a name="l00939"></a><span class="lineno">  939</span>&#160;                } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00940"></a><span class="lineno">  940</span>&#160;                    <span class="keywordflow">return</span> <a class="code" href="group__Either.html#a19b394d2b00fdcde9fa6bc9aac23223a">Either&lt;void, ReturnType&gt;::Ok</a>(std::apply(callable, tp));</div>
-<div class="line"><a name="l00941"></a><span class="lineno">  941</span>&#160;                }</div>
-<div class="line"><a name="l00942"></a><span class="lineno">  942</span>&#160;            } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00943"></a><span class="lineno">  943</span>&#160;                <span class="keywordflow">return</span> <a class="code" href="group__Either.html#abfa4933b50fe5e8ab7bf27bdb0553841">Either&lt;void, ReturnType&gt;::Error</a>();</div>
-<div class="line"><a name="l00944"></a><span class="lineno">  944</span>&#160;            }</div>
-<div class="line"><a name="l00945"></a><span class="lineno">  945</span>&#160;        };</div>
-<div class="line"><a name="l00946"></a><span class="lineno">  946</span>&#160; </div>
-<div class="line"><a name="l00947"></a><span class="lineno">  947</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">function</span>;</div>
-<div class="line"><a name="l00948"></a><span class="lineno">  948</span>&#160;    }</div>
-<div class="line"><a name="l00949"></a><span class="lineno">  949</span>&#160;}</div>
-<div class="line"><a name="l00950"></a><span class="lineno">  950</span>&#160; </div>
-<div class="line"><a name="l00951"></a><span class="lineno">  951</span>&#160;} <span class="comment">// namespace either</span></div>
-<div class="line"><a name="l00952"></a><span class="lineno">  952</span>&#160;} <span class="comment">// namespace yafl</span></div>
+<div class="line"><a name="l00905"></a><span class="lineno">  905</span>&#160; </div>
+<div class="line"><a name="l00906"></a><span class="lineno">  906</span>&#160;<span class="keyword">namespace </span>details {</div>
+<div class="line"><a name="l00907"></a><span class="lineno">  907</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> ErrorType, <span class="keyword">typename</span> Head&gt;</div>
+<div class="line"><a name="l00908"></a><span class="lineno">  908</span>&#160;    ErrorType getFailedValue(<span class="keyword">const</span> Head&amp; head) {</div>
+<div class="line"><a name="l00909"></a><span class="lineno">  909</span>&#160;        <span class="keywordflow">return</span> head.error();</div>
+<div class="line"><a name="l00910"></a><span class="lineno">  910</span>&#160;    }</div>
+<div class="line"><a name="l00911"></a><span class="lineno">  911</span>&#160; </div>
+<div class="line"><a name="l00912"></a><span class="lineno">  912</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> ErrorType, <span class="keyword">typename</span> Head, <span class="keyword">typename</span> ...Tail&gt;</div>
+<div class="line"><a name="l00913"></a><span class="lineno">  913</span>&#160;    ErrorType getFailedValue(<span class="keyword">const</span> Head&amp; head, Tail&amp;&amp; ...tail) {</div>
+<div class="line"><a name="l00914"></a><span class="lineno">  914</span>&#160;        <span class="keywordflow">if</span> (head.isError()) {</div>
+<div class="line"><a name="l00915"></a><span class="lineno">  915</span>&#160;            <span class="keywordflow">return</span> head.error();</div>
+<div class="line"><a name="l00916"></a><span class="lineno">  916</span>&#160;        } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00917"></a><span class="lineno">  917</span>&#160;            <span class="keywordflow">return</span> getFailedValue&lt;ErrorType&gt;(std::forward&lt;Tail&gt;(tail)...);</div>
+<div class="line"><a name="l00918"></a><span class="lineno">  918</span>&#160;        }</div>
+<div class="line"><a name="l00919"></a><span class="lineno">  919</span>&#160;    }</div>
+<div class="line"><a name="l00920"></a><span class="lineno">  920</span>&#160;}</div>
+<div class="line"><a name="l00921"></a><span class="lineno">  921</span>&#160; </div>
+<div class="line"><a name="l00922"></a><span class="lineno">  922</span>&#160; </div>
+<div class="line"><a name="l00931"></a><span class="lineno">  931</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> ErrorType = <span class="keywordtype">void</span>, <span class="keyword">typename</span> Callable&gt;</div>
+<div class="line"><a name="l00932"></a><span class="lineno"><a class="line" href="group__Either.html#gaf90b8bc181dadff2f613c53b4ead6287">  932</a></span>&#160;decltype(<span class="keyword">auto</span>) <a class="code" href="group__Either.html#gaf90b8bc181dadff2f613c53b4ead6287">lift</a>(Callable&amp;&amp; callable) {</div>
+<div class="line"><a name="l00933"></a><span class="lineno">  933</span>&#160;    <span class="keywordflow">if</span> constexpr (std::is_invocable_v&lt;Callable&gt;) {</div>
+<div class="line"><a name="l00934"></a><span class="lineno">  934</span>&#160;        <span class="keyword">using</span> ReturnType = std::remove_reference_t&lt;std::invoke_result_t&lt;Callable&gt;&gt;;</div>
+<div class="line"><a name="l00935"></a><span class="lineno">  935</span>&#160;        <span class="keywordflow">if</span> constexpr (std::is_void_v&lt;ReturnType&gt;) {</div>
+<div class="line"><a name="l00936"></a><span class="lineno">  936</span>&#160;            <span class="keywordflow">return</span> [callable = std::forward&lt;Callable&gt;(callable)](){</div>
+<div class="line"><a name="l00937"></a><span class="lineno">  937</span>&#160;                callable();</div>
+<div class="line"><a name="l00938"></a><span class="lineno">  938</span>&#160;                <span class="keywordflow">return</span> <a class="code" href="group__Either.html#a19b394d2b00fdcde9fa6bc9aac23223a">Either&lt;ErrorType, ReturnType&gt;::Ok</a>();</div>
+<div class="line"><a name="l00939"></a><span class="lineno">  939</span>&#160;            };</div>
+<div class="line"><a name="l00940"></a><span class="lineno">  940</span>&#160;        } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00941"></a><span class="lineno">  941</span>&#160;            <span class="keywordflow">return</span> [callable = std::forward&lt;Callable&gt;(callable)](){</div>
+<div class="line"><a name="l00942"></a><span class="lineno">  942</span>&#160;                <span class="keywordflow">return</span> <a class="code" href="group__Either.html#a19b394d2b00fdcde9fa6bc9aac23223a">Either&lt;ErrorType, ReturnType&gt;::Ok</a>(callable());</div>
+<div class="line"><a name="l00943"></a><span class="lineno">  943</span>&#160;            };</div>
+<div class="line"><a name="l00944"></a><span class="lineno">  944</span>&#160;        }</div>
+<div class="line"><a name="l00945"></a><span class="lineno">  945</span>&#160;    } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00946"></a><span class="lineno">  946</span>&#160;        <span class="keyword">using</span> ReturnType = <span class="keyword">typename</span> <a class="code" href="group__Function.html#structyafl_1_1function_1_1Info">function::Info&lt;Callable&gt;::ReturnType</a>;</div>
+<div class="line"><a name="l00947"></a><span class="lineno">  947</span>&#160;        <span class="keyword">using</span> FixedErrorType = <span class="keyword">typename</span> <a class="code" href="structyafl_1_1type_1_1FixedErrorType.html">type::FixedErrorType&lt;ErrorType&gt;</a>;</div>
+<div class="line"><a name="l00948"></a><span class="lineno">  948</span>&#160;        <span class="keyword">using</span> ReturnFunctionType = <span class="keyword">typename</span> <a class="code" href="group__Function.html#structyafl_1_1function_1_1Info">function::Info&lt;Callable&gt;::template</a> LiftedSignature&lt;FixedErrorType::template Type&gt;;</div>
+<div class="line"><a name="l00949"></a><span class="lineno">  949</span>&#160; </div>
+<div class="line"><a name="l00950"></a><span class="lineno">  950</span>&#160;        <span class="keyword">const</span> ReturnFunctionType <span class="keyword">function</span> =  [callable = std::forward&lt;Callable&gt;(callable)](<span class="keyword">auto</span>&amp;&amp; ...args) -&gt; <a class="code" href="group__Either.html#classyafl_1_1Either">Either&lt;ErrorType, ReturnType&gt;</a> {</div>
+<div class="line"><a name="l00951"></a><span class="lineno">  951</span>&#160;            <span class="keywordflow">if</span> (<a class="code" href="group__HOF.html#ga3805a64bc19cdbc827589b4e2e4f19b9">all_true</a>([](<span class="keyword">const</span> <span class="keyword">auto</span>&amp; v){ <span class="keywordflow">return</span> v.isOk();}, args...)) {</div>
+<div class="line"><a name="l00952"></a><span class="lineno">  952</span>&#160;                <span class="keyword">const</span> <span class="keyword">auto</span> tp = <a class="code" href="group__Tuple.html#ga76f2437175096df13a20a7e5f42cbd45">tuple::map_append</a>([](<span class="keyword">auto</span>&amp;&amp; arg){ <span class="keywordflow">return</span> arg.value();}, std::make_tuple(), args...);</div>
+<div class="line"><a name="l00953"></a><span class="lineno">  953</span>&#160;                <span class="keywordflow">if</span> constexpr (std::is_void_v&lt;ReturnType&gt;) {</div>
+<div class="line"><a name="l00954"></a><span class="lineno">  954</span>&#160;                    std::apply(callable, tp);</div>
+<div class="line"><a name="l00955"></a><span class="lineno">  955</span>&#160;                    <span class="keywordflow">return</span> <a class="code" href="group__Either.html#a19b394d2b00fdcde9fa6bc9aac23223a">Either&lt;ErrorType, ReturnType&gt;::Ok</a>();</div>
+<div class="line"><a name="l00956"></a><span class="lineno">  956</span>&#160;                } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00957"></a><span class="lineno">  957</span>&#160;                    <span class="keywordflow">return</span> <a class="code" href="group__Either.html#a19b394d2b00fdcde9fa6bc9aac23223a">Either&lt;ErrorType, ReturnType&gt;::Ok</a>(std::apply(callable, tp));</div>
+<div class="line"><a name="l00958"></a><span class="lineno">  958</span>&#160;                }</div>
+<div class="line"><a name="l00959"></a><span class="lineno">  959</span>&#160;            } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00960"></a><span class="lineno">  960</span>&#160;                <span class="keywordflow">if</span> constexpr (std::is_void_v&lt;ErrorType&gt;) {</div>
+<div class="line"><a name="l00961"></a><span class="lineno">  961</span>&#160;                    <span class="keywordflow">return</span> <a class="code" href="group__Either.html#abfa4933b50fe5e8ab7bf27bdb0553841">Either&lt;ErrorType, ReturnType&gt;::Error</a>();</div>
+<div class="line"><a name="l00962"></a><span class="lineno">  962</span>&#160;                } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00963"></a><span class="lineno">  963</span>&#160;                    <span class="keywordflow">return</span> <a class="code" href="group__Either.html#abfa4933b50fe5e8ab7bf27bdb0553841">Either&lt;ErrorType, ReturnType&gt;::Error</a>(details::getFailedValue&lt;ErrorType&gt;(args...));</div>
+<div class="line"><a name="l00964"></a><span class="lineno">  964</span>&#160;                }</div>
+<div class="line"><a name="l00965"></a><span class="lineno">  965</span>&#160;            }</div>
+<div class="line"><a name="l00966"></a><span class="lineno">  966</span>&#160;        };</div>
+<div class="line"><a name="l00967"></a><span class="lineno">  967</span>&#160; </div>
+<div class="line"><a name="l00968"></a><span class="lineno">  968</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">function</span>;</div>
+<div class="line"><a name="l00969"></a><span class="lineno">  969</span>&#160;    }</div>
+<div class="line"><a name="l00970"></a><span class="lineno">  970</span>&#160;}</div>
+<div class="line"><a name="l00971"></a><span class="lineno">  971</span>&#160; </div>
+<div class="line"><a name="l00972"></a><span class="lineno">  972</span>&#160;} <span class="comment">// namespace either</span></div>
+<div class="line"><a name="l00973"></a><span class="lineno">  973</span>&#160;} <span class="comment">// namespace yafl</span></div>
 <div class="ttc" id="agroup__Core_html_classyafl_1_1core_1_1Applicative"><div class="ttname"><a href="group__Core.html#classyafl_1_1core_1_1Applicative">yafl::core::Applicative</a></div><div class="ttdoc">Functional Applicative Functor class.</div><div class="ttdef"><b>Definition:</b> Applicative.h:26</div></div>
 <div class="ttc" id="agroup__Core_html_classyafl_1_1core_1_1Functor"><div class="ttname"><a href="group__Core.html#classyafl_1_1core_1_1Functor">yafl::core::Functor</a></div><div class="ttdoc">Functional Functor class.</div><div class="ttdef"><b>Definition:</b> Functor.h:27</div></div>
 <div class="ttc" id="agroup__Core_html_classyafl_1_1core_1_1Monad"><div class="ttname"><a href="group__Core.html#classyafl_1_1core_1_1Monad">yafl::core::Monad</a></div><div class="ttdoc">Functional Monad class.</div><div class="ttdef"><b>Definition:</b> Monad.h:25</div></div>
@@ -749,7 +770,7 @@ $(document).ready(function(){initNavTree('Either_8h_source.html',''); initResiza
 <div class="ttc" id="agroup__Either_html_classyafl_1_1Either_3_01void_00_01ValueType_01_4"><div class="ttname"><a href="group__Either.html#classyafl_1_1Either_3_01void_00_01ValueType_01_4">yafl::Either&lt; void, ValueType &gt;</a></div><div class="ttdoc">Partial specialization of the Either class for void error and generic value type.</div><div class="ttdef"><b>Definition:</b> Either.h:210</div></div>
 <div class="ttc" id="agroup__Either_html_classyafl_1_1Either_3_01void_00_01void_01_4"><div class="ttname"><a href="group__Either.html#classyafl_1_1Either_3_01void_00_01void_01_4">yafl::Either&lt; void, void &gt;</a></div><div class="ttdoc">Specialization of the Either class for void error and void value types.</div><div class="ttdef"><b>Definition:</b> Either.h:89</div></div>
 <div class="ttc" id="agroup__Either_html_ga03578d8a8cc49afc90bb0edcc2d3defb"><div class="ttname"><a href="group__Either.html#ga03578d8a8cc49afc90bb0edcc2d3defb">yafl::either::Error</a></div><div class="ttdeci">std::enable_if_t&lt;!std::is_void_v&lt; ErrorType &gt; &amp;&amp;std::is_void_v&lt; ValueType &gt;, Either&lt; ErrorType, void &gt; &gt; Error(const ErrorType &amp;arg)</div><div class="ttdoc">Helper function to create an Either that is an Error.</div><div class="ttdef"><b>Definition:</b> Either.h:878</div></div>
-<div class="ttc" id="agroup__Either_html_gafc79279c000bef41fd79dd20c4681012"><div class="ttname"><a href="group__Either.html#gafc79279c000bef41fd79dd20c4681012">yafl::either::lift</a></div><div class="ttdeci">decltype(auto) lift(Callable &amp;&amp;callable)</div><div class="ttdoc">Lift given callable into the given abstract monadic type.</div><div class="ttdef"><b>Definition:</b> Either.h:914</div></div>
+<div class="ttc" id="agroup__Either_html_gaf90b8bc181dadff2f613c53b4ead6287"><div class="ttname"><a href="group__Either.html#gaf90b8bc181dadff2f613c53b4ead6287">yafl::either::lift</a></div><div class="ttdeci">decltype(auto) lift(Callable &amp;&amp;callable)</div><div class="ttdoc">Lift given callable into the given abstract monadic type.</div><div class="ttdef"><b>Definition:</b> Either.h:932</div></div>
 <div class="ttc" id="agroup__Either_html_gafece43142539c2f337d00bd7ed39032d"><div class="ttname"><a href="group__Either.html#gafece43142539c2f337d00bd7ed39032d">yafl::either::Ok</a></div><div class="ttdeci">std::enable_if_t&lt;!std::is_void_v&lt; ErrorType &gt; &amp;&amp;!std::is_void_v&lt; ValueType &gt;, Either&lt; ErrorType, ValueType &gt; &gt; Ok(const ValueType &amp;arg)</div><div class="ttdoc">Helper function to create an Either that is an Ok.</div><div class="ttdef"><b>Definition:</b> Either.h:840</div></div>
 <div class="ttc" id="agroup__Function_html_structyafl_1_1function_1_1Info"><div class="ttname"><a href="group__Function.html#structyafl_1_1function_1_1Info">yafl::function::Info</a></div><div class="ttdoc">Template class that allows extracting information about a callable type (a function,...</div><div class="ttdef"><b>Definition:</b> TypeTraits.h:135</div></div>
 <div class="ttc" id="agroup__HOF_html_ga3805a64bc19cdbc827589b4e2e4f19b9"><div class="ttname"><a href="group__HOF.html#ga3805a64bc19cdbc827589b4e2e4f19b9">yafl::all_true</a></div><div class="ttdeci">decltype(auto) all_true(Predicate &amp;&amp;predicate, Args &amp;&amp;...args)</div><div class="ttdoc">Function that applies given predicate to all input arguments.</div><div class="ttdef"><b>Definition:</b> HOF.h:25</div></div>

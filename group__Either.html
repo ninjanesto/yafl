@@ -126,10 +126,10 @@ Functions</h2></td></tr>
 <tr class="memitem:ga03578d8a8cc49afc90bb0edcc2d3defb"><td class="memTemplItemLeft" align="right" valign="top">std::enable_if_t&lt;!std::is_void_v&lt; ErrorType &gt; &amp;&amp;std::is_void_v&lt; ValueType &gt;, <a class="el" href="group__Either.html#classyafl_1_1Either">Either</a>&lt; ErrorType, void &gt; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__Either.html#ga03578d8a8cc49afc90bb0edcc2d3defb">yafl::either::Error</a> (const ErrorType &amp;arg)</td></tr>
 <tr class="memdesc:ga03578d8a8cc49afc90bb0edcc2d3defb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Helper function to create an <a class="el" href="group__Either.html#classyafl_1_1Either" title="Either class.">Either</a> that is an Error.  <a href="group__Either.html#ga03578d8a8cc49afc90bb0edcc2d3defb">More...</a><br /></td></tr>
 <tr class="separator:ga03578d8a8cc49afc90bb0edcc2d3defb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gafc79279c000bef41fd79dd20c4681012"><td class="memTemplParams" colspan="2">template&lt;typename Callable &gt; </td></tr>
-<tr class="memitem:gafc79279c000bef41fd79dd20c4681012"><td class="memTemplItemLeft" align="right" valign="top">decltype(auto)&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__Either.html#gafc79279c000bef41fd79dd20c4681012">yafl::either::lift</a> (Callable &amp;&amp;callable)</td></tr>
-<tr class="memdesc:gafc79279c000bef41fd79dd20c4681012"><td class="mdescLeft">&#160;</td><td class="mdescRight">Lift given callable into the given abstract monadic type.  <a href="group__Either.html#gafc79279c000bef41fd79dd20c4681012">More...</a><br /></td></tr>
-<tr class="separator:gafc79279c000bef41fd79dd20c4681012"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaf90b8bc181dadff2f613c53b4ead6287"><td class="memTemplParams" colspan="2">template&lt;typename ErrorType  = void, typename Callable &gt; </td></tr>
+<tr class="memitem:gaf90b8bc181dadff2f613c53b4ead6287"><td class="memTemplItemLeft" align="right" valign="top">decltype(auto)&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__Either.html#gaf90b8bc181dadff2f613c53b4ead6287">yafl::either::lift</a> (Callable &amp;&amp;callable)</td></tr>
+<tr class="memdesc:gaf90b8bc181dadff2f613c53b4ead6287"><td class="mdescLeft">&#160;</td><td class="mdescRight">Lift given callable into the given abstract monadic type.  <a href="group__Either.html#gaf90b8bc181dadff2f613c53b4ead6287">More...</a><br /></td></tr>
+<tr class="separator:gaf90b8bc181dadff2f613c53b4ead6287"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <p>Yet Another Functional Library. </p>
@@ -2166,13 +2166,13 @@ template&lt;typename ErrorType , typename ValueType &gt; </div>
 
 </div>
 </div>
-<a id="gafc79279c000bef41fd79dd20c4681012"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gafc79279c000bef41fd79dd20c4681012">&#9670;&nbsp;</a></span>lift()</h2>
+<a id="gaf90b8bc181dadff2f613c53b4ead6287"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaf90b8bc181dadff2f613c53b4ead6287">&#9670;&nbsp;</a></span>lift()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Callable &gt; </div>
+template&lt;typename ErrorType  = void, typename Callable &gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">decltype(auto) yafl::either::lift </td>

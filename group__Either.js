@@ -58,7 +58,7 @@ var group__Either =
     ] ],
     [ "Error", "group__Either.html#gafe0a9035b3148aea1613793b3f8a69cc", null ],
     [ "Error", "group__Either.html#ga03578d8a8cc49afc90bb0edcc2d3defb", null ],
-    [ "lift", "group__Either.html#gafc79279c000bef41fd79dd20c4681012", null ],
+    [ "lift", "group__Either.html#gaf90b8bc181dadff2f613c53b4ead6287", null ],
     [ "Ok", "group__Either.html#ga6616de91761ae4c191f5283d2bc29779", null ],
     [ "Ok", "group__Either.html#gafece43142539c2f337d00bd7ed39032d", null ]
 ];
