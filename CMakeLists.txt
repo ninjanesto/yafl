@@ -1,12 +1,12 @@
 cmake_minimum_required(VERSION 3.20)
-project(YetAnotherFunctionalLib VERSION 0.0.1 LANGUAGES C CXX)
-
+project(YetAnotherFunctionalLib LANGUAGES C CXX)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(CMAKE_CXX_STANDARD 17)
 
 include(CommonBuildUtils)
 
+set_version(YetAnotherFunctionalLib 1 0 0 OPTIONAL snapshot)
 set_default_compile_flags()
 
 if(BUILD_YAFL_DOCS)

@@ -1,5 +1,19 @@
 include(CMakeParseArguments)
 
+function(set_version _prefix _major _minor _patch OPTIONAL _tweak)
+    set(${_prefix}_MAJOR_VERSION ${_major} PARENT_SCOPE)
+    set(${_prefix}_MINOR_VERSION ${_minor} PARENT_SCOPE)
+    set(${_prefix}_PATCH_LEVEL ${_patch} PARENT_SCOPE)
+    if(DEFINED _tweak)
+        set(${_prefix}_TWEAK ${_tweak} PARENT_SCOPE)
+        set(${_prefix}_VERSION ${_major}.${_minor}.${_patch}-${_tweak} PARENT_SCOPE)
+    else()
+        set(${_prefix}_VERSION ${_major}.${_minor}.${_patch} PARENT_SCOPE)
+    endif()
+
+    set(${_prefix}_SOVERSION ${_major}.${_minor} PARENT_SCOPE)
+endfunction()
+
 function(set_default_compile_flags)
     set(CMAKE_POSITION_INDEPENDENT_CODE TRUE PARENT_SCOPE)
     set(CMAKE_CXX_STANDARD_REQUIRED ON PARENT_SCOPE)
