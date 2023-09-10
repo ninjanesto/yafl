@@ -128,7 +128,7 @@ Functions</h2></td></tr>
 <tr class="separator:ga03578d8a8cc49afc90bb0edcc2d3defb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gaf90b8bc181dadff2f613c53b4ead6287"><td class="memTemplParams" colspan="2">template&lt;typename ErrorType  = void, typename Callable &gt; </td></tr>
 <tr class="memitem:gaf90b8bc181dadff2f613c53b4ead6287"><td class="memTemplItemLeft" align="right" valign="top">decltype(auto)&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__Either.html#gaf90b8bc181dadff2f613c53b4ead6287">yafl::either::lift</a> (Callable &amp;&amp;callable)</td></tr>
-<tr class="memdesc:gaf90b8bc181dadff2f613c53b4ead6287"><td class="mdescLeft">&#160;</td><td class="mdescRight">Lift given callable into the given abstract monadic type.  <a href="group__Either.html#gaf90b8bc181dadff2f613c53b4ead6287">More...</a><br /></td></tr>
+<tr class="memdesc:gaf90b8bc181dadff2f613c53b4ead6287"><td class="mdescLeft">&#160;</td><td class="mdescRight">Lift given callable into the <a class="el" href="group__Either.html#classyafl_1_1Either" title="Either class.">Either</a> monad realm.  <a href="group__Either.html#gaf90b8bc181dadff2f613c53b4ead6287">More...</a><br /></td></tr>
 <tr class="separator:gaf90b8bc181dadff2f613c53b4ead6287"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -2184,10 +2184,10 @@ template&lt;typename ErrorType  = void, typename Callable &gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p>Lift given callable into the given abstract monadic type. </p>
+<p>Lift given callable into the <a class="el" href="group__Either.html#classyafl_1_1Either" title="Either class.">Either</a> monad realm. </p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">MonadType</td><td>Abstract type to lift function to </td></tr>
+    <tr><td class="paramname">ErrorType</td><td>Type of Error </td></tr>
     <tr><td class="paramname">Callable</td><td>Callable type to lift </td></tr>
   </table>
   </dd>
@@ -2198,7 +2198,7 @@ template&lt;typename ErrorType  = void, typename Callable &gt; </div>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>callable lifted into the given abstract monadic type </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>callable lifted into the <a class="el" href="group__Either.html#classyafl_1_1Either" title="Either class.">Either</a> monad realm </dd></dl>
 
 </div>
 </div>
