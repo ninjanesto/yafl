@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['either_20monad_221',['Either monad',['../group__Either.html',1,'']]]
+  ['either_20monad_284',['Either Monad',['../group__Either.html',1,'']]]
 ];

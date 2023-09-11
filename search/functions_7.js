@@ -1,4 +1,6 @@
 var searchData=
 [
-  ['just_187',['Just',['../group__Maybe.html#acc7b3e69fefa931d129639cf9230ed1f',1,'yafl::Maybe&lt; void &gt;::Just()'],['../group__Maybe.html#a1d8d53589b84e8a6810eae90d063db48',1,'yafl::Maybe::Just()'],['../group__Maybe.html#gabc73df34b07f8c2275122709d340a26e',1,'yafl::maybe::Just()'],['../group__Maybe.html#ga6dd659f1be7050bbdac59e6ab8915aa7',1,'yafl::maybe::Just(ValueType &amp;&amp;args)']]]
+  ['id_226',['id',['../group__HOF.html#ga27e0f5912aab3004c1a36d45ac124f55',1,'yafl']]],
+  ['iserror_227',['isError',['../group__Either.html#a2f2fbe5a5512de976dc0c7bb822e91b1',1,'yafl::Either&lt; void, void &gt;::isError()'],['../group__Either.html#a5ee89bba635b6fdaba282f322c9a1310',1,'yafl::Either&lt; void, ValueType &gt;::isError()'],['../group__Either.html#aea856b412658db5fb9a450e836a01954',1,'yafl::Either&lt; ErrorType, void &gt;::isError()'],['../group__Either.html#a7c5b9ea04a8fb1b1314914054ac5b684',1,'yafl::Either::isError()']]],
+  ['isok_228',['isOk',['../group__Either.html#a5a34e46d106a202b905d20fac13b2f47',1,'yafl::Either&lt; void, void &gt;::isOk()'],['../group__Either.html#a697806615568b7f350874f4838cc2dfc',1,'yafl::Either&lt; void, ValueType &gt;::isOk()'],['../group__Either.html#a82a3032c933fcf7cb8a4680b63e24367',1,'yafl::Either&lt; ErrorType, void &gt;::isOk()'],['../group__Either.html#a7f6d802239be4b82000be09da4a0515f',1,'yafl::Either::isOk()']]]
 ];

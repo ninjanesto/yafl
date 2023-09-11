@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.9.1"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>YAFL: Maybe monad</title>
+<title>YAFL: Maybe Monad</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -86,11 +86,11 @@ $(document).ready(function(){initNavTree('group__Maybe.html',''); initResizable(
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
-<div class="title">Maybe monad</div>  </div>
+<div class="title">Maybe Monad</div>  </div>
 </div><!--header-->
 <div class="contents">
 
-<p>Yet Another Functional Library.  
+<p>Maybe class that implements Functor, Applicative and Monad.  
 <a href="#details">More...</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
@@ -122,7 +122,7 @@ Functions</h2></td></tr>
 <tr class="separator:ga75f1c459fd3e0dd82778fceafbfafaf3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<p>Yet Another Functional Library. </p>
+<p>Maybe class that implements Functor, Applicative and Monad. </p>
 <dl class="section copyright"><dt>Copyright</dt><dd>2023, Ernesto Festas. Distributed under MIT license (See accompanying LICENSE file) </dd></dl>
 <hr/><h2 class="groupheader">Class Documentation</h2>
 <a name="classyafl_1_1Maybe" id="classyafl_1_1Maybe"></a>
@@ -207,6 +207,13 @@ Inheritance diagram for yafl::Maybe&lt; T &gt;:</div>
 <tr class="memitem:a1d8d53589b84e8a6810eae90d063db48"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="group__Maybe.html#classyafl_1_1Maybe">Maybe</a>&lt; T &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Maybe.html#a1d8d53589b84e8a6810eae90d063db48">Just</a> (const T &amp;<a class="el" href="group__Maybe.html#a249db6f112529dc2464c8d6c21255d0b">value</a>)</td></tr>
 <tr class="memdesc:a1d8d53589b84e8a6810eae90d063db48"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs a <a class="el" href="group__Maybe.html#classyafl_1_1Maybe" title="Maybe class.">Maybe</a> type with a "valid" value.  <a href="group__Maybe.html#a1d8d53589b84e8a6810eae90d063db48">More...</a><br /></td></tr>
 <tr class="separator:a1d8d53589b84e8a6810eae90d063db48"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr><td colspan="2"><h3>Friends</h3></td></tr>
+<tr class="memitem:a40dd6e6ab4d5d45a87aaf5c202cce3a6"><td class="memItemLeft" align="right" valign="top">class&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Maybe.html#a40dd6e6ab4d5d45a87aaf5c202cce3a6">core::Functor&lt; Maybe, T &gt;</a></td></tr>
+<tr class="separator:a40dd6e6ab4d5d45a87aaf5c202cce3a6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0e0313f0a14dbcb1298cc42cd9837a9d"><td class="memItemLeft" align="right" valign="top">class&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Maybe.html#a0e0313f0a14dbcb1298cc42cd9837a9d">core::Applicative&lt; Maybe, T &gt;</a></td></tr>
+<tr class="separator:a0e0313f0a14dbcb1298cc42cd9837a9d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9701a7abbf3d7fafed63ef5d89319e4f"><td class="memItemLeft" align="right" valign="top">class&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Maybe.html#a9701a7abbf3d7fafed63ef5d89319e4f">core::Monad&lt; Maybe, T &gt;</a></td></tr>
+<tr class="separator:a9701a7abbf3d7fafed63ef5d89319e4f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h4 class="groupheader">Constructor &amp; Destructor Documentation</h4>
 <a id="aa681f12954ad6f750ecc34e0ddf47d04"></a>
@@ -593,6 +600,79 @@ template&lt;typename T &gt; </div>
 
 </div>
 </div>
+<h4 class="groupheader">Friends And Related Function Documentation</h4>
+<a id="a0e0313f0a14dbcb1298cc42cd9837a9d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0e0313f0a14dbcb1298cc42cd9837a9d">&#9670;&nbsp;</a></span>core::Applicative&lt; Maybe, T &gt;</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">friend class <a class="el" href="group__Core.html#classyafl_1_1core_1_1Applicative">core::Applicative</a>&lt; <a class="el" href="group__Maybe.html#classyafl_1_1Maybe">Maybe</a>, T &gt;</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">friend</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a40dd6e6ab4d5d45a87aaf5c202cce3a6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a40dd6e6ab4d5d45a87aaf5c202cce3a6">&#9670;&nbsp;</a></span>core::Functor&lt; Maybe, T &gt;</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">friend class <a class="el" href="group__Core.html#classyafl_1_1core_1_1Functor">core::Functor</a>&lt; <a class="el" href="group__Maybe.html#classyafl_1_1Maybe">Maybe</a>, T &gt;</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">friend</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a9701a7abbf3d7fafed63ef5d89319e4f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9701a7abbf3d7fafed63ef5d89319e4f">&#9670;&nbsp;</a></span>core::Monad&lt; Maybe, T &gt;</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">friend class <a class="el" href="group__Core.html#classyafl_1_1core_1_1Monad">core::Monad</a>&lt; <a class="el" href="group__Maybe.html#classyafl_1_1Maybe">Maybe</a>, T &gt;</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">friend</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
 
 </div>
 </div>
@@ -656,6 +736,11 @@ Inheritance diagram for yafl::Maybe&lt; void &gt;:</div>
 <tr class="memitem:acc7b3e69fefa931d129639cf9230ed1f"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="group__Maybe.html#classyafl_1_1Maybe">Maybe</a>&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Maybe.html#acc7b3e69fefa931d129639cf9230ed1f">Just</a> ()</td></tr>
 <tr class="memdesc:acc7b3e69fefa931d129639cf9230ed1f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs a <a class="el" href="group__Maybe.html#classyafl_1_1Maybe" title="Maybe class.">Maybe</a> type with a "valid" value.  <a href="group__Maybe.html#acc7b3e69fefa931d129639cf9230ed1f">More...</a><br /></td></tr>
 <tr class="separator:acc7b3e69fefa931d129639cf9230ed1f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr><td colspan="2"><h3>Friends</h3></td></tr>
+<tr class="memitem:a9cd387a507324c3c62eadf9970955c07"><td class="memItemLeft" align="right" valign="top">class&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Maybe.html#a9cd387a507324c3c62eadf9970955c07">core::Functor&lt; Maybe, void &gt;</a></td></tr>
+<tr class="separator:a9cd387a507324c3c62eadf9970955c07"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5e92c91ec81cb14377e7241a39c322f0"><td class="memItemLeft" align="right" valign="top">class&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Maybe.html#a5e92c91ec81cb14377e7241a39c322f0">core::Monad&lt; Maybe, void &gt;</a></td></tr>
+<tr class="separator:a5e92c91ec81cb14377e7241a39c322f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h4 class="groupheader">Constructor &amp; Destructor Documentation</h4>
 <a id="a7756a7c9a10dd233738e35797e13bb99"></a>
@@ -944,6 +1029,51 @@ Inheritance diagram for yafl::Maybe&lt; void &gt;:</div>
 
 </div>
 </div>
+<h4 class="groupheader">Friends And Related Function Documentation</h4>
+<a id="a9cd387a507324c3c62eadf9970955c07"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9cd387a507324c3c62eadf9970955c07">&#9670;&nbsp;</a></span>core::Functor&lt; Maybe, void &gt;</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">friend class <a class="el" href="group__Core.html#classyafl_1_1core_1_1Functor">core::Functor</a>&lt; <a class="el" href="group__Maybe.html#classyafl_1_1Maybe">Maybe</a>, void &gt;</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">friend</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a5e92c91ec81cb14377e7241a39c322f0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5e92c91ec81cb14377e7241a39c322f0">&#9670;&nbsp;</a></span>core::Monad&lt; Maybe, void &gt;</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">friend class <a class="el" href="group__Core.html#classyafl_1_1core_1_1Monad">core::Monad</a>&lt; <a class="el" href="group__Maybe.html#classyafl_1_1Maybe">Maybe</a>, void &gt;</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">friend</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
 
 </div>
 </div>
@@ -964,6 +1094,8 @@ template&lt;typename T  = void&gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p><code>#include &lt;src/yafl/Maybe.h&gt;</code></p>
 
 <p>Function that helps build a <a class="el" href="group__Maybe.html#classyafl_1_1Maybe" title="Maybe class.">Maybe</a> with a void "value". </p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
@@ -993,6 +1125,8 @@ template&lt;typename ValueType &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p><code>#include &lt;src/yafl/Maybe.h&gt;</code></p>
 
 <p>Function that helps build a <a class="el" href="group__Maybe.html#classyafl_1_1Maybe" title="Maybe class.">Maybe</a> with a value. </p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
@@ -1029,6 +1163,8 @@ template&lt;typename Callable &gt; </div>
       </table>
 </div><div class="memdoc">
 
+<p><code>#include &lt;src/yafl/Maybe.h&gt;</code></p>
+
 <p>Lift given callable into <a class="el" href="group__Maybe.html#classyafl_1_1Maybe" title="Maybe class.">Maybe</a> monad realm. </p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
@@ -1062,6 +1198,8 @@ template&lt;typename ValueType &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p><code>#include &lt;src/yafl/Maybe.h&gt;</code></p>
 
 <p>Function that helps build a <a class="el" href="group__Maybe.html#classyafl_1_1Maybe" title="Maybe class.">Maybe</a> with Nothing. </p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>

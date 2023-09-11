@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.9.1"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>YAFL: Either monad</title>
+<title>YAFL: Either Monad</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -86,11 +86,11 @@ $(document).ready(function(){initNavTree('group__Either.html',''); initResizable
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
-<div class="title">Either monad</div>  </div>
+<div class="title">Either Monad</div>  </div>
 </div><!--header-->
 <div class="contents">
 
-<p>Yet Another Functional Library.  
+<p>Either class that implements Functor, Applicative and Monad.  
 <a href="#details">More...</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
@@ -132,7 +132,7 @@ Functions</h2></td></tr>
 <tr class="separator:gaf90b8bc181dadff2f613c53b4ead6287"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<p>Yet Another Functional Library. </p>
+<p>Either class that implements Functor, Applicative and Monad. </p>
 <dl class="section copyright"><dt>Copyright</dt><dd>2023, Ernesto Festas. Distributed under MIT license (See accompanying LICENSE file) </dd></dl>
 <hr/><h2 class="groupheader">Class Documentation</h2>
 <a name="classyafl_1_1Either" id="classyafl_1_1Either"></a>
@@ -226,6 +226,13 @@ Inheritance diagram for yafl::Either&lt; ErrorType, ValueType &gt;:</div>
 <tr class="memitem:a19b394d2b00fdcde9fa6bc9aac23223a"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="group__Either.html#classyafl_1_1Either">Either</a>&lt; ErrorType, ValueType &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Either.html#a19b394d2b00fdcde9fa6bc9aac23223a">Ok</a> (const ValueType &amp;<a class="el" href="group__Either.html#a6774a00c8b6df8711d68dc5c105ea5eb">value</a>)</td></tr>
 <tr class="memdesc:a19b394d2b00fdcde9fa6bc9aac23223a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs an <a class="el" href="group__Either.html#classyafl_1_1Either" title="Either class.">Either</a> type that is a Value.  <a href="group__Either.html#a19b394d2b00fdcde9fa6bc9aac23223a">More...</a><br /></td></tr>
 <tr class="separator:a19b394d2b00fdcde9fa6bc9aac23223a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr><td colspan="2"><h3>Friends</h3></td></tr>
+<tr class="memitem:ac61ca7c192b8dde9c291413019a3ebab"><td class="memItemLeft" align="right" valign="top">class&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Either.html#ac61ca7c192b8dde9c291413019a3ebab">core::Functor&lt; Either, ErrorType, ValueType &gt;</a></td></tr>
+<tr class="separator:ac61ca7c192b8dde9c291413019a3ebab"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a12228d75aba74e4fd6b0207cbbdc5d35"><td class="memItemLeft" align="right" valign="top">class&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Either.html#a12228d75aba74e4fd6b0207cbbdc5d35">core::Applicative&lt; Either, ErrorType, ValueType &gt;</a></td></tr>
+<tr class="separator:a12228d75aba74e4fd6b0207cbbdc5d35"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a20eb8f00b985a7bcf7abaed98b95afb1"><td class="memItemLeft" align="right" valign="top">class&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Either.html#a20eb8f00b985a7bcf7abaed98b95afb1">core::Monad&lt; Either, ErrorType, ValueType &gt;</a></td></tr>
+<tr class="separator:a20eb8f00b985a7bcf7abaed98b95afb1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h4 class="groupheader">Constructor &amp; Destructor Documentation</h4>
 <a id="a0c610a8ccb65c2ad60837d9c5c067e52"></a>
@@ -722,6 +729,79 @@ template&lt;typename ErrorType , typename ValueType &gt; </div>
 
 </div>
 </div>
+<h4 class="groupheader">Friends And Related Function Documentation</h4>
+<a id="a12228d75aba74e4fd6b0207cbbdc5d35"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a12228d75aba74e4fd6b0207cbbdc5d35">&#9670;&nbsp;</a></span>core::Applicative&lt; Either, ErrorType, ValueType &gt;</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ErrorType , typename ValueType &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">friend class <a class="el" href="group__Core.html#classyafl_1_1core_1_1Applicative">core::Applicative</a>&lt; <a class="el" href="group__Either.html#classyafl_1_1Either">Either</a>, ErrorType, ValueType &gt;</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">friend</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ac61ca7c192b8dde9c291413019a3ebab"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac61ca7c192b8dde9c291413019a3ebab">&#9670;&nbsp;</a></span>core::Functor&lt; Either, ErrorType, ValueType &gt;</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ErrorType , typename ValueType &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">friend class <a class="el" href="group__Core.html#classyafl_1_1core_1_1Functor">core::Functor</a>&lt; <a class="el" href="group__Either.html#classyafl_1_1Either">Either</a>, ErrorType, ValueType &gt;</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">friend</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a20eb8f00b985a7bcf7abaed98b95afb1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a20eb8f00b985a7bcf7abaed98b95afb1">&#9670;&nbsp;</a></span>core::Monad&lt; Either, ErrorType, ValueType &gt;</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ErrorType , typename ValueType &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">friend class <a class="el" href="group__Core.html#classyafl_1_1core_1_1Monad">core::Monad</a>&lt; <a class="el" href="group__Either.html#classyafl_1_1Either">Either</a>, ErrorType, ValueType &gt;</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">friend</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
 
 </div>
 </div>
@@ -788,6 +868,11 @@ Inheritance diagram for yafl::Either&lt; void, void &gt;:</div>
 <tr class="memitem:a75b3650f40f601611e871ab442f2b7b2"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="group__Either.html#classyafl_1_1Either">Either</a>&lt; void, void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Either.html#a75b3650f40f601611e871ab442f2b7b2">Ok</a> ()</td></tr>
 <tr class="memdesc:a75b3650f40f601611e871ab442f2b7b2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs an <a class="el" href="group__Either.html#classyafl_1_1Either" title="Either class.">Either</a> type that is an Ok.  <a href="group__Either.html#a75b3650f40f601611e871ab442f2b7b2">More...</a><br /></td></tr>
 <tr class="separator:a75b3650f40f601611e871ab442f2b7b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr><td colspan="2"><h3>Friends</h3></td></tr>
+<tr class="memitem:a2848b9184043d010146d846b80a89c95"><td class="memItemLeft" align="right" valign="top">class&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Either.html#a2848b9184043d010146d846b80a89c95">core::Functor&lt; Either, void, void &gt;</a></td></tr>
+<tr class="separator:a2848b9184043d010146d846b80a89c95"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3ef50c0d8608b718a96ed029fe78f96d"><td class="memItemLeft" align="right" valign="top">class&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Either.html#a3ef50c0d8608b718a96ed029fe78f96d">core::Monad&lt; Either, void, void &gt;</a></td></tr>
+<tr class="separator:a3ef50c0d8608b718a96ed029fe78f96d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h4 class="groupheader">Constructor &amp; Destructor Documentation</h4>
 <a id="a7485d00de6b9d817cd23fa7eab4e6131"></a>
@@ -1104,6 +1189,51 @@ Inheritance diagram for yafl::Either&lt; void, void &gt;:</div>
 
 </div>
 </div>
+<h4 class="groupheader">Friends And Related Function Documentation</h4>
+<a id="a2848b9184043d010146d846b80a89c95"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2848b9184043d010146d846b80a89c95">&#9670;&nbsp;</a></span>core::Functor&lt; Either, void, void &gt;</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">friend class <a class="el" href="group__Core.html#classyafl_1_1core_1_1Functor">core::Functor</a>&lt; <a class="el" href="group__Either.html#classyafl_1_1Either">Either</a>, void, void &gt;</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">friend</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a3ef50c0d8608b718a96ed029fe78f96d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3ef50c0d8608b718a96ed029fe78f96d">&#9670;&nbsp;</a></span>core::Monad&lt; Either, void, void &gt;</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">friend class <a class="el" href="group__Core.html#classyafl_1_1core_1_1Monad">core::Monad</a>&lt; <a class="el" href="group__Either.html#classyafl_1_1Either">Either</a>, void, void &gt;</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">friend</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
 
 </div>
 </div>
@@ -1190,6 +1320,13 @@ Inheritance diagram for yafl::Either&lt; void, ValueType &gt;:</div>
 <tr class="memitem:a4c0716a1b305e3424d7a7098486d6a95"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="group__Either.html#classyafl_1_1Either">Either</a>&lt; void, ValueType &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Either.html#a4c0716a1b305e3424d7a7098486d6a95">Ok</a> (const ValueType &amp;<a class="el" href="group__Either.html#a36ea23d6b4fa7281f1bf8401d7ea81cf">value</a>)</td></tr>
 <tr class="memdesc:a4c0716a1b305e3424d7a7098486d6a95"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs an <a class="el" href="group__Either.html#classyafl_1_1Either" title="Either class.">Either</a> type that is a Value.  <a href="group__Either.html#a4c0716a1b305e3424d7a7098486d6a95">More...</a><br /></td></tr>
 <tr class="separator:a4c0716a1b305e3424d7a7098486d6a95"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr><td colspan="2"><h3>Friends</h3></td></tr>
+<tr class="memitem:a9b7f872c5fd8f9fc0c4760c2bebc27e0"><td class="memItemLeft" align="right" valign="top">class&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Either.html#a9b7f872c5fd8f9fc0c4760c2bebc27e0">core::Functor&lt; Either, void, ValueType &gt;</a></td></tr>
+<tr class="separator:a9b7f872c5fd8f9fc0c4760c2bebc27e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a23c31454067f69dc58ed25d873379ec5"><td class="memItemLeft" align="right" valign="top">class&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Either.html#a23c31454067f69dc58ed25d873379ec5">core::Applicative&lt; Either, void, ValueType &gt;</a></td></tr>
+<tr class="separator:a23c31454067f69dc58ed25d873379ec5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5b69f67c3e5960022eb30251d0945da2"><td class="memItemLeft" align="right" valign="top">class&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Either.html#a5b69f67c3e5960022eb30251d0945da2">core::Monad&lt; Either, void, ValueType &gt;</a></td></tr>
+<tr class="separator:a5b69f67c3e5960022eb30251d0945da2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h4 class="groupheader">Constructor &amp; Destructor Documentation</h4>
 <a id="a1803856938133f14a6fad7b6fbcf3a95"></a>
@@ -1606,6 +1743,79 @@ template&lt;typename ValueType &gt; </div>
 
 </div>
 </div>
+<h4 class="groupheader">Friends And Related Function Documentation</h4>
+<a id="a23c31454067f69dc58ed25d873379ec5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a23c31454067f69dc58ed25d873379ec5">&#9670;&nbsp;</a></span>core::Applicative&lt; Either, void, ValueType &gt;</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ValueType &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">friend class <a class="el" href="group__Core.html#classyafl_1_1core_1_1Applicative">core::Applicative</a>&lt; <a class="el" href="group__Either.html#classyafl_1_1Either">Either</a>, void, ValueType &gt;</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">friend</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a9b7f872c5fd8f9fc0c4760c2bebc27e0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9b7f872c5fd8f9fc0c4760c2bebc27e0">&#9670;&nbsp;</a></span>core::Functor&lt; Either, void, ValueType &gt;</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ValueType &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">friend class <a class="el" href="group__Core.html#classyafl_1_1core_1_1Functor">core::Functor</a>&lt; <a class="el" href="group__Either.html#classyafl_1_1Either">Either</a>, void, ValueType &gt;</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">friend</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a5b69f67c3e5960022eb30251d0945da2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5b69f67c3e5960022eb30251d0945da2">&#9670;&nbsp;</a></span>core::Monad&lt; Either, void, ValueType &gt;</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ValueType &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">friend class <a class="el" href="group__Core.html#classyafl_1_1core_1_1Monad">core::Monad</a>&lt; <a class="el" href="group__Either.html#classyafl_1_1Either">Either</a>, void, ValueType &gt;</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">friend</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
 
 </div>
 </div>
@@ -1681,6 +1891,11 @@ Inheritance diagram for yafl::Either&lt; ErrorType, void &gt;:</div>
 <tr class="memitem:ad78f8ed4cab94f5516df7f68e3ac3fa8"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="group__Either.html#classyafl_1_1Either">Either</a>&lt; ErrorType, void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Either.html#ad78f8ed4cab94f5516df7f68e3ac3fa8">Error</a> (const ErrorType &amp;<a class="el" href="group__Either.html#adc6a046f0050ec254a5dc11f636e3021">error</a>)</td></tr>
 <tr class="memdesc:ad78f8ed4cab94f5516df7f68e3ac3fa8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs an <a class="el" href="group__Either.html#classyafl_1_1Either" title="Either class.">Either</a> type that is an Error.  <a href="group__Either.html#ad78f8ed4cab94f5516df7f68e3ac3fa8">More...</a><br /></td></tr>
 <tr class="separator:ad78f8ed4cab94f5516df7f68e3ac3fa8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr><td colspan="2"><h3>Friends</h3></td></tr>
+<tr class="memitem:a7a1bdf4642320a3446153cfcbc1b6a09"><td class="memItemLeft" align="right" valign="top">class&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Either.html#a7a1bdf4642320a3446153cfcbc1b6a09">core::Functor&lt; Either, ErrorType, void &gt;</a></td></tr>
+<tr class="separator:a7a1bdf4642320a3446153cfcbc1b6a09"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2d53e5c19ac96339e8ae91deec136632"><td class="memItemLeft" align="right" valign="top">class&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Either.html#a2d53e5c19ac96339e8ae91deec136632">core::Monad&lt; Either, ErrorType, void &gt;</a></td></tr>
+<tr class="separator:a2d53e5c19ac96339e8ae91deec136632"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h4 class="groupheader">Constructor &amp; Destructor Documentation</h4>
 <a id="a6ca619b1985a5d89bbee5a0b2a2a4b40"></a>
@@ -2097,6 +2312,55 @@ template&lt;typename ErrorType &gt; </div>
 
 </div>
 </div>
+<h4 class="groupheader">Friends And Related Function Documentation</h4>
+<a id="a7a1bdf4642320a3446153cfcbc1b6a09"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7a1bdf4642320a3446153cfcbc1b6a09">&#9670;&nbsp;</a></span>core::Functor&lt; Either, ErrorType, void &gt;</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ErrorType &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">friend class <a class="el" href="group__Core.html#classyafl_1_1core_1_1Functor">core::Functor</a>&lt; <a class="el" href="group__Either.html#classyafl_1_1Either">Either</a>, ErrorType, void &gt;</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">friend</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a2d53e5c19ac96339e8ae91deec136632"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2d53e5c19ac96339e8ae91deec136632">&#9670;&nbsp;</a></span>core::Monad&lt; Either, ErrorType, void &gt;</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ErrorType &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">friend class <a class="el" href="group__Core.html#classyafl_1_1core_1_1Monad">core::Monad</a>&lt; <a class="el" href="group__Either.html#classyafl_1_1Either">Either</a>, ErrorType, void &gt;</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">friend</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
 
 </div>
 </div>
@@ -2117,6 +2381,8 @@ template&lt;typename ErrorType , typename ValueType &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p><code>#include &lt;src/yafl/Either.h&gt;</code></p>
 
 <p>Helper function to create an <a class="el" href="group__Either.html#classyafl_1_1Either" title="Either class.">Either</a> that is an Error. </p>
 <p>Is this case this function is applicable when both error and value types are void </p><dl class="tparams"><dt>Template Parameters</dt><dd>
@@ -2147,6 +2413,8 @@ template&lt;typename ErrorType , typename ValueType &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p><code>#include &lt;src/yafl/Either.h&gt;</code></p>
 
 <p>Helper function to create an <a class="el" href="group__Either.html#classyafl_1_1Either" title="Either class.">Either</a> that is an Error. </p>
 <p>Is this case this function is applicable when error type is not void and value type is void </p><dl class="tparams"><dt>Template Parameters</dt><dd>
@@ -2184,6 +2452,8 @@ template&lt;typename ErrorType  = void, typename Callable &gt; </div>
       </table>
 </div><div class="memdoc">
 
+<p><code>#include &lt;src/yafl/Either.h&gt;</code></p>
+
 <p>Lift given callable into the <a class="el" href="group__Either.html#classyafl_1_1Either" title="Either class.">Either</a> monad realm. </p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
@@ -2219,6 +2489,8 @@ template&lt;typename ErrorType , typename ValueType &gt; </div>
       </table>
 </div><div class="memdoc">
 
+<p><code>#include &lt;src/yafl/Either.h&gt;</code></p>
+
 <p>Helper function to create an <a class="el" href="group__Either.html#classyafl_1_1Either" title="Either class.">Either</a> that is an Ok. </p>
 <p>Is this case this function is applicable when both error and value types are void </p><dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
@@ -2248,6 +2520,8 @@ template&lt;typename ErrorType , typename ValueType &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p><code>#include &lt;src/yafl/Either.h&gt;</code></p>
 
 <p>Helper function to create an <a class="el" href="group__Either.html#classyafl_1_1Either" title="Either class.">Either</a> that is an Ok. </p>
 <p>Is this case this function is applicable when error type is not void and value type is not void </p><dl class="tparams"><dt>Template Parameters</dt><dd>

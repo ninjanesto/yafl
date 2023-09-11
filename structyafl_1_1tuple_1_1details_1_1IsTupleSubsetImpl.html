@@ -83,6 +83,7 @@ $(document).ready(function(){initNavTree('structyafl_1_1tuple_1_1details_1_1IsTu
 
 <div class="header">
   <div class="summary">
+<a href="#pub-static-attribs">Static Public Attributes</a> &#124;
 <a href="structyafl_1_1tuple_1_1details_1_1IsTupleSubsetImpl-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">yafl::tuple::details::IsTupleSubsetImpl&lt; Index, Tuple1, Tuple2, IsValid &gt; Struct Template Reference</div>  </div>
@@ -93,6 +94,14 @@ $(document).ready(function(){initNavTree('structyafl_1_1tuple_1_1details_1_1IsTu
  <a href="structyafl_1_1tuple_1_1details_1_1IsTupleSubsetImpl.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="TypeTraits_8h_source.html">TypeTraits.h</a>&gt;</code></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-attribs"></a>
+Static Public Attributes</h2></td></tr>
+<tr class="memitem:aa9dc8099e84807bf0bef14e2c4786da3"><td class="memItemLeft" align="right" valign="top">static constexpr std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structyafl_1_1tuple_1_1details_1_1IsTupleSubsetImpl.html#aa9dc8099e84807bf0bef14e2c4786da3">index</a> = std::tuple_size_v&lt;Tuple2&gt;</td></tr>
+<tr class="separator:aa9dc8099e84807bf0bef14e2c4786da3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae486716164dd072db37901102f1c8461"><td class="memItemLeft" align="right" valign="top">static constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structyafl_1_1tuple_1_1details_1_1IsTupleSubsetImpl.html#ae486716164dd072db37901102f1c8461">value</a></td></tr>
+<tr class="separator:ae486716164dd072db37901102f1c8461"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;std::size_t Index, typename Tuple1, typename Tuple2, bool IsValid&gt;<br />
 struct yafl::tuple::details::IsTupleSubsetImpl&lt; Index, Tuple1, Tuple2, IsValid &gt;</h3>
@@ -107,15 +116,71 @@ struct yafl::tuple::details::IsTupleSubsetImpl&lt; Index, Tuple1, Tuple2, IsVali
   </table>
   </dd>
 </dl>
-</div><hr/>The documentation for this struct was generated from the following file:<ul>
-<li>src/yafl/<a class="el" href="TypeTraits_8h_source.html">TypeTraits.h</a></li>
-</ul>
+</div><h2 class="groupheader">Member Data Documentation</h2>
+<a id="aa9dc8099e84807bf0bef14e2c4786da3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa9dc8099e84807bf0bef14e2c4786da3">&#9670;&nbsp;</a></span>index</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;std::size_t Index, typename Tuple1 , typename Tuple2 , bool IsValid&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">constexpr std::size_t <a class="el" href="structyafl_1_1tuple_1_1details_1_1IsTupleSubsetImpl.html">yafl::tuple::details::IsTupleSubsetImpl</a>&lt; Index, Tuple1, Tuple2, IsValid &gt;::index = std::tuple_size_v&lt;Tuple2&gt;</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">constexpr</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ae486716164dd072db37901102f1c8461"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae486716164dd072db37901102f1c8461">&#9670;&nbsp;</a></span>value</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;std::size_t Index, typename Tuple1 , typename Tuple2 , bool IsValid&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">constexpr bool <a class="el" href="structyafl_1_1tuple_1_1details_1_1IsTupleSubsetImpl.html">yafl::tuple::details::IsTupleSubsetImpl</a>&lt; Index, Tuple1, Tuple2, IsValid &gt;::value</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">constexpr</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">= []() {</div>
+<div class="line">        <span class="keywordflow">if</span> constexpr (std::tuple_size_v&lt;Tuple2&gt; == 0) {</div>
+<div class="line">            <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line">        } <span class="keywordflow">else</span> {</div>
+<div class="line">            <span class="keywordflow">return</span> (Index &lt; std::tuple_size_v&lt;Tuple2&gt;) &amp;&amp;</div>
+<div class="line">                   compareTupleTypeByIndex&lt;Index, Tuple1, Tuple2&gt;() &amp;&amp;</div>
+<div class="line">                   IsTupleSubsetImpl&lt;Index + 1, Tuple1, Tuple2, (Index + 1 &lt; std::tuple_size_v&lt;Tuple2&gt;)&gt;::<a class="code" href="structyafl_1_1tuple_1_1details_1_1IsTupleSubsetImpl.html#ae486716164dd072db37901102f1c8461">value</a>;</div>
+<div class="line">        }</div>
+<div class="line">    }()</div>
+<div class="ttc" id="astructyafl_1_1tuple_1_1details_1_1IsTupleSubsetImpl_html_ae486716164dd072db37901102f1c8461"><div class="ttname"><a href="structyafl_1_1tuple_1_1details_1_1IsTupleSubsetImpl.html#ae486716164dd072db37901102f1c8461">yafl::tuple::details::IsTupleSubsetImpl::value</a></div><div class="ttdeci">static constexpr bool value</div><div class="ttdef"><b>Definition:</b> TypeTraits.h:225</div></div>
+</div><!-- fragment -->
+</div>
+</div>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><b>yafl</b></li><li class="navelem"><a class="el" href="namespaceyafl_1_1tuple.html">tuple</a></li><li class="navelem"><b>details</b></li><li class="navelem"><a class="el" href="structyafl_1_1tuple_1_1details_1_1IsTupleSubsetImpl.html">IsTupleSubsetImpl</a></li>
+    <li class="navelem"><a class="el" href="namespaceyafl.html">yafl</a></li><li class="navelem"><a class="el" href="namespaceyafl_1_1tuple.html">tuple</a></li><li class="navelem"><a class="el" href="namespaceyafl_1_1tuple_1_1details.html">details</a></li><li class="navelem"><a class="el" href="structyafl_1_1tuple_1_1details_1_1IsTupleSubsetImpl.html">IsTupleSubsetImpl</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
   </ul>
 </div>

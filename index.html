@@ -81,11 +81,405 @@ $(document).ready(function(){initNavTree('index.html',''); initResizable(); });
 </iframe>
 </div>
 
-<div class="header">
+<div class="PageDoc"><div class="header">
   <div class="headertitle">
 <div class="title">YAFL Documentation</div>  </div>
 </div><!--header-->
 <div class="contents">
+<div class="textblock"><p><a class="anchor" id="md_README"></a> <img src="doc/logo/yafl.png" alt="" title="Yet Another Functional Library" class="inline"/></p>
+<p><a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT" style="pointer-events: none;" class="inline"/></a></p>
+<p><img src="https://github.com/ninjanesto/yafl/actions/workflows/yafl-build-run-tests.yml/badge.svg?branch=master" alt="Yafl Build and Tests" style="pointer-events: none;" class="inline"/></p>
+<p><a href="https://github.com/ninjanesto/yafl/actions/workflows/yafl-build-run-coverage.yml"><img src="https://github.com/ninjanesto/yafl/actions/workflows/yafl-build-run-coverage.yml/badge.svg" alt="Yafl Build and Run Coverage" style="pointer-events: none;" class="inline"/></a> <a href="https://codecov.io/gh/ninjanesto/yafl"><img src="https://codecov.io/gh/ninjanesto/yafl/graph/badge.svg?token=0XDHUSTRNG" alt="Yafl Coverage" style="pointer-events: none;" class="inline"/></a></p>
+<p><a href="https://github.com/ninjanesto/yafl/actions/workflows/yafl-build-docs.yml"><img src="https://github.com/ninjanesto/yafl/actions/workflows/yafl-build-docs.yml/badge.svg" alt="Yafl Doxygen Docs" style="pointer-events: none;" class="inline"/></a></p>
+<h1><a class="anchor" id="autotoc_md0"></a>
+Yet Another Functional Library</h1>
+<p>Functional Programming concepts implemented in C++17</p>
+<h1><a class="anchor" id="autotoc_md1"></a>
+Table of Contents</h1>
+<p>01. <a href="#introduction">Introduction</a> 02. <a href="#high-order-functions-hof">High Order Functions (HOF)</a> 03. <a href="#functor-applicative-functor-and-monad">Functor, Applicative Functor and Monad</a> 04. <a href="#maybe">Maybe</a> 05. <a href="#either">Either</a> 06. <a href="#function-lift">Function Lift</a> 07. <a href="#build">Build</a> 08. <a href="#example-app">Example App</a> 09. <a href="#future">Future</a></p>
+<h2><a class="anchor" id="autotoc_md2"></a>
+Introduction</h2>
+<p>C++ is a multi paradigm programming language and functional programming (FP) concepts keep getting added to the C++ standard.</p>
+<p>Yafl is a header only library that implements some key FP concepts, such as curring / uncurring, partial application, function composition, kleisli composition, and also the Maybe and Either monads (Functor, Applicative Functor and Monad).</p>
+<p>This library helps you in reducing code noise and boilerplate code. It can improve readability (if you are accustomed to FP) and it is really useful to learn functional concepts.</p>
+<p>Most of the concepts present in this library were inspired in some Haskell features.</p>
+<h3><a class="anchor" id="autotoc_md3"></a>
+High Order Functions (HOF)</h3>
+<p>Higher order functions are functions that take one or more functions as arguments, and/or return a function as their result.</p>
+<h4><a class="anchor" id="autotoc_md4"></a>
+Function Composition</h4>
+<p>Function composition is a mechanism that combines simple functions to build more complicated functions. Is an operation that takes two functions as arguments and returns a new function where th result of each function is passed as the argument of the next, and the result of the last one is the result of the whole.</p>
+<div class="fragment"><div class="line"> {c++}</div>
+<div class="line">struct Xpto { std::string value; };</div>
+<div class="line"> </div>
+<div class="line">const auto f1 =[](int i) { return i*42;};</div>
+<div class="line">const auto f2 =[](int i) { return std::to_string(i);};</div>
+<div class="line">const auto f3 =[](const std::string&amp; s) { return Xpto{ s };};</div>
+<div class="line"> </div>
+<div class="line">const auto comp_f1_f2 = yafl::compose(f1, f2);</div>
+<div class="line">const auto threeway = yafl::compose(comp_f1_f2, f3);</div>
+<div class="line">std::cout &lt;&lt; threeway(1).value &lt;&lt; std::endl;</div>
+</div><!-- fragment --><p>In mathematics, function composition is associative.</p>
+<p>f . (g . h) = (f . g) . h</p>
+<p>The above example is implemented following left associativity. We can implement the above example expressing right associativity. Note that in this example there's no need to explicitly declare the function type </p><div class="fragment"><div class="line"> {c++}</div>
+<div class="line">struct Xpto { std::string value; };</div>
+<div class="line"> </div>
+<div class="line">const auto f1 =[](int i) { return i*42;};</div>
+<div class="line">const auto f2 =[](int i) { return std::to_string(i);};</div>
+<div class="line">const auto f3 =[](const std::string&amp; s) { return Xpto{ s };};</div>
+<div class="line"> </div>
+<div class="line">const auto comp_f2_f3 = yafl::compose(f2, f3);</div>
+<div class="line">const auto threeway = yafl::compose(f1, comp_f2_f3);</div>
+<div class="line">std::cout &lt;&lt; threeway(1).value &lt;&lt; std::endl;</div>
+</div><!-- fragment --><h4><a class="anchor" id="autotoc_md5"></a>
+Partial Function Application</h4>
+<p>Partial application (or partial function application) refers to the process of fixing a number of arguments to a function, producing another function of smaller arity (less input arguments).</p>
+<div class="fragment"><div class="line"> {c++}</div>
+<div class="line">struct Xpto { std::string value;};</div>
+<div class="line"> </div>
+<div class="line">const auto f = [](int i, int j, float f, const std::string&amp; s, const Xpto&amp; x) {return 42;};</div>
+<div class="line"> </div>
+<div class="line">const auto partial_3arg_app = yafl::partial(f, 1, 2, 3.14);</div>
+<div class="line">const auto result = partial_3arg_app(&quot;s&quot;, Xpto{&quot;&quot;});</div>
+<div class="line">std::cout &lt;&lt; result &lt;&lt; std::endl;</div>
+<div class="line"> </div>
+<div class="line">const auto partial_2arg_app = yafl::partial(f, 1, 2);</div>
+<div class="line">const auto partial_4arg_app = yafl::partial(partial_2arg_app, 3.14, &quot;&quot;);</div>
+<div class="line">const auto result2 = partial_4arg_app(Xpto{&quot;&quot;});</div>
+<div class="line">std::cout &lt;&lt; result2 &lt;&lt; std::endl;</div>
+</div><!-- fragment --><h4><a class="anchor" id="autotoc_md6"></a>
+Currying / Uncurrying</h4>
+<p>Currying consists in the transformation of a function that takes multiple arguments into a sequence of functions, each takes a single argument.</p>
+<p>Uncurrying is the reverse process. It takes a function that takes one argument and whose return value is another function and yields a new function that takes two arguments (one from each function) and returns as result the application of the first function with using the first argument and using its result with the second argument.</p>
+<p>Note: we only referred two arguments , but we support multiple argument functions as shown in the following examples</p>
+<div class="fragment"><div class="line"> {c++}</div>
+<div class="line">int function1(int arg1, float arg2, const std::string&amp; arg3) { return 42;}</div>
+<div class="line"> </div>
+<div class="line">const auto curried_function1 = yafl::curry(function1);</div>
+<div class="line">const auto curried_function1_with_arg1_and_arg2 = curried_function1(42)(3.14);</div>
+<div class="line">const auto result = curried_function1_with_arg1_and_arg2(&quot;dummy&quot;);</div>
+<div class="line"> </div>
+<div class="line">const auto uncurried_function1 = yafl::uncurry(curried_function1);</div>
+<div class="line">const auto result2 = uncurried_function1(42, 3.14, &quot;dummy&quot;);</div>
+</div><!-- fragment --><p>The same behaviour can be achieved using lambda functions. The next example uses a lambda function that doesn't return anything.</p>
+<div class="fragment"><div class="line"> {c++}</div>
+<div class="line">const auto curried_function1 = yafl::curry([](int, int, int ,int){});</div>
+<div class="line">const auto curried_function1_with_arg1 = curried_function1(1);</div>
+<div class="line">curried_function1_with_arg1(2)(3)(4);</div>
+<div class="line"> </div>
+<div class="line">const auto uncurried_function1 = yafl::uncurry(curried_function1);</div>
+<div class="line">uncurried_function1(1, 2, 3, 4);</div>
+</div><!-- fragment --><h4><a class="anchor" id="autotoc_md7"></a>
+Identity and Const functions</h4>
+<p>The identity function always returns the value that was used as its argument, unchanged. The const function returns a function that may receive 0 or more arguments but will always evaluate to the value configured when it was invoked </p><div class="fragment"><div class="line"> {c++}</div>
+<div class="line">//v is 42</div>
+<div class="line">const auto v = yafl::id(42);</div>
+<div class="line"> </div>
+<div class="line">const auto ff = yafl::constf(42);</div>
+<div class="line">// all the following invocations will evaluate to 42</div>
+<div class="line">ff();</div>
+<div class="line">ff(&quot;&quot;);</div>
+<div class="line">ff(1,&quot;&quot;,3);</div>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md8"></a>
+Functor, Applicative Functor and Monad</h2>
+<p>The following <em>Functor</em>, <em>Applicative Functor</em> and <em>Monad</em> classes are part of YAFL core and are not meant to be used as is but if needed, it is possible to do so. Each description contains a brief example of a possible usage.</p>
+<p>We provide two implementations for all these functional "interfaces", the <a href="#maybe">Maybe</a> and <a href="#either">Either</a> classes.</p>
+<h3><a class="anchor" id="autotoc_md9"></a>
+Functor</h3>
+<p>In mathematics a functor is a mapping between categories (collection of objects linked by morphisms).</p>
+<p>We address Functor as a wrapper class for any value type, that allows a transformation to the underlying values, by relying on the application of a given function. It is represented in YAFL by the abstract class yafl::Functor, which provides the method <code>fmap</code> to apply the given transformation to the wrapped value.</p>
+<div class="fragment"><div class="line"> {c++}</div>
+<div class="line">const std::unique_ptr&lt;yafl::core::Functor&lt;yafl::Maybe, int&gt;&gt; functor =</div>
+<div class="line">        std::make_unique&lt;yafl::Maybe&lt;int&gt;&gt;(yafl::maybe::Just(420));</div>
+<div class="line">functor-&gt;fmap([](int i){ std::cout &lt;&lt; i &lt;&lt; std::endl;});</div>
+</div><!-- fragment --><p>Functors are required to obey certain laws. <a class="anchor" id="autotoc_md10"></a> </p><h5>Functors must preserve identity morphisms</h5>
+<p><em>Functor(a).fmap(id) = id(Functor(a))</em></p>
+<p><em>fmap(id, Functor(a)) = id(Functor(a))</em></p>
+<p>where:</p><ul>
+<li>id is the identity function. This function has type <em>id: a -&gt; a</em></li>
+<li>a is any value type</li>
+</ul>
+<div class="fragment"><div class="line"> {c++}</div>
+<div class="line">const auto v = yafl::maybe::Just(420);</div>
+<div class="line">const auto r2 = yafl::id(v);</div>
+<div class="line">std::cout &lt;&lt; (v.fmap(yafl::id&lt;int&gt;).value() == r2.value()) &lt;&lt; std::endl;</div>
+<div class="line">std::cout &lt;&lt; (yafl::functor::fmap(yafl::id&lt;int&gt;, v).value() == r2.value()) &lt;&lt; std::endl;</div>
+</div><!-- fragment --><p><a class="anchor" id="autotoc_md11"></a> </p><h5>Functors preserve composition of morphisms</h5>
+<p><em>fmap(compose(f, g), Functor(a)) == compose(fmap f, fmap g)(Functor(a))</em></p>
+<p><em>Functor(a).fmap(compose(f, g)) == compose(fmap f, fmap g)(Functor(a))</em></p>
+<p>where:</p><ul>
+<li>compose is the composition function. It has type <em>compose: (a -&gt; b), (b -&gt; c) -&gt; (a -&gt; c)</em></li>
+<li>a is any value type</li>
+</ul>
+<div class="fragment"><div class="line"> {c++}</div>
+<div class="line">const auto f1 = [](int i) { return std::to_string(i);};</div>
+<div class="line">const auto f2 = [](const std::string&amp; s) { return s + &quot;dummy&quot;;};</div>
+<div class="line"> </div>
+<div class="line">const auto m = yafl::maybe::Just(42);</div>
+<div class="line"> </div>
+<div class="line">const auto compose = yafl::compose(f1, f2);</div>
+<div class="line">const auto fmap_compose = yafl::functor::fmap&lt;yafl::Maybe&gt;(compose);</div>
+<div class="line"> </div>
+<div class="line">const auto compose2 = yafl::compose(yafl::functor::fmap&lt;yafl::Maybe&gt;(f1), yafl::functor::fmap&lt;yafl::Maybe&gt;(f2));</div>
+<div class="line">const auto result2 = compose2(m);</div>
+<div class="line"> </div>
+<div class="line">std::cout &lt;&lt; (fmap_compose(m).value() == result2.value()) &lt;&lt; std::endl;</div>
+<div class="line">std::cout &lt;&lt; (m.fmap(compose).value() == result2.value()) &lt;&lt; std::endl;</div>
+<div class="line">std::cout &lt;&lt; (yafl::functor::fmap(compose, m).value() == result2.value()) &lt;&lt; std::endl;</div>
+<div class="line">std::cout &lt;&lt; (m.fmap(f1).fmap(f2).value() == result2.value()) &lt;&lt; std::endl;</div>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md12"></a>
+Applicative Functor</h3>
+<p>Applicative functors are functors on steroids (with extra laws and operations). They are an intermediate class between Functor and Monad. They allow function application to be chained across multiple instances of the structure.</p>
+<p>Functor <em>fmap</em> applies a function to a value inside a functor:</p>
+<p><em>fmap :: (a -&gt; b) -&gt; f a -&gt; f b</em></p>
+<p>Applicative <em>apply</em> applies a function inside a functor to a value also inside the functor</p>
+<p><em>apply :: f (a -&gt; b) -&gt; f a -&gt; f b</em></p>
+<p>We implemented the apply operation using C++ operator(). Our implementation of applicative functors can receive a function with any number of arguments, that can later be partially applied.</p>
+<p>It is represented in YAFL by the abstract class yafl::Applicative, which provides the method <code>operator()</code> to apply the given value to the wrapped function.</p>
+<div class="fragment"><div class="line"> {c++}</div>
+<div class="line">const std::unique_ptr&lt;yafl::core::Applicative&lt;yafl::Maybe, std::function&lt;int(int)&gt;&gt;&gt; applicative =</div>
+<div class="line">std::make_unique&lt;yafl::Maybe&lt;std::function&lt;int(int)&gt;&gt;&gt;(yafl::maybe::Just&lt;std::function&lt;int(int)&gt;&gt;([](int i){ return i;}));</div>
+<div class="line">(*applicative)(42);</div>
+</div><!-- fragment --><p>Applicatives are required to satisfy four laws: <a class="anchor" id="autotoc_md13"></a> </p><h5>Identity</h5>
+<p><em>Applicative(id)(Value) = Value</em></p>
+<p>where:</p><ul>
+<li>id is the identity function. This function has type <em>id: a -&gt; a</em></li>
+<li>any value or a Functor with any wrapped value. It has type <em>Value: a</em> or <em>Value: Functor a</em>.</li>
+</ul>
+<div class="fragment"><div class="line"> {c++}</div>
+<div class="line">const auto v = yafl::maybe::Just(42);</div>
+<div class="line">const auto ap = yafl::maybe::Just(&amp;yafl::id&lt;int&gt;);</div>
+<div class="line">std::cout &lt;&lt; (ap(v).value() == v.value()) &lt;&lt; std::endl;</div>
+<div class="line">std::cout &lt;&lt; (ap(yafl::Maybe(v)).value() == v.value()) &lt;&lt; std::endl;</div>
+<div class="line">std::cout &lt;&lt; (ap(yafl::maybe::Just(42)).value() == v.value()) &lt;&lt; std::endl;</div>
+<div class="line"> </div>
+<div class="line">const auto ap2 = yafl::maybe::Just(&amp;yafl::id&lt;int&gt;);</div>
+<div class="line">std::cout &lt;&lt; (ap2(42).value() == v.value()) &lt;&lt; std::endl;</div>
+</div><!-- fragment --><p><a class="anchor" id="autotoc_md14"></a> </p><h5>Composition</h5>
+<p><em>Applicative(compose)(function_u)(function_v)(value_w) = function_v(function_u(value_w)))</em></p>
+<p>where:</p><ul>
+<li>compose is the composition function. It has type <em>compose: (a -&gt; b), (b -&gt; c) -&gt; (a -&gt; c)</em></li>
+<li>function_u can be a callable objet or a Functor with a wrapped callable. It has type <em>function_u : a -&gt; b</em>,</li>
+<li>function_v can be a callable objet or a Functor with a wrapped callable. It has type <em>function_v : b -&gt; c</em>,</li>
+<li>value_w can be any value or a Functor with any value wrapped. It has type <em>value_w : a</em> or <em>value_w : Functor a</em></li>
+</ul>
+<div class="fragment"><div class="line"> {c++}</div>
+<div class="line">const auto lf = [](int i){ return 42 * i;};</div>
+<div class="line">const auto rf = [](int i){ return std::to_string(i);};</div>
+<div class="line">const auto ap = yafl::maybe::Just(&amp;yafl::compose&lt;std::function&lt;int(int)&gt;, </div>
+<div class="line">                                                 std::function&lt;std::string(int)&gt;&gt;);</div>
+<div class="line">const auto ap_decl = yafl::maybe::Just(&amp;yafl::compose&lt;decltype(lf), decltype(rf)&gt;);</div>
+<div class="line"> </div>
+<div class="line"> </div>
+<div class="line">const auto ap_result = ap(lf)(rf)(2);</div>
+<div class="line">const auto ap_result2 = ap(yafl::maybe::Just(std::function(lf)))</div>
+<div class="line">                         (yafl::maybe::Just(std::function(rf)))</div>
+<div class="line">                         (yafl::maybe::Just(2));</div>
+<div class="line"> </div>
+<div class="line">const auto ap2 = yafl::maybe::Just(std::function(lf))(2);</div>
+<div class="line">const auto ap2_result = yafl::maybe::Just(std::function(rf))(ap2);</div>
+<div class="line"> </div>
+<div class="line">std::cout &lt;&lt; (ap_result.value() == ap2_result.value()) &lt;&lt; std::endl;</div>
+<div class="line">std::cout &lt;&lt; (ap_result2.value() == ap2_result.value()) &lt;&lt; std::endl;</div>
+<div class="line">std::cout &lt;&lt; (ap_decl(lf)(rf)(2).value() == ap2_result.value()) &lt;&lt; std::endl;</div>
+</div><!-- fragment --><p><a class="anchor" id="autotoc_md15"></a> </p><h5>Homomorphism</h5>
+<p><em>Applicative(f)(Functor x) = Applicative(f (x))</em> where:</p><ul>
+<li>f is a function that takes a value of x. It has type <em>f: a -&gt; b</em></li>
+<li>x is any value type. It has type x : <em>a</em></li>
+</ul>
+<div class="fragment"><div class="line"> {c++}</div>
+<div class="line">const auto f = [](int i){ return 42 * i;};</div>
+<div class="line">const auto ap = yafl::maybe::Just&lt;std::function&lt;int(int)&gt;&gt;(f);</div>
+<div class="line">const auto ap2 = yafl::maybe::Just(f);</div>
+<div class="line"> </div>
+<div class="line">std::cout &lt;&lt; (ap(2).value() == yafl::maybe::Just(f(2)).value()) &lt;&lt; std::endl;</div>
+<div class="line">std::cout &lt;&lt; (ap(yafl::maybe::Just(2)).value() == yafl::maybe::Just(f(2)).value()) &lt;&lt; std::endl;</div>
+<div class="line"> </div>
+<div class="line">std::cout &lt;&lt; (ap2(2).value() == yafl::maybe::Just(f(2)).value()) &lt;&lt; std::endl;</div>
+<div class="line">std::cout &lt;&lt; (ap2(yafl::maybe::Just(2)).value() == yafl::maybe::Just(f(2)).value()) &lt;&lt; std::endl;</div>
+</div><!-- fragment --><p><a class="anchor" id="autotoc_md16"></a> </p><h5>Interchange</h5>
+<p><em>Applicative(f)(Functor x) == Applicative(g)(Functor u)</em></p>
+<p>where:</p><ul>
+<li>x is any value type. It has type <em>a</em>.</li>
+<li>f is a function that takes a value of x. It has type f: a -&gt; b</li>
+<li>g is a function that takes a function and applies it to a value x. It has type g: (a -&gt; b) -&gt; b</li>
+</ul>
+<div class="fragment"><div class="line"> {c++}</div>
+<div class="line">const auto f = [](int i){ return 42 * i;};</div>
+<div class="line">const auto ap = yafl::maybe::Just&lt;std::function&lt;int(int)&gt;&gt;(f);</div>
+<div class="line"> </div>
+<div class="line">const auto ap2 = yafl::maybe::Just([](auto func){ return func(2);});</div>
+<div class="line"> </div>
+<div class="line">std::cout &lt;&lt; (ap(yafl::maybe::Just(2)).value() == ap2(f).value()) &lt;&lt; std::endl;</div>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md17"></a>
+Monad</h3>
+<p>A monad is another higher-order abstraction that builds on top of functors and applicatives. It encapsulates sequences of computation steps. Monads provide a way to chain operations together in a controlled manner, abstracting away the need for explicit sequencing and error handling.</p>
+<p>We address Monads as a wrapper class for any value type, and we provide a method <code>bind</code>. This method is often used to flatten nested monadic structures while simultaneously applying a function to the values within these structures This bind method can also be referred as flatmap in other functional programming languages. The flatMap (or bind in our case) operation combines mapping and flattening, which can be quite useful for handling sequences of computations or values that are encapsulated within monads. It is represented in YAFL by the abstract class yafl::Monad.</p>
+<div class="fragment"><div class="line"> {c++}</div>
+<div class="line">const std::unique_ptr&lt;yafl::core::Monad&lt;yafl::Maybe, int&gt;&gt; monad =</div>
+<div class="line">std::make_unique&lt;yafl::Maybe&lt;int&gt;&gt;(yafl::maybe::Just(420));</div>
+<div class="line">monad-&gt;bind([](int i){ return yafl::Maybe&lt;int&gt;::Nothing();});</div>
+</div><!-- fragment --><p> Monads must also adhere to certain laws.</p>
+<p><a class="anchor" id="autotoc_md18"></a> </p><h5>Left identity</h5>
+<p><em>Monad(a) k = k a</em> </p><div class="fragment"><div class="line"> {c++}</div>
+<div class="line">const auto func = [](int i){ return yafl::maybe::Just(i*2);};</div>
+<div class="line">const auto v = yafl::maybe::Just(42);</div>
+<div class="line">const auto result = v.bind(func);</div>
+<div class="line">const auto result2 = func(42);</div>
+<div class="line">std::cout &lt;&lt; (result.value() == result2.value()) &lt;&lt; std::endl;</div>
+<div class="line">std::cout &lt;&lt; (yafl::monad::bind(func, v).value() == func(42).value()) &lt;&lt; std::endl;</div>
+</div><!-- fragment --><p><a class="anchor" id="autotoc_md19"></a> </p><h5>Right identity</h5>
+<div class="fragment"><div class="line"> {c++}</div>
+<div class="line">const auto v = yafl::maybe::Just(42);</div>
+<div class="line">const auto mreturn = [](int arg) {</div>
+<div class="line">   return yafl::maybe::Just(arg);</div>
+<div class="line">};</div>
+<div class="line">std::cout &lt;&lt; (v.bind(mreturn).value() == v.value()) &lt;&lt; std::endl;</div>
+</div><!-- fragment --><p><a class="anchor" id="autotoc_md20"></a> </p><h5>Associativity</h5>
+<div class="fragment"><div class="line"> {c++}</div>
+<div class="line">const auto v = yafl::maybe::Just(42);</div>
+<div class="line">const auto f = [](int i) { return yafl::maybe::Just(2 * i);};</div>
+<div class="line">const auto g = [](int i) { return yafl::maybe::Just(6 + i);};</div>
+<div class="line"> </div>
+<div class="line">const auto lresult = v.bind(f).bind(g).value();</div>
+<div class="line">const auto rresult = v.bind([f,g](int i) { return f(i).bind(g);}).value();</div>
+<div class="line">std::cout &lt;&lt; (lresult == rresult) &lt;&lt; std::endl;</div>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md21"></a>
+Maybe</h2>
+<p>The Maybe Monad is a concept commonly used in functional programming languages, to handle computations that may or may not produce a value. It's particularly useful for situations where the result of a computation could be null or undefined. The Maybe Monad provides a structured way to handle such cases without resorting to explicit null checks or throwing exceptions.</p>
+<h3><a class="anchor" id="autotoc_md22"></a>
+Motivation</h3>
+<p>The Maybe Monad addresses the problem of null values or undefined behavior. In languages like C++, null pointers can lead to runtime errors and crashes. The Maybe Monad offers a type-safe way to represent optional values while avoiding these issues.</p>
+<h3><a class="anchor" id="autotoc_md23"></a>
+Structure</h3>
+<p>The Maybe Monad consists of two possible states:</p><ul>
+<li>Just(value): Represents a valid value.</li>
+<li>Nothing: Represents the absence of a value.</li>
+</ul>
+<p>For each state it provides the functions <code>fmap</code>, <code>bind</code> and <code>operator()</code>, <code>hasValue</code> Supports the retrieval of the wrapped value via the <code>value</code> and <code>valueOr</code> functions. Note: These functions are not visible if type void is used.</p>
+<h3><a class="anchor" id="autotoc_md24"></a>
+Implementation</h3>
+<p>In our implementation, the Maybe class implements the abstract classes Functor, Applicative and Monad. We support both void and any value types. Instead of returning null or throwing exceptions, functions <code>fmap</code>, <code>bind</code> and <code>operator()</code> return a Maybe monad instance. Chaining operations is central to the Maybe Monad's utility. One can compose operations that work on optional values. If any step in the chain encounters a Nothing, the rest of the chain short-circuits, avoiding unnecessary computations. The Maybe Monad provides a structured way to handle errors without using exceptions. Instead of throwing exceptions, a computation that fails returns a Nothing, and the chain of operations can continue or stop gracefully.</p>
+<h3><a class="anchor" id="autotoc_md25"></a>
+Benefits:</h3>
+<ul>
+<li>Safe Handling of Optionals: Prevents null pointer exceptions by encapsulating optional values</li>
+<li>Functional Composition: Supports chaining of operations on optional values</li>
+<li>Improved Code Readability: Enhances code readability by eliminating nested null checks. Expresses intent by using monadic operations.</li>
+<li>Predictable Behavior: Simplifies error handling and edge cases</li>
+<li>Reduced Error Surfaces: Makes code more robust and resilient</li>
+<li>Type Safety: Ensures type safety by encapsulating optional values in a monad</li>
+</ul>
+<h2><a class="anchor" id="autotoc_md26"></a>
+Either</h2>
+<p>The Either Monad is a monadic structure that encapsulates two possible values, typically referred to as "left" and "right". It's used to represent computations that might fail or have two distinct outcomes. Is often used for error handling, where the "left" value represents an error or failure, and the "right" value represents a successful computation.</p>
+<h3><a class="anchor" id="autotoc_md27"></a>
+Motivation</h3>
+<p>The Either Monad is designed to handle computations that might have two distinct outcomes, such as success and failure. It provides a structured way to manage these outcomes while ensuring composability and type safety.</p>
+<h3><a class="anchor" id="autotoc_md28"></a>
+Structure</h3>
+<p>The Either Monad consists of two possible states:</p><ul>
+<li>Error(value): Represents an error value</li>
+<li>Ok(value): Represents a valid value</li>
+</ul>
+<p>Our implementation uses Error and Ok to represent the "left" and "right" values. For each state it also provides the functions <code>fmap</code>, <code>bind</code>, <code>operator()</code>, <code>isError</code>, <code>isOk</code> Supports the retrieval of the wrapped error or value via the <code>value</code>, <code>valueOr</code>, <code>error</code>, <code>errorOr</code> functions. Note: These functions are not visible if type void is used.</p>
+<h3><a class="anchor" id="autotoc_md29"></a>
+Implementation</h3>
+<p>In our implementation, the Either class implements the abstract classes Functor, Applicative and Monad. We support both void and any value types. Instead of returning null or throwing exceptions, functions <code>fmap</code>, <code>bind</code> and <code>operator()</code> return an Either monad instance. The Either monad supports composability, allowing you to chain computations together and handle errors gracefully. This makes it suitable for scenarios where one needs to perform a sequence of computations that might fail at any point. If any step in the chain encounters an Error, the rest of the chain short-circuits, avoiding unnecessary computations and the error is propagated. The Either monad is a powerful tool for managing computations with two distinct outcomes, such as success and failure. It provides a structured way to handle errors, compose computations, and ensure a clear separation between successful and unsuccessful outcomes.</p>
+<h3><a class="anchor" id="autotoc_md30"></a>
+Benefits:</h3>
+<ul>
+<li>Handling Success and Failure: Represents computations that can have either a successful result (Ok) or an error (Error)</li>
+<li>Improved Error Handling: Offers a consistent error-handling mechanism across different parts of the code</li>
+<li>Clear Separation of Concerns: Separates the handling of successful and failed computations.</li>
+<li>Functional Composition: Enables chaining of operations while dealing with potential errors</li>
+<li>Predictable Behavior: Ensures that every computation returns an Either value, indicating success or failure.</li>
+<li>Flexible Error Reporting: Enables capturing additional information about failures using Left values.</li>
+<li>Improved Readability: Makes code more readable by explicitly handling success and failure cases.</li>
+</ul>
+<h2><a class="anchor" id="autotoc_md31"></a>
+Function lift</h2>
+<p>Lifting is a technique in functional programming that involves transforming regular functions into functions that can operate on values wrapped within special types, such as our Maybe or Either types.</p>
+<p>Function lifting is a fundamental concept in functional programming, allowing one to work with values in a more expressive and safe manner within the context of these functors/monads. It helps one avoid explicitly handling null values (Maybe) or error propagation (Either) by encapsulating such behavior within the functor/monad itself.</p>
+<p>We provide a function lift, within namespace maybe, that lifts the provided function into the Maybe monad realm. </p>
+<h3><a class="anchor" id="autotoc_md32"></a>
+Maybe Lift:</h3>
+<div class="fragment"><div class="line"> {c++}</div>
+<div class="line">const auto funcOneArgRetInt = [](int i) { return 42 * i;};</div>
+<div class="line">const auto liftedFunction = maybe::lift(funcOneArgRetInt);</div>
+<div class="line">const auto result = liftedFunction(maybe::Just(1));</div>
+<div class="line">const auto result2 = lifted(maybe::Nothing&lt;int&gt;());</div>
+<div class="line"> </div>
+<div class="line">const auto funcMultiArgRetString = [](int i, int j, const std::string&amp; s) { return s + std::to_string(i + j);};</div>
+<div class="line">const auto liftedFunctionMArg = maybe::lift(funcMultiArgRetString);</div>
+<div class="line">const auto result  = liftedFunctionMArg(maybe::Just(2), maybe::Just(4), maybe::Just&lt;std::string&gt;(&quot;dummy&quot;));</div>
+<div class="line">const auto result2 = liftedFunctionMArg(maybe::Nothing&lt;int&gt;(), maybe::Just&lt;int&gt;(4), maybe::Just&lt;std::string&gt;(&quot;dummy&quot;));</div>
+<div class="line">const auto result3 = liftedFunctionMArg(maybe::Just(1), maybe::Nothing&lt;int&gt;(), maybe::Just&lt;std::string&gt;(&quot;dummy&quot;));</div>
+<div class="line">const auto result4 = liftedFunctionMArg(maybe::Just(1), maybe::Just&lt;int&gt;(4), maybe::Nothing&lt;std::string&gt;());</div>
+</div><!-- fragment --><p>We provide a function lift, within namespace either, that lifts the provided function into the Either monad realm. In this case one needs to explicitly specify the Error type since it cannot be deduced. </p>
+<h3><a class="anchor" id="autotoc_md33"></a>
+Either Lift:</h3>
+<div class="fragment"><div class="line"> {c++}</div>
+<div class="line">const auto funcOneArgRetInt = [](int i) { return 42 * i;};</div>
+<div class="line">const auto liftedFunc_voiderror = yafl::either::lift(funcOneArgRetInt);</div>
+<div class="line">const auto result = liftedFunc_voiderror(either::Ok&lt;void&gt;(1));</div>
+<div class="line">const auto result_witherror = liftedFunc_voiderror(either::Nothing&lt;void&gt;());</div>
+<div class="line"> </div>
+<div class="line">const auto liftedFunc_interror = yafl::either::lift&lt;int&gt;(funcOneArgRetInt);</div>
+<div class="line">const auto result = liftedFunc_interror(either::Ok&lt;int&gt;(1));</div>
+<div class="line"> </div>
+<div class="line">const auto funcMultiArgRetString = [](int i, int j, const std::string&amp; s) { return s + std::to_string(i + j);};</div>
+<div class="line">const auto liftedFuncMArg = yafl::either::lift&lt;int&gt;(funcMultiArgRetString);</div>
+<div class="line">const auto result = liftedFuncMArg(either::Ok&lt;int&gt;(2), either::Ok&lt;int&gt;(4), either::Ok&lt;int, std::string&gt;(&quot;dummy&quot;));</div>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md34"></a>
+Build</h2>
+<p>Currently, YAFL supports CMake and Bazel build tools </p>
+<h3><a class="anchor" id="autotoc_md35"></a>
+CMake</h3>
+<p>Create a build directory and navigate into it: </p><div class="fragment"><div class="line">mkdir build</div>
+<div class="line">cd build</div>
+</div><!-- fragment --><p> Run CMake to generate build files. YAFL supports several CMake flags with different meanings</p><ul>
+<li><code>BUILD_YAFL_DOCS</code>: Enables building doxygen documentation. Requires doxygen to be installed</li>
+<li><code>BUILD_YAFL_TESTS</code>: Enables building all tests. Requires GTest framework to be installed. Tests can be executed using CTest.</li>
+<li><code>BUILD_YAFL_COVERAGE</code>: Enables building all tests with coverage support. Requires GTest framework, python3, lcov to be installed</li>
+<li><code>BUILD_YAFL_EXAMPLE</code>: Enables building the example application.</li>
+</ul>
+<p>Example building and installing the library in Release build type </p><div class="fragment"><div class="line">cmake .. -DCMAKE_INSTALL_PREFIX:PATH=&lt;some path&gt;</div>
+<div class="line"> </div>
+<div class="line">cmake --build . --config Release --target install</div>
+</div><!-- fragment --><p> Note that YAFL will be installed in</p><ul>
+<li>Header files will be installed in &lt;PREFIX&gt;/include</li>
+<li>Static/Shared library files will be installed in &lt;PREFIX&gt;/lib</li>
+<li>CMake target files will be installed in &lt;PREFIX&gt;/lib/cmake/Yafl</li>
+</ul>
+<p>Example building the tests and coverage using ninja </p><div class="fragment"><div class="line">cmake .. -DBUILD_YAFL_TESTS=ON -DBUILD_YAFL_COVERAGE=ON -GNinja</div>
+<div class="line"> </div>
+<div class="line">cmake --build . --config Debug</div>
+<div class="line">cmake --build . --config Debug --target test </div>
+<div class="line"> </div>
+<div class="line">cmake --build . --config Debug --target coverage</div>
+</div><!-- fragment --><p>Example building the example application </p><div class="fragment"><div class="line">cmake .. -DBUILD_YAFL_EXAMPLE=ON</div>
+<div class="line"> </div>
+<div class="line">cmake --build . --config Release</div>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md36"></a>
+Bazel</h3>
+<p>TODO</p>
+<h2><a class="anchor" id="autotoc_md37"></a>
+Example App</h2>
+<p>A sample application is provided with YAFL that shows briefly how this library can be used. It is a simple caesar cipher encoder/decoder application. This application receives a file, a seed and the mechanism (encode / decode) and outputs another file that contains the application the cipher. The main function for this application executes the same operations several times, using different YAFL approaches, just to present YAFL use cases.</p>
+<p>It can be build using CMake flag -DBUILD_YAFL_EXAMPLE=ON, and it generates the binary <code>ACC</code> in <code>&lt;cmake build directory&gt;/example/</code></p>
+<p>Usage: <code>./ACC &lt;-e|-d&gt; &lt;seed&gt; &lt;filename&gt;</code></p>
+<p>Note: Seed can be a value between 0 and 255</p>
+<h2><a class="anchor" id="autotoc_md38"></a>
+Future</h2>
+<ul>
+<li>Add BiFunctor implementation to Either type</li>
+<li>Add other monads (Reader, Writer, State, Continuation, ...)</li>
+<li>Bazel input flags and install targets</li>
+<li>Bazel github actions</li>
+<li>Bump C++ version </li>
+</ul>
+</div></div><!-- PageDoc -->
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

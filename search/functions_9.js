@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['lift_189',['lift',['../group__Either.html#gaf90b8bc181dadff2f613c53b4ead6287',1,'yafl::either::lift()'],['../group__Maybe.html#ga75f1c459fd3e0dd82778fceafbfafaf3',1,'yafl::maybe::lift()']]]
+  ['kleisli_5fcompose_230',['kleisli_compose',['../group__HOF.html#ga7ba8fcd4e642d274b7f667b26df5f07f',1,'yafl']]]
 ];

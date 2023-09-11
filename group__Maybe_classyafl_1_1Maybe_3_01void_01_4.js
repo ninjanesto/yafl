@@ -8,5 +8,7 @@ var group__Maybe_classyafl_1_1Maybe_3_01void_01_4 =
     [ "operator!", "group__Maybe.html#ae1944e030ab38da69c304c5ab1452315", null ],
     [ "operator=", "group__Maybe.html#a2140fdeb20dc92db9e56fbd37f196e9b", null ],
     [ "operator=", "group__Maybe.html#a447e253b6c6d2c632091f06e88f04af1", null ],
-    [ "operator==", "group__Maybe.html#a680346e1fb47eba67f74b9bf524524ae", null ]
+    [ "operator==", "group__Maybe.html#a680346e1fb47eba67f74b9bf524524ae", null ],
+    [ "core::Functor< Maybe, void >", "group__Maybe.html#a9cd387a507324c3c62eadf9970955c07", null ],
+    [ "core::Monad< Maybe, void >", "group__Maybe.html#a5e92c91ec81cb14377e7241a39c322f0", null ]
 ];

@@ -14,7 +14,10 @@ var group__Either =
       [ "operator=", "group__Either.html#aaebaa03da2996adb7a8064485c98bbc9", null ],
       [ "operator==", "group__Either.html#a87431e63d0fa91e547fc881308cc6298", null ],
       [ "value", "group__Either.html#a6774a00c8b6df8711d68dc5c105ea5eb", null ],
-      [ "valueOr", "group__Either.html#aa9d3f4205f07547b176a0f033d91e8a9", null ]
+      [ "valueOr", "group__Either.html#aa9d3f4205f07547b176a0f033d91e8a9", null ],
+      [ "core::Applicative< Either, ErrorType, ValueType >", "group__Either.html#a12228d75aba74e4fd6b0207cbbdc5d35", null ],
+      [ "core::Functor< Either, ErrorType, ValueType >", "group__Either.html#ac61ca7c192b8dde9c291413019a3ebab", null ],
+      [ "core::Monad< Either, ErrorType, ValueType >", "group__Either.html#a20eb8f00b985a7bcf7abaed98b95afb1", null ]
     ] ],
     [ "Either< void, void >", "group__Either.html#classyafl_1_1Either_3_01void_00_01void_01_4", [
       [ "Either", "group__Either.html#a7485d00de6b9d817cd23fa7eab4e6131", null ],
@@ -26,7 +29,9 @@ var group__Either =
       [ "operator!", "group__Either.html#a360d680288cd86a21a9b82de5dc6b816", null ],
       [ "operator=", "group__Either.html#ac10e8e543ba82e134b1cb8f7ca05e3fe", null ],
       [ "operator=", "group__Either.html#a377b6dd5b743157e6eedec38f8eac6d0", null ],
-      [ "operator==", "group__Either.html#aad3900081131af8dcf93d142f4084dfe", null ]
+      [ "operator==", "group__Either.html#aad3900081131af8dcf93d142f4084dfe", null ],
+      [ "core::Functor< Either, void, void >", "group__Either.html#a2848b9184043d010146d846b80a89c95", null ],
+      [ "core::Monad< Either, void, void >", "group__Either.html#a3ef50c0d8608b718a96ed029fe78f96d", null ]
     ] ],
     [ "Either< void, ValueType >", "group__Either.html#classyafl_1_1Either_3_01void_00_01ValueType_01_4", [
       [ "Either", "group__Either.html#a1803856938133f14a6fad7b6fbcf3a95", null ],
@@ -40,7 +45,10 @@ var group__Either =
       [ "operator=", "group__Either.html#a565302aefa84a8189ca300d10246615c", null ],
       [ "operator==", "group__Either.html#ab3381b36b58a7ca63be7ad191777244f", null ],
       [ "value", "group__Either.html#a36ea23d6b4fa7281f1bf8401d7ea81cf", null ],
-      [ "valueOr", "group__Either.html#a927d8f63de89322619d9e8ccd0d86877", null ]
+      [ "valueOr", "group__Either.html#a927d8f63de89322619d9e8ccd0d86877", null ],
+      [ "core::Applicative< Either, void, ValueType >", "group__Either.html#a23c31454067f69dc58ed25d873379ec5", null ],
+      [ "core::Functor< Either, void, ValueType >", "group__Either.html#a9b7f872c5fd8f9fc0c4760c2bebc27e0", null ],
+      [ "core::Monad< Either, void, ValueType >", "group__Either.html#a5b69f67c3e5960022eb30251d0945da2", null ]
     ] ],
     [ "Either< ErrorType, void >", "group__Either.html#classyafl_1_1Either_3_01ErrorType_00_01void_01_4", [
       [ "Either", "group__Either.html#a6ca619b1985a5d89bbee5a0b2a2a4b40", null ],
@@ -54,7 +62,9 @@ var group__Either =
       [ "operator!", "group__Either.html#a1c161e9ae7edb63980c379c0eba56141", null ],
       [ "operator=", "group__Either.html#a0ce42e1435b0cc6f7472f53410a82334", null ],
       [ "operator=", "group__Either.html#ada86d09012ec0ac636acb89ad4bbcee5", null ],
-      [ "operator==", "group__Either.html#a20473f053f60d72050cec1da7fdd5bf2", null ]
+      [ "operator==", "group__Either.html#a20473f053f60d72050cec1da7fdd5bf2", null ],
+      [ "core::Functor< Either, ErrorType, void >", "group__Either.html#a7a1bdf4642320a3446153cfcbc1b6a09", null ],
+      [ "core::Monad< Either, ErrorType, void >", "group__Either.html#a2d53e5c19ac96339e8ae91deec136632", null ]
     ] ],
     [ "Error", "group__Either.html#gafe0a9035b3148aea1613793b3f8a69cc", null ],
     [ "Error", "group__Either.html#ga03578d8a8cc49afc90bb0edcc2d3defb", null ],

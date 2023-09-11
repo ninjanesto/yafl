@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['uncurry_199',['uncurry',['../group__HOF.html#ga6199176f68b95611b0697cc941f7b1b0',1,'yafl']]]
+  ['partial_240',['partial',['../group__HOF.html#gaea2f7e1b828bff918206b80b468c256c',1,'yafl']]]
 ];

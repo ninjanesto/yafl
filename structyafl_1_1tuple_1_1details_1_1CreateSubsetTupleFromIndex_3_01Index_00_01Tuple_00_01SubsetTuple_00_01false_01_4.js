@@ -1,0 +1,4 @@
+var structyafl_1_1tuple_1_1details_1_1CreateSubsetTupleFromIndex_3_01Index_00_01Tuple_00_01SubsetTuple_00_01false_01_4 =
+[
+    [ "NewSubsetTuple", "structyafl_1_1tuple_1_1details_1_1CreateSubsetTupleFromIndex_3_01Index_00_01Tuple_00_01SubsetTuple_00_01false_01_4.html#a6c101552f195e29c0dc5fe75a3309dd1", null ]
+];

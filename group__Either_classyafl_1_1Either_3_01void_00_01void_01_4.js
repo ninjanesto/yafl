@@ -9,5 +9,7 @@ var group__Either_classyafl_1_1Either_3_01void_00_01void_01_4 =
     [ "operator!", "group__Either.html#a360d680288cd86a21a9b82de5dc6b816", null ],
     [ "operator=", "group__Either.html#ac10e8e543ba82e134b1cb8f7ca05e3fe", null ],
     [ "operator=", "group__Either.html#a377b6dd5b743157e6eedec38f8eac6d0", null ],
-    [ "operator==", "group__Either.html#aad3900081131af8dcf93d142f4084dfe", null ]
+    [ "operator==", "group__Either.html#aad3900081131af8dcf93d142f4084dfe", null ],
+    [ "core::Functor< Either, void, void >", "group__Either.html#a2848b9184043d010146d846b80a89c95", null ],
+    [ "core::Monad< Either, void, void >", "group__Either.html#a3ef50c0d8608b718a96ed029fe78f96d", null ]
 ];

@@ -89,7 +89,7 @@ $(document).ready(function(){initNavTree('group__HOF.html',''); initResizable();
 </div><!--header-->
 <div class="contents">
 
-<p>Yet Another Functional Library.  
+<p>Group of High Order Functions that provide features like function composition, partial application, currying and uncurrying, etc.  
 <a href="#details">More...</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
@@ -132,7 +132,7 @@ Functions</h2></td></tr>
 <tr class="separator:ga48a240fe803a7b7c9188b0b85951f95d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<p>Yet Another Functional Library. </p>
+<p>Group of High Order Functions that provide features like function composition, partial application, currying and uncurrying, etc. </p>
 <dl class="section copyright"><dt>Copyright</dt><dd>2023, Ernesto Festas. Distributed under MIT license (See accompanying LICENSE file) </dd></dl>
 <h2 class="groupheader">Function Documentation</h2>
 <a id="ga3805a64bc19cdbc827589b4e2e4f19b9"></a>
@@ -162,6 +162,8 @@ template&lt;typename Predicate , typename ... Args&gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p><code>#include &lt;src/yafl/HOF.h&gt;</code></p>
 
 <p>Function that applies given predicate to all input arguments. </p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
@@ -210,6 +212,8 @@ template&lt;typename TLeft , typename TRight &gt; </div>
       </table>
 </div><div class="memdoc">
 
+<p><code>#include &lt;src/yafl/HOF.h&gt;</code></p>
+
 <p>Generic composition. </p>
 <p>It can perform either function or monadic function (kleisli) composition </p><dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
@@ -247,6 +251,8 @@ template&lt;typename First &gt; </div>
       </table>
 </div><div class="memdoc">
 
+<p><code>#include &lt;src/yafl/HOF.h&gt;</code></p>
+
 <p>Function that always evaluates to the first argument, ignoring its second argument. </p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
@@ -281,6 +287,8 @@ template&lt;typename Callable &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p><code>#include &lt;src/yafl/HOF.h&gt;</code></p>
 
 <p>Curry given callable. </p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
@@ -327,6 +335,8 @@ template&lt;typename TLeft , typename TRight &gt; </div>
       </table>
 </div><div class="memdoc">
 
+<p><code>#include &lt;src/yafl/HOF.h&gt;</code></p>
+
 <p>Compose functions. </p>
 <p>Similar as piping shell commands. Output of first function is piped as input to the second function, except when output is void </p><dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
@@ -363,6 +373,8 @@ template&lt;typename Arg &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p><code>#include &lt;src/yafl/HOF.h&gt;</code></p>
 
 <p>Identity function. </p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
@@ -408,6 +420,8 @@ template&lt;typename TLeft , typename TRight &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p><code>#include &lt;src/yafl/HOF.h&gt;</code></p>
 
 <p>Compose functions that return Monadic values. </p>
 <p>Similar as piping shell commands. Output of first function is piped as input to the second function, except when output is void </p><dl class="tparams"><dt>Template Parameters</dt><dd>
@@ -456,6 +470,8 @@ template&lt;typename Callable , typename ... Args&gt; </div>
       </table>
 </div><div class="memdoc">
 
+<p><code>#include &lt;src/yafl/HOF.h&gt;</code></p>
+
 <p>Partial apply given function. </p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
@@ -492,6 +508,8 @@ template&lt;typename Callable &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p><code>#include &lt;src/yafl/HOF.h&gt;</code></p>
 
 <p>Uncurry given callable. </p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>

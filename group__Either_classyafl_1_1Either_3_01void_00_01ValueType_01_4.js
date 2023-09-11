@@ -11,5 +11,8 @@ var group__Either_classyafl_1_1Either_3_01void_00_01ValueType_01_4 =
     [ "operator=", "group__Either.html#a565302aefa84a8189ca300d10246615c", null ],
     [ "operator==", "group__Either.html#ab3381b36b58a7ca63be7ad191777244f", null ],
     [ "value", "group__Either.html#a36ea23d6b4fa7281f1bf8401d7ea81cf", null ],
-    [ "valueOr", "group__Either.html#a927d8f63de89322619d9e8ccd0d86877", null ]
+    [ "valueOr", "group__Either.html#a927d8f63de89322619d9e8ccd0d86877", null ],
+    [ "core::Applicative< Either, void, ValueType >", "group__Either.html#a23c31454067f69dc58ed25d873379ec5", null ],
+    [ "core::Functor< Either, void, ValueType >", "group__Either.html#a9b7f872c5fd8f9fc0c4760c2bebc27e0", null ],
+    [ "core::Monad< Either, void, ValueType >", "group__Either.html#a5b69f67c3e5960022eb30251d0945da2", null ]
 ];

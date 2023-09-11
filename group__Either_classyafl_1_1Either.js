@@ -13,5 +13,8 @@ var group__Either_classyafl_1_1Either =
     [ "operator=", "group__Either.html#aaebaa03da2996adb7a8064485c98bbc9", null ],
     [ "operator==", "group__Either.html#a87431e63d0fa91e547fc881308cc6298", null ],
     [ "value", "group__Either.html#a6774a00c8b6df8711d68dc5c105ea5eb", null ],
-    [ "valueOr", "group__Either.html#aa9d3f4205f07547b176a0f033d91e8a9", null ]
+    [ "valueOr", "group__Either.html#aa9d3f4205f07547b176a0f033d91e8a9", null ],
+    [ "core::Applicative< Either, ErrorType, ValueType >", "group__Either.html#a12228d75aba74e4fd6b0207cbbdc5d35", null ],
+    [ "core::Functor< Either, ErrorType, ValueType >", "group__Either.html#ac61ca7c192b8dde9c291413019a3ebab", null ],
+    [ "core::Monad< Either, ErrorType, ValueType >", "group__Either.html#a20eb8f00b985a7bcf7abaed98b95afb1", null ]
 ];

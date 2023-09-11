@@ -11,5 +11,7 @@ var group__Either_classyafl_1_1Either_3_01ErrorType_00_01void_01_4 =
     [ "operator!", "group__Either.html#a1c161e9ae7edb63980c379c0eba56141", null ],
     [ "operator=", "group__Either.html#a0ce42e1435b0cc6f7472f53410a82334", null ],
     [ "operator=", "group__Either.html#ada86d09012ec0ac636acb89ad4bbcee5", null ],
-    [ "operator==", "group__Either.html#a20473f053f60d72050cec1da7fdd5bf2", null ]
+    [ "operator==", "group__Either.html#a20473f053f60d72050cec1da7fdd5bf2", null ],
+    [ "core::Functor< Either, ErrorType, void >", "group__Either.html#a7a1bdf4642320a3446153cfcbc1b6a09", null ],
+    [ "core::Monad< Either, ErrorType, void >", "group__Either.html#a2d53e5c19ac96339e8ae91deec136632", null ]
 ];

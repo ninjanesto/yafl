@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['hasvalue_183',['hasValue',['../group__Maybe.html#a4f4e21bc1901ce7e28378eac98dbe5f2',1,'yafl::Maybe&lt; void &gt;::hasValue()'],['../group__Maybe.html#a267bb3d28417865ec67238e54b2478b5',1,'yafl::Maybe::hasValue()']]]
+  ['getfailedvalue_224',['getFailedValue',['../namespaceyafl_1_1either_1_1details.html#a6f40cab0d776cb8fa1a1a607c570aa32',1,'yafl::either::details::getFailedValue(const Head &amp;head)'],['../namespaceyafl_1_1either_1_1details.html#add70d7131b427c6ddcf0d4e2fefc45d8',1,'yafl::either::details::getFailedValue(const Head &amp;head, Tail &amp;&amp;...tail)']]]
 ];

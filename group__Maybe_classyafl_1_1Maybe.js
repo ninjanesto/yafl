@@ -10,5 +10,8 @@ var group__Maybe_classyafl_1_1Maybe =
     [ "operator=", "group__Maybe.html#a88e550fe74e827438597b54924184a58", null ],
     [ "operator==", "group__Maybe.html#a8d50a965d639f0292ab8a7065c3b0c07", null ],
     [ "value", "group__Maybe.html#a249db6f112529dc2464c8d6c21255d0b", null ],
-    [ "valueOr", "group__Maybe.html#aeca634999613960e168a273a1dac7bd1", null ]
+    [ "valueOr", "group__Maybe.html#aeca634999613960e168a273a1dac7bd1", null ],
+    [ "core::Applicative< Maybe, T >", "group__Maybe.html#a0e0313f0a14dbcb1298cc42cd9837a9d", null ],
+    [ "core::Functor< Maybe, T >", "group__Maybe.html#a40dd6e6ab4d5d45a87aaf5c202cce3a6", null ],
+    [ "core::Monad< Maybe, T >", "group__Maybe.html#a9701a7abbf3d7fafed63ef5d89319e4f", null ]
 ];
