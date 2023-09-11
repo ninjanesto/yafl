@@ -121,7 +121,7 @@ Function Composition</h4>
 <div class="line">std::cout &lt;&lt; threeway(1).value &lt;&lt; std::endl;</div>
 </div><!-- fragment --><p>In mathematics, function composition is associative.</p>
 <p>f . (g . h) = (f . g) . h</p>
-<p>The above example is implemented following left associativity. We can implement the above example expressing right associativity. Note that in this example there's no need to explicitly declare the function type </p><div class="fragment"><div class="line"> {c++}</div>
+<p>The above example is implemented following left associativity. We can implement the above example expressing right associativity. </p><div class="fragment"><div class="line"> {c++}</div>
 <div class="line">struct Xpto { std::string value; };</div>
 <div class="line"> </div>
 <div class="line">const auto f1 =[](int i) { return i*42;};</div>

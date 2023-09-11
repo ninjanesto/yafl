@@ -94,164 +94,170 @@ $(document).ready(function(){initNavTree('HOF_8h_source.html',''); initResizable
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160; </div>
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespaceyafl.html">yafl</a> {</div>
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160; </div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> Predicate, <span class="keyword">typename</span> ...Args&gt;</div>
-<div class="line"><a name="l00026"></a><span class="lineno"><a class="line" href="group__HOF.html#ga3805a64bc19cdbc827589b4e2e4f19b9">   26</a></span>&#160;decltype(<span class="keyword">auto</span>) <a class="code" href="group__HOF.html#ga3805a64bc19cdbc827589b4e2e4f19b9">all_true</a>(Predicate&amp;&amp; predicate, Args&amp;&amp; ...args) {</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    <span class="keywordflow">return</span> (predicate(std::forward&lt;Args&gt;(args)) &amp;&amp; ...);</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;}</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160; </div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> TLeft, <span class="keyword">typename</span> TRight&gt;</div>
-<div class="line"><a name="l00041"></a><span class="lineno"><a class="line" href="group__HOF.html#ga3a399951add4e38d909187a162cdefb1">   41</a></span>&#160;decltype(<span class="keyword">auto</span>) <a class="code" href="group__HOF.html#ga3a399951add4e38d909187a162cdefb1">function_compose</a>(TLeft&amp;&amp; lhs, TRight&amp;&amp; rhs) {</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    <span class="keyword">using</span> LhsReturnType = <span class="keyword">typename</span> <a class="code" href="group__Function.html#structyafl_1_1function_1_1Info">function::Info&lt;TLeft&gt;::ReturnType</a>;</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    <span class="keywordflow">if</span> constexpr (std::is_invocable_v&lt;TLeft&gt;) {</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;        <span class="keywordflow">if</span> constexpr (std::is_void_v&lt;LhsReturnType&gt;) {</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;            <span class="keywordflow">return</span> [rhs = std::forward&lt;TRight&gt;(rhs), lhs = std::forward&lt;TLeft&gt;(lhs)]() {</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;                lhs();</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;                <span class="keywordflow">return</span> rhs();</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;            };</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;        } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;            <span class="keywordflow">return</span> [rhs = std::forward&lt;TRight&gt;(rhs), lhs = std::forward&lt;TLeft&gt;(lhs)]() {</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;                <span class="keywordflow">return</span> rhs(lhs());</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;            };</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;        }</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;        <span class="keyword">using</span> InputArg = <span class="keyword">typename</span> <a class="code" href="group__Function.html#structyafl_1_1function_1_1Info">function::Info&lt;TLeft&gt;::template</a> ArgType&lt;0&gt;;</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;        <span class="keywordflow">if</span> constexpr (std::is_void_v&lt;LhsReturnType&gt;) {</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;            <span class="keywordflow">return</span> [rhs = std::forward&lt;TRight&gt;(rhs), lhs = std::forward&lt;TLeft&gt;(lhs)](InputArg&amp;&amp; arg) {</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;                lhs(std::move(arg));</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;                <span class="keywordflow">return</span> rhs();</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;            };</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;        } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;            <span class="keywordflow">return</span> [rhs = std::forward&lt;TRight&gt;(rhs), lhs = std::forward&lt;TLeft&gt;(lhs)](InputArg&amp;&amp; arg) {</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;                <span class="keywordflow">return</span> rhs(lhs(std::move(arg)));</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> Predicate, <span class="keyword">typename</span> ...Args&gt;</div>
+<div class="line"><a name="l00027"></a><span class="lineno"><a class="line" href="group__HOF.html#ga22373390c3f1b950c5ad4d050493c421">   27</a></span>&#160;decltype(<span class="keyword">auto</span>) <a class="code" href="group__HOF.html#ga22373390c3f1b950c5ad4d050493c421">all</a>(Predicate&amp;&amp; predicate, Args&amp;&amp; ...args) {</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    <span class="keywordflow">return</span> (predicate(std::forward&lt;Args&gt;(args)) &amp;&amp; ...);</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;}</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160; </div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> Predicate, <span class="keyword">typename</span> ...Args&gt;</div>
+<div class="line"><a name="l00042"></a><span class="lineno"><a class="line" href="group__HOF.html#ga286fe4360229f6a536e3a004f06d2741">   42</a></span>&#160;decltype(<span class="keyword">auto</span>) <a class="code" href="group__HOF.html#ga286fe4360229f6a536e3a004f06d2741">any</a>(Predicate&amp;&amp; predicate, Args&amp;&amp; ...args) {</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    <span class="keywordflow">return</span> (predicate(std::forward&lt;Args&gt;(args)) || ...);</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;}</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160; </div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> TLeft, <span class="keyword">typename</span> TRight&gt;</div>
+<div class="line"><a name="l00057"></a><span class="lineno"><a class="line" href="group__HOF.html#ga3a399951add4e38d909187a162cdefb1">   57</a></span>&#160;decltype(<span class="keyword">auto</span>) <a class="code" href="group__HOF.html#ga3a399951add4e38d909187a162cdefb1">function_compose</a>(TLeft&amp;&amp; lhs, TRight&amp;&amp; rhs) {</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    <span class="keyword">using</span> LhsReturnType = <span class="keyword">typename</span> <a class="code" href="group__Function.html#structyafl_1_1function_1_1Info">function::Info&lt;TLeft&gt;::ReturnType</a>;</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    <span class="keywordflow">if</span> constexpr (std::is_invocable_v&lt;TLeft&gt;) {</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;        <span class="keywordflow">if</span> constexpr (std::is_void_v&lt;LhsReturnType&gt;) {</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;            <span class="keywordflow">return</span> [rhs = std::forward&lt;TRight&gt;(rhs), lhs = std::forward&lt;TLeft&gt;(lhs)]() {</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;                lhs();</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;                <span class="keywordflow">return</span> rhs();</div>
 <div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;            };</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;        }</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    }</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;}</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160; </div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> TLeft, <span class="keyword">typename</span> TRight&gt;</div>
-<div class="line"><a name="l00080"></a><span class="lineno"><a class="line" href="group__HOF.html#ga7ba8fcd4e642d274b7f667b26df5f07f">   80</a></span>&#160;decltype(<span class="keyword">auto</span>) <a class="code" href="group__HOF.html#ga7ba8fcd4e642d274b7f667b26df5f07f">kleisli_compose</a>(TLeft&amp;&amp; lhs, TRight&amp;&amp; rhs) {</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    <span class="keyword">using</span> FirstArg = <span class="keyword">typename</span> <a class="code" href="group__Function.html#structyafl_1_1function_1_1Info">function::Info&lt;TLeft&gt;::template</a> ArgType&lt;0&gt;;</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    <span class="keyword">using</span> RhsReturnType = <span class="keyword">typename</span> <a class="code" href="group__Function.html#structyafl_1_1function_1_1Info">function::Info&lt;TRight&gt;::ReturnType</a>;</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    static_assert(<a class="code" href="group__Type.html#structyafl_1_1type_1_1DomainTypeInfo">type::DomainTypeInfo&lt;RhsReturnType&gt;::hasMonadicBase</a>, <span class="stringliteral">&quot;Right hand side needs to have Monadic base&quot;</span>);</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;        } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;            <span class="keywordflow">return</span> [rhs = std::forward&lt;TRight&gt;(rhs), lhs = std::forward&lt;TLeft&gt;(lhs)]() {</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;                <span class="keywordflow">return</span> rhs(lhs());</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;            };</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;        }</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;        <span class="keyword">using</span> InputArg = <span class="keyword">typename</span> <a class="code" href="group__Function.html#structyafl_1_1function_1_1Info">function::Info&lt;TLeft&gt;::template</a> ArgType&lt;0&gt;;</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;        <span class="keywordflow">if</span> constexpr (std::is_void_v&lt;LhsReturnType&gt;) {</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;            <span class="keywordflow">return</span> [rhs = std::forward&lt;TRight&gt;(rhs), lhs = std::forward&lt;TLeft&gt;(lhs)](InputArg&amp;&amp; arg) {</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;                lhs(std::move(arg));</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;                <span class="keywordflow">return</span> rhs();</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;            };</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;        } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;            <span class="keywordflow">return</span> [rhs = std::forward&lt;TRight&gt;(rhs), lhs = std::forward&lt;TLeft&gt;(lhs)](InputArg&amp;&amp; arg) {</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;                <span class="keywordflow">return</span> rhs(lhs(std::move(arg)));</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;            };</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;        }</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    }</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;}</div>
 <div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160; </div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;    <span class="keywordflow">return</span> [rhs = std::forward&lt;TRight&gt;(rhs), lhs = std::forward&lt;TLeft&gt;(lhs)](<span class="keyword">const</span> FirstArg&amp; arg) -&gt; RhsReturnType {</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;        <span class="keyword">using</span> LhsReturnType = <span class="keyword">typename</span> <a class="code" href="group__Function.html#structyafl_1_1function_1_1Info">function::Info&lt;TLeft&gt;::ReturnType</a>;</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;        <span class="keyword">const</span> LhsReturnType intermediate_result = lhs(arg);</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160; </div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;        <span class="keywordflow">if</span> constexpr (std::is_void_v&lt;<span class="keyword">typename</span> <a class="code" href="group__Type.html#structyafl_1_1type_1_1DomainTypeInfo">type::DomainTypeInfo&lt;LhsReturnType&gt;::ValueType</a>&gt;) {</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;            <span class="keywordflow">if</span> (!intermediate_result) {</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;                <span class="keywordflow">return</span> <a class="code" href="group__Type.html#structyafl_1_1type_1_1DomainTypeInfo">type::DomainTypeInfo&lt;RhsReturnType&gt;::handleError</a>(intermediate_result);</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;            } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;                <span class="keywordflow">return</span> rhs();</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;            }</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;        } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;            <span class="keywordflow">if</span> constexpr (<a class="code" href="group__Type.html#structyafl_1_1type_1_1DomainTypeInfo">type::DomainTypeInfo</a>&lt;<span class="keyword">typename</span> <a class="code" href="group__Function.html#structyafl_1_1function_1_1Info">function::Info&lt;TRight&gt;::template</a> ArgType&lt;0&gt;&gt;::hasMonadicBase) {</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;                <span class="keywordflow">return</span> rhs(intermediate_result);</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;            } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;                <span class="keywordflow">if</span> (!intermediate_result) {</div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;                    <span class="keywordflow">return</span> <a class="code" href="group__Type.html#structyafl_1_1type_1_1DomainTypeInfo">type::DomainTypeInfo&lt;RhsReturnType&gt;::handleError</a>(intermediate_result);</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;                }</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;                <span class="keywordflow">return</span> rhs(intermediate_result.value());</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;            }</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;        }</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;    };</div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;}</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160; </div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> TLeft, <span class="keyword">typename</span> TRight&gt;</div>
-<div class="line"><a name="l00118"></a><span class="lineno"><a class="line" href="group__HOF.html#ga50bf14e76c24629353962fd8bbf9b836">  118</a></span>&#160;decltype(<span class="keyword">auto</span>) <a class="code" href="group__HOF.html#ga50bf14e76c24629353962fd8bbf9b836">compose</a>(TLeft&amp;&amp; lhs, TRight&amp;&amp; rhs) {</div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;    <span class="keyword">using</span> LhsReturnType = <span class="keyword">typename</span> <a class="code" href="group__Function.html#structyafl_1_1function_1_1Info">function::Info&lt;TLeft&gt;::ReturnType</a>;</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;    <span class="keywordflow">if</span> constexpr (<a class="code" href="group__Type.html#structyafl_1_1type_1_1DomainTypeInfo">type::DomainTypeInfo&lt;LhsReturnType&gt;::hasMonadicBase</a>) {</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="group__HOF.html#ga7ba8fcd4e642d274b7f667b26df5f07f">kleisli_compose</a>(std::forward&lt;TLeft&gt;(lhs), std::forward&lt;TRight&gt;(rhs));</div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="group__HOF.html#ga3a399951add4e38d909187a162cdefb1">function_compose</a>(std::forward&lt;TLeft&gt;(lhs), std::forward&lt;TRight&gt;(rhs));</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;    }</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;}</div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160; </div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> Callable&gt;</div>
-<div class="line"><a name="l00135"></a><span class="lineno"><a class="line" href="group__HOF.html#ga279891e386b83638e5f7e82f65c63051">  135</a></span>&#160;decltype(<span class="keyword">auto</span>) <a class="code" href="group__HOF.html#ga279891e386b83638e5f7e82f65c63051">curry</a>(Callable&amp;&amp; callable) {</div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;    <span class="keywordflow">if</span> constexpr (std::is_invocable_v&lt;std::decay_t&lt;Callable&gt;&gt;) {</div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;        <span class="keywordflow">return</span> callable();</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> TLeft, <span class="keyword">typename</span> TRight&gt;</div>
+<div class="line"><a name="l00096"></a><span class="lineno"><a class="line" href="group__HOF.html#ga7ba8fcd4e642d274b7f667b26df5f07f">   96</a></span>&#160;decltype(<span class="keyword">auto</span>) <a class="code" href="group__HOF.html#ga7ba8fcd4e642d274b7f667b26df5f07f">kleisli_compose</a>(TLeft&amp;&amp; lhs, TRight&amp;&amp; rhs) {</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;    <span class="keyword">using</span> FirstArg = <span class="keyword">typename</span> <a class="code" href="group__Function.html#structyafl_1_1function_1_1Info">function::Info&lt;TLeft&gt;::template</a> ArgType&lt;0&gt;;</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    <span class="keyword">using</span> RhsReturnType = <span class="keyword">typename</span> <a class="code" href="group__Function.html#structyafl_1_1function_1_1Info">function::Info&lt;TRight&gt;::ReturnType</a>;</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;    static_assert(<a class="code" href="group__Type.html#structyafl_1_1type_1_1DomainTypeInfo">type::DomainTypeInfo&lt;RhsReturnType&gt;::hasMonadicBase</a>, <span class="stringliteral">&quot;Right hand side needs to have Monadic base&quot;</span>);</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160; </div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;    <span class="keywordflow">return</span> [rhs = std::forward&lt;TRight&gt;(rhs), lhs = std::forward&lt;TLeft&gt;(lhs)](<span class="keyword">const</span> FirstArg&amp; arg) -&gt; RhsReturnType {</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;        <span class="keyword">using</span> LhsReturnType = <span class="keyword">typename</span> <a class="code" href="group__Function.html#structyafl_1_1function_1_1Info">function::Info&lt;TLeft&gt;::ReturnType</a>;</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;        <span class="keyword">const</span> LhsReturnType intermediate_result = lhs(arg);</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160; </div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;        <span class="keywordflow">if</span> constexpr (std::is_void_v&lt;<span class="keyword">typename</span> <a class="code" href="group__Type.html#structyafl_1_1type_1_1DomainTypeInfo">type::DomainTypeInfo&lt;LhsReturnType&gt;::ValueType</a>&gt;) {</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;            <span class="keywordflow">if</span> (!intermediate_result) {</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;                <span class="keywordflow">return</span> <a class="code" href="group__Type.html#structyafl_1_1type_1_1DomainTypeInfo">type::DomainTypeInfo&lt;RhsReturnType&gt;::handleError</a>(intermediate_result);</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;            } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;                <span class="keywordflow">return</span> rhs();</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;            }</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;        } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;            <span class="keywordflow">if</span> constexpr (<a class="code" href="group__Type.html#structyafl_1_1type_1_1DomainTypeInfo">type::DomainTypeInfo</a>&lt;<span class="keyword">typename</span> <a class="code" href="group__Function.html#structyafl_1_1function_1_1Info">function::Info&lt;TRight&gt;::template</a> ArgType&lt;0&gt;&gt;::hasMonadicBase) {</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;                <span class="keywordflow">return</span> rhs(intermediate_result);</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;            } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;                <span class="keywordflow">if</span> (!intermediate_result) {</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;                    <span class="keywordflow">return</span> <a class="code" href="group__Type.html#structyafl_1_1type_1_1DomainTypeInfo">type::DomainTypeInfo&lt;RhsReturnType&gt;::handleError</a>(intermediate_result);</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;                }</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;                <span class="keywordflow">return</span> rhs(intermediate_result.value());</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;            }</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;        }</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    };</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;}</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160; </div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> TLeft, <span class="keyword">typename</span> TRight&gt;</div>
+<div class="line"><a name="l00134"></a><span class="lineno"><a class="line" href="group__HOF.html#ga50bf14e76c24629353962fd8bbf9b836">  134</a></span>&#160;decltype(<span class="keyword">auto</span>) <a class="code" href="group__HOF.html#ga50bf14e76c24629353962fd8bbf9b836">compose</a>(TLeft&amp;&amp; lhs, TRight&amp;&amp; rhs) {</div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;    <span class="keyword">using</span> LhsReturnType = <span class="keyword">typename</span> <a class="code" href="group__Function.html#structyafl_1_1function_1_1Info">function::Info&lt;TLeft&gt;::ReturnType</a>;</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;    <span class="keywordflow">if</span> constexpr (<a class="code" href="group__Type.html#structyafl_1_1type_1_1DomainTypeInfo">type::DomainTypeInfo&lt;LhsReturnType&gt;::hasMonadicBase</a>) {</div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="group__HOF.html#ga7ba8fcd4e642d274b7f667b26df5f07f">kleisli_compose</a>(std::forward&lt;TLeft&gt;(lhs), std::forward&lt;TRight&gt;(rhs));</div>
 <div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;    } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;        <span class="keyword">using</span> FirstArg = <span class="keyword">typename</span> <a class="code" href="group__Function.html#structyafl_1_1function_1_1Info">function::Info&lt;Callable&gt;::template</a> ArgType&lt;0&gt;;</div>
-<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;        <span class="keywordflow">return</span> [callable = std::forward&lt;Callable&gt;(callable)](<span class="keyword">const</span> FirstArg&amp; arg) {</div>
-<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;            <span class="keyword">using</span> ReturnFunType = <span class="keyword">typename</span> <a class="code" href="group__Function.html#structyafl_1_1function_1_1Info">function::Info&lt;Callable&gt;::PartialApplyFirst</a>;</div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="group__HOF.html#ga3a399951add4e38d909187a162cdefb1">function_compose</a>(std::forward&lt;TLeft&gt;(lhs), std::forward&lt;TRight&gt;(rhs));</div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;    }</div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;}</div>
 <div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160; </div>
-<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;            <span class="keyword">const</span> ReturnFunType inner_func = [callable, arg = std::move(arg)](<span class="keyword">auto</span>&amp;&amp; ...args) {</div>
-<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;                <span class="keywordflow">return</span> callable(std::move(arg), std::forward&lt;decltype(args)&gt;(args)...);</div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;            };</div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160; </div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;            <span class="keywordflow">return</span> <a class="code" href="group__HOF.html#ga279891e386b83638e5f7e82f65c63051">curry</a>(std::move(inner_func));</div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;        };</div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;    }</div>
-<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;}</div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160; </div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;<span class="keyword">namespace </span>{</div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Callable, <span class="keyword">typename</span> Head&gt;</div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;    decltype(<span class="keyword">auto</span>) uncurry_impl(Callable&amp;&amp; callable, Head&amp;&amp; value) {</div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;        <span class="keywordflow">return</span> callable(std::forward&lt;Head&gt;(value));</div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;    }</div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160; </div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Callable, <span class="keyword">typename</span> Head, <span class="keyword">typename</span> ...Tail&gt;</div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;    decltype(<span class="keyword">auto</span>) uncurry_impl(Callable&amp;&amp; callable, Head&amp;&amp; value, Tail&amp;&amp;...ts) {</div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;        <span class="keyword">const</span> <span class="keyword">auto</span> result = callable(std::forward&lt;Head&gt;(value));</div>
-<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;        <span class="keywordflow">return</span> uncurry_impl(result, std::forward&lt;Tail&gt;(ts)...);</div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;    }</div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;} <span class="comment">// end namespace</span></div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160; </div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> Callable&gt;</div>
-<div class="line"><a name="l00173"></a><span class="lineno"><a class="line" href="group__HOF.html#ga6199176f68b95611b0697cc941f7b1b0">  173</a></span>&#160;decltype(<span class="keyword">auto</span>) <a class="code" href="group__HOF.html#ga6199176f68b95611b0697cc941f7b1b0">uncurry</a>(Callable&amp;&amp; callable) {</div>
-<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;    <span class="keywordflow">return</span> [callable = std::forward&lt;Callable&gt;(callable)](<span class="keyword">auto</span>&amp;&amp; ...args) {</div>
-<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;        <span class="keywordflow">return</span> uncurry_impl(callable, std::forward&lt;decltype(args)&gt;(args)...);</div>
-<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;    };</div>
-<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;}</div>
-<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160; </div>
-<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> Callable, <span class="keyword">typename</span> ...Args&gt;</div>
-<div class="line"><a name="l00189"></a><span class="lineno"><a class="line" href="group__HOF.html#gaea2f7e1b828bff918206b80b468c256c">  189</a></span>&#160;decltype(<span class="keyword">auto</span>) <a class="code" href="group__HOF.html#gaea2f7e1b828bff918206b80b468c256c">partial</a>(Callable&amp;&amp; callable, Args&amp;&amp; ...args) {</div>
-<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;    <span class="keyword">using</span> IsTupleSubset = <a class="code" href="group__Tuple.html#structyafl_1_1tuple_1_1IsTupleSubset">tuple::IsTupleSubset&lt;typename function::Info&lt;Callable&gt;::ArgTypes</a>, std::tuple&lt;Args...&gt;&gt;;</div>
-<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;    static_assert(IsTupleSubset::value, <span class="stringliteral">&quot;Input arguments are not a subset of the Callable arguments&quot;</span>);</div>
-<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160; </div>
-<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;    <span class="keywordflow">if</span> constexpr (std::is_invocable_v&lt;std::decay_t&lt;Callable&gt;, std::decay_t&lt;Args&gt;...&gt;) {</div>
-<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;        <span class="keywordflow">return</span> std::invoke(callable, std::forward&lt;Args&gt;(args)...);</div>
-<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;    } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160; </div>
-<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;        <span class="keyword">using</span> RemainingArgsTuple = <a class="code" href="group__Tuple.html#ga638450c0ef2d8d0f8d0c1f698fc47a55">tuple::TupleSubset&lt;IsTupleSubset::index, typename function::Info&lt;Callable&gt;::ArgTypes</a>&gt;;</div>
-<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;        <span class="keyword">using</span> ReturnType = <a class="code" href="group__Function.html#ga1f55c15030aa5f05967186a518ef1c70">function::FunctionFromTuple&lt;typename function::Info&lt;Callable&gt;::ReturnType</a>, RemainingArgsTuple&gt;;</div>
-<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160; </div>
-<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;        <span class="keyword">const</span> ReturnType f = [callable = std::forward&lt;Callable&gt;(callable), vargs = std::make_tuple(std::forward&lt;Args&gt;(args)...)](<span class="keyword">auto</span>&amp;&amp; ...inner_args) {</div>
-<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;            <span class="keywordflow">return</span> std::apply([callable = std::move(callable)](<span class="keyword">auto</span>&amp;&amp; ...apply_args){</div>
-<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;                                  <span class="keywordflow">return</span> callable(std::forward&lt;decltype(apply_args)&gt;(apply_args)...);</div>
-<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;                              },</div>
-<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;                              std::tuple_cat(vargs, std::make_tuple(inner_args...)));</div>
-<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;        };</div>
-<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160; </div>
-<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;        <span class="keywordflow">return</span> f;</div>
-<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;    }</div>
-<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;}</div>
-<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160; </div>
-<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> Arg&gt;</div>
-<div class="line"><a name="l00219"></a><span class="lineno"><a class="line" href="group__HOF.html#ga27e0f5912aab3004c1a36d45ac124f55">  219</a></span>&#160;Arg <a class="code" href="group__HOF.html#ga27e0f5912aab3004c1a36d45ac124f55">id</a>(Arg&amp;&amp; arg) {</div>
-<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;    <span class="keywordflow">return</span> std::forward&lt;Arg&gt;(arg);</div>
-<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;}</div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> Callable&gt;</div>
+<div class="line"><a name="l00151"></a><span class="lineno"><a class="line" href="group__HOF.html#ga279891e386b83638e5f7e82f65c63051">  151</a></span>&#160;decltype(<span class="keyword">auto</span>) <a class="code" href="group__HOF.html#ga279891e386b83638e5f7e82f65c63051">curry</a>(Callable&amp;&amp; callable) {</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;    <span class="keywordflow">if</span> constexpr (std::is_invocable_v&lt;std::decay_t&lt;Callable&gt;&gt;) {</div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;        <span class="keywordflow">return</span> callable();</div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;    } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;        <span class="keyword">using</span> FirstArg = <span class="keyword">typename</span> <a class="code" href="group__Function.html#structyafl_1_1function_1_1Info">function::Info&lt;Callable&gt;::template</a> ArgType&lt;0&gt;;</div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;        <span class="keywordflow">return</span> [callable = std::forward&lt;Callable&gt;(callable)](<span class="keyword">const</span> FirstArg&amp; arg) {</div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;            <span class="keyword">using</span> ReturnFunType = <span class="keyword">typename</span> <a class="code" href="group__Function.html#structyafl_1_1function_1_1Info">function::Info&lt;Callable&gt;::PartialApplyFirst</a>;</div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160; </div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;            <span class="keyword">const</span> ReturnFunType inner_func = [callable, arg = std::move(arg)](<span class="keyword">auto</span>&amp;&amp; ...args) {</div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;                <span class="keywordflow">return</span> callable(std::move(arg), std::forward&lt;decltype(args)&gt;(args)...);</div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;            };</div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160; </div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;            <span class="keywordflow">return</span> <a class="code" href="group__HOF.html#ga279891e386b83638e5f7e82f65c63051">curry</a>(std::move(inner_func));</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;        };</div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;    }</div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;}</div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160; </div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;<span class="keyword">namespace </span>{</div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Callable, <span class="keyword">typename</span> Head&gt;</div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;    decltype(<span class="keyword">auto</span>) uncurry_impl(Callable&amp;&amp; callable, Head&amp;&amp; value) {</div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;        <span class="keywordflow">return</span> callable(std::forward&lt;Head&gt;(value));</div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;    }</div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160; </div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Callable, <span class="keyword">typename</span> Head, <span class="keyword">typename</span> ...Tail&gt;</div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;    decltype(<span class="keyword">auto</span>) uncurry_impl(Callable&amp;&amp; callable, Head&amp;&amp; value, Tail&amp;&amp;...ts) {</div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;        <span class="keyword">const</span> <span class="keyword">auto</span> result = callable(std::forward&lt;Head&gt;(value));</div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;        <span class="keywordflow">return</span> uncurry_impl(result, std::forward&lt;Tail&gt;(ts)...);</div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;    }</div>
+<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;} <span class="comment">// end namespace</span></div>
+<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160; </div>
+<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> Callable&gt;</div>
+<div class="line"><a name="l00189"></a><span class="lineno"><a class="line" href="group__HOF.html#ga6199176f68b95611b0697cc941f7b1b0">  189</a></span>&#160;decltype(<span class="keyword">auto</span>) <a class="code" href="group__HOF.html#ga6199176f68b95611b0697cc941f7b1b0">uncurry</a>(Callable&amp;&amp; callable) {</div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;    <span class="keywordflow">return</span> [callable = std::forward&lt;Callable&gt;(callable)](<span class="keyword">auto</span>&amp;&amp; ...args) {</div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;        <span class="keywordflow">return</span> uncurry_impl(callable, std::forward&lt;decltype(args)&gt;(args)...);</div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;    };</div>
+<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;}</div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160; </div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> Callable, <span class="keyword">typename</span> ...Args&gt;</div>
+<div class="line"><a name="l00205"></a><span class="lineno"><a class="line" href="group__HOF.html#gaea2f7e1b828bff918206b80b468c256c">  205</a></span>&#160;decltype(<span class="keyword">auto</span>) <a class="code" href="group__HOF.html#gaea2f7e1b828bff918206b80b468c256c">partial</a>(Callable&amp;&amp; callable, Args&amp;&amp; ...args) {</div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;    <span class="keyword">using</span> IsTupleSubset = <a class="code" href="group__Tuple.html#structyafl_1_1tuple_1_1IsTupleSubset">tuple::IsTupleSubset&lt;typename function::Info&lt;Callable&gt;::ArgTypes</a>, std::tuple&lt;Args...&gt;&gt;;</div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;    static_assert(IsTupleSubset::value, <span class="stringliteral">&quot;Input arguments are not a subset of the Callable arguments&quot;</span>);</div>
+<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160; </div>
+<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;    <span class="keywordflow">if</span> constexpr (std::is_invocable_v&lt;std::decay_t&lt;Callable&gt;, std::decay_t&lt;Args&gt;...&gt;) {</div>
+<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;        <span class="keywordflow">return</span> std::invoke(callable, std::forward&lt;Args&gt;(args)...);</div>
+<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;    } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160; </div>
+<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;        <span class="keyword">using</span> RemainingArgsTuple = <a class="code" href="group__Tuple.html#ga638450c0ef2d8d0f8d0c1f698fc47a55">tuple::TupleSubset&lt;IsTupleSubset::index, typename function::Info&lt;Callable&gt;::ArgTypes</a>&gt;;</div>
+<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;        <span class="keyword">using</span> ReturnType = <a class="code" href="group__Function.html#ga1f55c15030aa5f05967186a518ef1c70">function::FunctionFromTuple&lt;typename function::Info&lt;Callable&gt;::ReturnType</a>, RemainingArgsTuple&gt;;</div>
+<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160; </div>
+<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;        <span class="keyword">const</span> ReturnType f = [callable = std::forward&lt;Callable&gt;(callable), vargs = std::make_tuple(std::forward&lt;Args&gt;(args)...)](<span class="keyword">auto</span>&amp;&amp; ...inner_args) {</div>
+<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;            <span class="keywordflow">return</span> std::apply([callable = std::move(callable)](<span class="keyword">auto</span>&amp;&amp; ...apply_args){</div>
+<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;                                  <span class="keywordflow">return</span> callable(std::forward&lt;decltype(apply_args)&gt;(apply_args)...);</div>
+<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;                              },</div>
+<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;                              std::tuple_cat(vargs, std::make_tuple(inner_args...)));</div>
+<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;        };</div>
 <div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160; </div>
-<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> First&gt;</div>
-<div class="line"><a name="l00231"></a><span class="lineno"><a class="line" href="group__HOF.html#ga48a240fe803a7b7c9188b0b85951f95d">  231</a></span>&#160;decltype(<span class="keyword">auto</span>) <a class="code" href="group__HOF.html#ga48a240fe803a7b7c9188b0b85951f95d">constf</a>(First&amp;&amp; first) {</div>
-<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;    <span class="keywordflow">return</span> [first = std::forward&lt;First&gt;(first)](<span class="keyword">auto</span>&amp;&amp; ...) {</div>
-<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;        <span class="keywordflow">return</span> first;</div>
-<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;    };</div>
-<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;}</div>
-<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160; </div>
-<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;} <span class="comment">// namespace yafl</span></div>
+<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;        <span class="keywordflow">return</span> f;</div>
+<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;    }</div>
+<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;}</div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160; </div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> Arg&gt;</div>
+<div class="line"><a name="l00235"></a><span class="lineno"><a class="line" href="group__HOF.html#ga27e0f5912aab3004c1a36d45ac124f55">  235</a></span>&#160;Arg <a class="code" href="group__HOF.html#ga27e0f5912aab3004c1a36d45ac124f55">id</a>(Arg&amp;&amp; arg) {</div>
+<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;    <span class="keywordflow">return</span> std::forward&lt;Arg&gt;(arg);</div>
+<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;}</div>
+<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160; </div>
+<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> First&gt;</div>
+<div class="line"><a name="l00247"></a><span class="lineno"><a class="line" href="group__HOF.html#ga48a240fe803a7b7c9188b0b85951f95d">  247</a></span>&#160;decltype(<span class="keyword">auto</span>) <a class="code" href="group__HOF.html#ga48a240fe803a7b7c9188b0b85951f95d">constf</a>(First&amp;&amp; first) {</div>
+<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;    <span class="keywordflow">return</span> [first = std::forward&lt;First&gt;(first)](<span class="keyword">auto</span>&amp;&amp; ...) {</div>
+<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;        <span class="keywordflow">return</span> first;</div>
+<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;    };</div>
+<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;}</div>
+<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160; </div>
+<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;} <span class="comment">// namespace yafl</span></div>
 <div class="ttc" id="agroup__Function_html_ga1f55c15030aa5f05967186a518ef1c70"><div class="ttname"><a href="group__Function.html#ga1f55c15030aa5f05967186a518ef1c70">yafl::function::FunctionFromTuple</a></div><div class="ttdeci">typename details::FunctionFromTupleImpl&lt; Ret, Tuple &gt;::FunctionType FunctionFromTuple</div><div class="ttdoc">Helper type that allows to construct a std::function type using an expanded tuple as its input argume...</div><div class="ttdef"><b>Definition:</b> TypeTraits.h:154</div></div>
 <div class="ttc" id="agroup__Function_html_structyafl_1_1function_1_1Info"><div class="ttname"><a href="group__Function.html#structyafl_1_1function_1_1Info">yafl::function::Info</a></div><div class="ttdoc">Template class that allows extracting information about a callable type (a function,...</div><div class="ttdef"><b>Definition:</b> TypeTraits.h:135</div></div>
-<div class="ttc" id="agroup__HOF_html_ga279891e386b83638e5f7e82f65c63051"><div class="ttname"><a href="group__HOF.html#ga279891e386b83638e5f7e82f65c63051">yafl::curry</a></div><div class="ttdeci">decltype(auto) curry(Callable &amp;&amp;callable)</div><div class="ttdoc">Curry given callable.</div><div class="ttdef"><b>Definition:</b> HOF.h:135</div></div>
-<div class="ttc" id="agroup__HOF_html_ga27e0f5912aab3004c1a36d45ac124f55"><div class="ttname"><a href="group__HOF.html#ga27e0f5912aab3004c1a36d45ac124f55">yafl::id</a></div><div class="ttdeci">Arg id(Arg &amp;&amp;arg)</div><div class="ttdoc">Identity function.</div><div class="ttdef"><b>Definition:</b> HOF.h:219</div></div>
-<div class="ttc" id="agroup__HOF_html_ga3805a64bc19cdbc827589b4e2e4f19b9"><div class="ttname"><a href="group__HOF.html#ga3805a64bc19cdbc827589b4e2e4f19b9">yafl::all_true</a></div><div class="ttdeci">decltype(auto) all_true(Predicate &amp;&amp;predicate, Args &amp;&amp;...args)</div><div class="ttdoc">Function that applies given predicate to all input arguments.</div><div class="ttdef"><b>Definition:</b> HOF.h:26</div></div>
-<div class="ttc" id="agroup__HOF_html_ga3a399951add4e38d909187a162cdefb1"><div class="ttname"><a href="group__HOF.html#ga3a399951add4e38d909187a162cdefb1">yafl::function_compose</a></div><div class="ttdeci">decltype(auto) function_compose(TLeft &amp;&amp;lhs, TRight &amp;&amp;rhs)</div><div class="ttdoc">Compose functions.</div><div class="ttdef"><b>Definition:</b> HOF.h:41</div></div>
-<div class="ttc" id="agroup__HOF_html_ga48a240fe803a7b7c9188b0b85951f95d"><div class="ttname"><a href="group__HOF.html#ga48a240fe803a7b7c9188b0b85951f95d">yafl::constf</a></div><div class="ttdeci">decltype(auto) constf(First &amp;&amp;first)</div><div class="ttdoc">Function that always evaluates to the first argument, ignoring its second argument.</div><div class="ttdef"><b>Definition:</b> HOF.h:231</div></div>
-<div class="ttc" id="agroup__HOF_html_ga50bf14e76c24629353962fd8bbf9b836"><div class="ttname"><a href="group__HOF.html#ga50bf14e76c24629353962fd8bbf9b836">yafl::compose</a></div><div class="ttdeci">decltype(auto) compose(TLeft &amp;&amp;lhs, TRight &amp;&amp;rhs)</div><div class="ttdoc">Generic composition.</div><div class="ttdef"><b>Definition:</b> HOF.h:118</div></div>
-<div class="ttc" id="agroup__HOF_html_ga6199176f68b95611b0697cc941f7b1b0"><div class="ttname"><a href="group__HOF.html#ga6199176f68b95611b0697cc941f7b1b0">yafl::uncurry</a></div><div class="ttdeci">decltype(auto) uncurry(Callable &amp;&amp;callable)</div><div class="ttdoc">Uncurry given callable.</div><div class="ttdef"><b>Definition:</b> HOF.h:173</div></div>
-<div class="ttc" id="agroup__HOF_html_ga7ba8fcd4e642d274b7f667b26df5f07f"><div class="ttname"><a href="group__HOF.html#ga7ba8fcd4e642d274b7f667b26df5f07f">yafl::kleisli_compose</a></div><div class="ttdeci">decltype(auto) kleisli_compose(TLeft &amp;&amp;lhs, TRight &amp;&amp;rhs)</div><div class="ttdoc">Compose functions that return Monadic values.</div><div class="ttdef"><b>Definition:</b> HOF.h:80</div></div>
-<div class="ttc" id="agroup__HOF_html_gaea2f7e1b828bff918206b80b468c256c"><div class="ttname"><a href="group__HOF.html#gaea2f7e1b828bff918206b80b468c256c">yafl::partial</a></div><div class="ttdeci">decltype(auto) partial(Callable &amp;&amp;callable, Args &amp;&amp;...args)</div><div class="ttdoc">Partial apply given function.</div><div class="ttdef"><b>Definition:</b> HOF.h:189</div></div>
+<div class="ttc" id="agroup__HOF_html_ga22373390c3f1b950c5ad4d050493c421"><div class="ttname"><a href="group__HOF.html#ga22373390c3f1b950c5ad4d050493c421">yafl::all</a></div><div class="ttdeci">decltype(auto) all(Predicate &amp;&amp;predicate, Args &amp;&amp;...args)</div><div class="ttdoc">Function that applies given predicate to all input arguments and returns true if ALL of the arguments...</div><div class="ttdef"><b>Definition:</b> HOF.h:27</div></div>
+<div class="ttc" id="agroup__HOF_html_ga279891e386b83638e5f7e82f65c63051"><div class="ttname"><a href="group__HOF.html#ga279891e386b83638e5f7e82f65c63051">yafl::curry</a></div><div class="ttdeci">decltype(auto) curry(Callable &amp;&amp;callable)</div><div class="ttdoc">Curry given callable.</div><div class="ttdef"><b>Definition:</b> HOF.h:151</div></div>
+<div class="ttc" id="agroup__HOF_html_ga27e0f5912aab3004c1a36d45ac124f55"><div class="ttname"><a href="group__HOF.html#ga27e0f5912aab3004c1a36d45ac124f55">yafl::id</a></div><div class="ttdeci">Arg id(Arg &amp;&amp;arg)</div><div class="ttdoc">Identity function.</div><div class="ttdef"><b>Definition:</b> HOF.h:235</div></div>
+<div class="ttc" id="agroup__HOF_html_ga286fe4360229f6a536e3a004f06d2741"><div class="ttname"><a href="group__HOF.html#ga286fe4360229f6a536e3a004f06d2741">yafl::any</a></div><div class="ttdeci">decltype(auto) any(Predicate &amp;&amp;predicate, Args &amp;&amp;...args)</div><div class="ttdoc">Function that applies given predicate to all input arguments and returns true if ANY of the arguments...</div><div class="ttdef"><b>Definition:</b> HOF.h:42</div></div>
+<div class="ttc" id="agroup__HOF_html_ga3a399951add4e38d909187a162cdefb1"><div class="ttname"><a href="group__HOF.html#ga3a399951add4e38d909187a162cdefb1">yafl::function_compose</a></div><div class="ttdeci">decltype(auto) function_compose(TLeft &amp;&amp;lhs, TRight &amp;&amp;rhs)</div><div class="ttdoc">Compose functions.</div><div class="ttdef"><b>Definition:</b> HOF.h:57</div></div>
+<div class="ttc" id="agroup__HOF_html_ga48a240fe803a7b7c9188b0b85951f95d"><div class="ttname"><a href="group__HOF.html#ga48a240fe803a7b7c9188b0b85951f95d">yafl::constf</a></div><div class="ttdeci">decltype(auto) constf(First &amp;&amp;first)</div><div class="ttdoc">Function that always evaluates to the first argument, ignoring its second argument.</div><div class="ttdef"><b>Definition:</b> HOF.h:247</div></div>
+<div class="ttc" id="agroup__HOF_html_ga50bf14e76c24629353962fd8bbf9b836"><div class="ttname"><a href="group__HOF.html#ga50bf14e76c24629353962fd8bbf9b836">yafl::compose</a></div><div class="ttdeci">decltype(auto) compose(TLeft &amp;&amp;lhs, TRight &amp;&amp;rhs)</div><div class="ttdoc">Generic composition.</div><div class="ttdef"><b>Definition:</b> HOF.h:134</div></div>
+<div class="ttc" id="agroup__HOF_html_ga6199176f68b95611b0697cc941f7b1b0"><div class="ttname"><a href="group__HOF.html#ga6199176f68b95611b0697cc941f7b1b0">yafl::uncurry</a></div><div class="ttdeci">decltype(auto) uncurry(Callable &amp;&amp;callable)</div><div class="ttdoc">Uncurry given callable.</div><div class="ttdef"><b>Definition:</b> HOF.h:189</div></div>
+<div class="ttc" id="agroup__HOF_html_ga7ba8fcd4e642d274b7f667b26df5f07f"><div class="ttname"><a href="group__HOF.html#ga7ba8fcd4e642d274b7f667b26df5f07f">yafl::kleisli_compose</a></div><div class="ttdeci">decltype(auto) kleisli_compose(TLeft &amp;&amp;lhs, TRight &amp;&amp;rhs)</div><div class="ttdoc">Compose functions that return Monadic values.</div><div class="ttdef"><b>Definition:</b> HOF.h:96</div></div>
+<div class="ttc" id="agroup__HOF_html_gaea2f7e1b828bff918206b80b468c256c"><div class="ttname"><a href="group__HOF.html#gaea2f7e1b828bff918206b80b468c256c">yafl::partial</a></div><div class="ttdeci">decltype(auto) partial(Callable &amp;&amp;callable, Args &amp;&amp;...args)</div><div class="ttdoc">Partial apply given function.</div><div class="ttdef"><b>Definition:</b> HOF.h:205</div></div>
 <div class="ttc" id="agroup__Tuple_html_ga638450c0ef2d8d0f8d0c1f698fc47a55"><div class="ttname"><a href="group__Tuple.html#ga638450c0ef2d8d0f8d0c1f698fc47a55">yafl::tuple::TupleSubset</a></div><div class="ttdeci">typename details::CreateSubsetTupleFromIndex&lt; Index, Tuple, std::tuple&lt;&gt;, true &gt;::NewSubsetTuple TupleSubset</div><div class="ttdoc">Creates a tuple subset type starting for the given index position.</div><div class="ttdef"><b>Definition:</b> TypeTraits.h:309</div></div>
 <div class="ttc" id="agroup__Tuple_html_structyafl_1_1tuple_1_1IsTupleSubset"><div class="ttname"><a href="group__Tuple.html#structyafl_1_1tuple_1_1IsTupleSubset">yafl::tuple::IsTupleSubset</a></div><div class="ttdoc">Extract information about whether a tuple is a subset of another tuple If true extracts the index.</div><div class="ttdef"><b>Definition:</b> TypeTraits.h:259</div></div>
 <div class="ttc" id="agroup__Type_html_structyafl_1_1type_1_1DomainTypeInfo"><div class="ttname"><a href="group__Type.html#structyafl_1_1type_1_1DomainTypeInfo">yafl::type::DomainTypeInfo</a></div><div class="ttdoc">Type details for Yafl types.</div><div class="ttdef"><b>Definition:</b> TypeTraits.h:360</div></div>

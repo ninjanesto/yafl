@@ -1,5 +1,7 @@
 var NAVTREEINDEX1 =
 {
+"structyafl_1_1function_1_1details_1_1CallableHelper_3_01std_1_1function_3_01Ret_07ClassType_1_1_5_08_07Args_8_8_8_08_4_01_4.html":[4,0,0,1,0,7],
+"structyafl_1_1function_1_1details_1_1CallableHelper_3_01std_1_1function_3_01Ret_07ClassType_1_1_5_6_08_07Args_8_8_8_08_4_01_4.html":[4,0,0,1,0,8],
 "structyafl_1_1function_1_1details_1_1CallableHelper_3_01std_1_1function_3_01Ret_07_5_08_07Args_8_8_8_08_4_01_4.html":[4,0,0,1,0,9],
 "structyafl_1_1function_1_1details_1_1CallableHelper_3_01std_1_1function_3_01Ret_07_6_08_07Args_8_8_8_08_4_01_4.html":[4,0,0,1,0,4],
 "structyafl_1_1function_1_1details_1_1FunctionFromTupleImpl.html":[4,0,0,1,0,10],

@@ -1,6 +1,7 @@
 var group__HOF =
 [
-    [ "all_true", "group__HOF.html#ga3805a64bc19cdbc827589b4e2e4f19b9", null ],
+    [ "all", "group__HOF.html#ga22373390c3f1b950c5ad4d050493c421", null ],
+    [ "any", "group__HOF.html#ga286fe4360229f6a536e3a004f06d2741", null ],
     [ "compose", "group__HOF.html#ga50bf14e76c24629353962fd8bbf9b836", null ],
     [ "constf", "group__HOF.html#ga48a240fe803a7b7c9188b0b85951f95d", null ],
     [ "curry", "group__HOF.html#ga279891e386b83638e5f7e82f65c63051", null ],

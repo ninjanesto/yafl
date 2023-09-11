@@ -90,7 +90,7 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "annotated.html",
-"structyafl_1_1function_1_1details_1_1CallableHelper_3_01std_1_1function_3_01Ret_07_5_08_07Args_8_8_8_08_4_01_4.html"
+"structyafl_1_1function_1_1details_1_1CallableHelper_3_01std_1_1function_3_01Ret_07ClassType_1_1_5_08_07Args_8_8_8_08_4_01_4.html"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

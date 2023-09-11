@@ -94,10 +94,14 @@ $(document).ready(function(){initNavTree('group__HOF.html',''); initResizable();
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ga3805a64bc19cdbc827589b4e2e4f19b9"><td class="memTemplParams" colspan="2">template&lt;typename Predicate , typename ... Args&gt; </td></tr>
-<tr class="memitem:ga3805a64bc19cdbc827589b4e2e4f19b9"><td class="memTemplItemLeft" align="right" valign="top">decltype(auto)&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__HOF.html#ga3805a64bc19cdbc827589b4e2e4f19b9">yafl::all_true</a> (Predicate &amp;&amp;predicate, Args &amp;&amp;...args)</td></tr>
-<tr class="memdesc:ga3805a64bc19cdbc827589b4e2e4f19b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Function that applies given predicate to all input arguments.  <a href="group__HOF.html#ga3805a64bc19cdbc827589b4e2e4f19b9">More...</a><br /></td></tr>
-<tr class="separator:ga3805a64bc19cdbc827589b4e2e4f19b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga22373390c3f1b950c5ad4d050493c421"><td class="memTemplParams" colspan="2">template&lt;typename Predicate , typename ... Args&gt; </td></tr>
+<tr class="memitem:ga22373390c3f1b950c5ad4d050493c421"><td class="memTemplItemLeft" align="right" valign="top">decltype(auto)&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__HOF.html#ga22373390c3f1b950c5ad4d050493c421">yafl::all</a> (Predicate &amp;&amp;predicate, Args &amp;&amp;...args)</td></tr>
+<tr class="memdesc:ga22373390c3f1b950c5ad4d050493c421"><td class="mdescLeft">&#160;</td><td class="mdescRight">Function that applies given predicate to all input arguments and returns true if ALL of the arguments satisfies the given predicate.  <a href="group__HOF.html#ga22373390c3f1b950c5ad4d050493c421">More...</a><br /></td></tr>
+<tr class="separator:ga22373390c3f1b950c5ad4d050493c421"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga286fe4360229f6a536e3a004f06d2741"><td class="memTemplParams" colspan="2">template&lt;typename Predicate , typename ... Args&gt; </td></tr>
+<tr class="memitem:ga286fe4360229f6a536e3a004f06d2741"><td class="memTemplItemLeft" align="right" valign="top">decltype(auto)&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__HOF.html#ga286fe4360229f6a536e3a004f06d2741">yafl::any</a> (Predicate &amp;&amp;predicate, Args &amp;&amp;...args)</td></tr>
+<tr class="memdesc:ga286fe4360229f6a536e3a004f06d2741"><td class="mdescLeft">&#160;</td><td class="mdescRight">Function that applies given predicate to all input arguments and returns true if ANY of the arguments satisfies the given predicate.  <a href="group__HOF.html#ga286fe4360229f6a536e3a004f06d2741">More...</a><br /></td></tr>
+<tr class="separator:ga286fe4360229f6a536e3a004f06d2741"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga3a399951add4e38d909187a162cdefb1"><td class="memTemplParams" colspan="2">template&lt;typename TLeft , typename TRight &gt; </td></tr>
 <tr class="memitem:ga3a399951add4e38d909187a162cdefb1"><td class="memTemplItemLeft" align="right" valign="top">decltype(auto)&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__HOF.html#ga3a399951add4e38d909187a162cdefb1">yafl::function_compose</a> (TLeft &amp;&amp;lhs, TRight &amp;&amp;rhs)</td></tr>
 <tr class="memdesc:ga3a399951add4e38d909187a162cdefb1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compose functions.  <a href="group__HOF.html#ga3a399951add4e38d909187a162cdefb1">More...</a><br /></td></tr>
@@ -135,8 +139,8 @@ Functions</h2></td></tr>
 <p>Group of High Order Functions that provide features like function composition, partial application, currying and uncurrying, etc. </p>
 <dl class="section copyright"><dt>Copyright</dt><dd>2023, Ernesto Festas. Distributed under MIT license (See accompanying LICENSE file) </dd></dl>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="ga3805a64bc19cdbc827589b4e2e4f19b9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga3805a64bc19cdbc827589b4e2e4f19b9">&#9670;&nbsp;</a></span>all_true()</h2>
+<a id="ga22373390c3f1b950c5ad4d050493c421"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga22373390c3f1b950c5ad4d050493c421">&#9670;&nbsp;</a></span>all()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -144,7 +148,7 @@ Functions</h2></td></tr>
 template&lt;typename Predicate , typename ... Args&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">decltype(auto) yafl::all_true </td>
+          <td class="memname">decltype(auto) yafl::all </td>
           <td>(</td>
           <td class="paramtype">Predicate &amp;&amp;&#160;</td>
           <td class="paramname"><em>predicate</em>, </td>
@@ -165,7 +169,7 @@ template&lt;typename Predicate , typename ... Args&gt; </div>
 
 <p><code>#include &lt;src/yafl/HOF.h&gt;</code></p>
 
-<p>Function that applies given predicate to all input arguments. </p>
+<p>Function that applies given predicate to all input arguments and returns true if ALL of the arguments satisfies the given predicate. </p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">Predicate</td><td>Predicate function type </td></tr>
@@ -181,6 +185,55 @@ template&lt;typename Predicate , typename ... Args&gt; </div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if all arguments verify the predicate and false otherwise </dd></dl>
+
+</div>
+</div>
+<a id="ga286fe4360229f6a536e3a004f06d2741"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga286fe4360229f6a536e3a004f06d2741">&#9670;&nbsp;</a></span>any()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Predicate , typename ... Args&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">decltype(auto) yafl::any </td>
+          <td>(</td>
+          <td class="paramtype">Predicate &amp;&amp;&#160;</td>
+          <td class="paramname"><em>predicate</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Args &amp;&amp;...&#160;</td>
+          <td class="paramname"><em>args</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p><code>#include &lt;src/yafl/HOF.h&gt;</code></p>
+
+<p>Function that applies given predicate to all input arguments and returns true if ANY of the arguments satisfies the given predicate. </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">Predicate</td><td>Predicate function type </td></tr>
+    <tr><td class="paramname">Args</td><td>Input arguments types </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">predicate</td><td>predicate function </td></tr>
+    <tr><td class="paramname">args</td><td>input arguments </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true if any arguments verify the predicate and false otherwise </dd></dl>
 
 </div>
 </div>
