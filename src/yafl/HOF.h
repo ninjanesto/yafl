@@ -1,9 +1,10 @@
 /**
- * \brief       Yet Another Functional Library
+ * \brief       Group of High Order Functions that provide features like function composition,
+ * partial application, currying and uncurrying, etc
  *
  * \copyright   2023, Ernesto Festas.
  *              Distributed under MIT license (See accompanying LICENSE file)
- * \defgroup HOF High Order Functions
+ * \defgroup    HOF High Order Functions
  */
 #pragma once
 
@@ -14,7 +15,8 @@ namespace yafl {
 
 /**
  * @ingroup HOF
- * Function that applies given predicate to all input arguments
+ * Function that applies given predicate to all input arguments and returns true
+ * if ALL of the arguments satisfies the given predicate
  * @tparam Predicate Predicate function type
  * @tparam Args Input arguments types
  * @param predicate predicate function
@@ -22,8 +24,23 @@ namespace yafl {
  * @return true if all arguments verify the predicate and false otherwise
  */
 template<typename Predicate, typename ...Args>
-decltype(auto) all_true(Predicate&& predicate, Args&& ...args) {
+decltype(auto) all(Predicate&& predicate, Args&& ...args) {
     return (predicate(std::forward<Args>(args)) && ...);
+}
+
+/**
+ * @ingroup HOF
+ * Function that applies given predicate to all input arguments and returns true
+ * if ANY of the arguments satisfies the given predicate
+ * @tparam Predicate Predicate function type
+ * @tparam Args Input arguments types
+ * @param predicate predicate function
+ * @param args input arguments
+ * @return true if any arguments verify the predicate and false otherwise
+ */
+template<typename Predicate, typename ...Args>
+decltype(auto) any(Predicate&& predicate, Args&& ...args) {
+    return (predicate(std::forward<Args>(args)) || ...);
 }
 
 /**

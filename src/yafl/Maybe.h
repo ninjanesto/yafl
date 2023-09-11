@@ -1,9 +1,9 @@
 /**
- * \brief       Yet Another Functional Library
+ * \brief       Maybe class that implements Functor, Applicative and Monad
  *
  * \copyright   2023, Ernesto Festas.
  *              Distributed under MIT license (See accompanying LICENSE file)
- * \defgroup Maybe Maybe monad
+ * \defgroup    Maybe Maybe Monad
  */
 #pragma once
 
@@ -27,6 +27,7 @@ namespace yafl {
  */
 template <typename>
 class Maybe;
+
 namespace type{
 namespace details {
 
@@ -198,7 +199,7 @@ public:
 
     /**
      * Move constructor
-     * @param maybe arguent to be moved
+     * @param maybe argument to be moved
      */
     Maybe(Maybe<T>&& maybe) noexcept = default;
 
@@ -433,7 +434,7 @@ decltype(auto) lift(Callable &&callable) {
         using ReturnFunctionType = typename function::Info<Callable>::template LiftedSignature<Maybe>;
 
         const ReturnFunctionType function = [callable = std::forward<Callable>(callable)](auto&& ...args) -> Maybe<ReturnType> {
-            if (all_true([](auto&& v) { return v.hasValue(); }, args...)) {
+            if (all([](auto &&v) { return v.hasValue(); }, args...)) {
                 const auto tp = tuple::map_append([](auto&& arg) { return arg.value(); }, std::make_tuple(), args...);
 
                 if constexpr (std::is_void_v<ReturnType>) {

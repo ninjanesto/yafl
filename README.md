@@ -12,16 +12,15 @@
 Functional Programming concepts implemented in C++17
 
 # Table of Contents
-1. [Introduction](#introduction)
-2. [High Order Functions (HOF)](#high-order-functions-hof)
-3. [Functor, Applicative Functor and Monad](#functor-applicative-functor-and-monad)
-4. [Maybe](#maybe)
-5. [Either](#either)
-6. [Function Lift](#function-lift)
-7. [Build](#build)
-8. [Use/Install](#use--install)
-9. [Example App](#example-app)
-10. [Future](#future)
+01. <a href="#introduction">Introduction</a>
+02. <a href="#high-order-functions-hof">High Order Functions (HOF)</a>
+03. <a href="#functor-applicative-functor-and-monad">Functor, Applicative Functor and Monad</a>
+04. <a href="#maybe">Maybe</a>
+05. <a href="#either">Either</a>
+06. <a href="#function-lift">Function Lift</a>
+07. <a href="#build">Build</a>
+08. <a href="#example-app">Example App</a>
+09. <a href="#future">Future</a>
 
 ## Introduction
 C++ is a multi paradigm programming language and functional programming (FP) concepts keep getting added to the C++ standard.
@@ -56,7 +55,7 @@ In mathematics, function composition is associative.
 f . (g . h) = (f . g) . h
 
 The above example is implemented following left associativity.
-We can implement the above example expressing right associativity. Note that in this example there's no need to explicitly declare the function type
+We can implement the above example expressing right associativity.
 ```c++
 struct Xpto { std::string value; };
 
@@ -135,9 +134,9 @@ ff(1,"",3);
 The following *Functor*, *Applicative Functor* and *Monad* classes are part of YAFL core and are not meant to be used as is but if needed, it is possible to do so.
 Each description contains a brief example of a possible usage.
 
-We provide two implementations for all these functional "interfaces", the [Maybe](###maybe) and [Either](###either) classes
+We provide two implementations for all these functional "interfaces", the <a href="#maybe">Maybe</a> and <a href="#either">Either</a> classes.
 
-#### Functor
+### Functor
 In mathematics a functor is a mapping between categories (collection of objects linked by morphisms).
 
 We address Functor as a wrapper class for any value type, that allows a transformation to the underlying values, by relying on the application of a given function.
@@ -195,7 +194,7 @@ std::cout << (yafl::functor::fmap(compose, m).value() == result2.value()) << std
 std::cout << (m.fmap(f1).fmap(f2).value() == result2.value()) << std::endl;
 ```
 
-#### Applicative Functor
+### Applicative Functor
 Applicative functors are functors on steroids (with extra laws and operations). They are an intermediate class between Functor and Monad.
 They allow function application to be chained across multiple instances of the structure.
 
@@ -305,7 +304,7 @@ const auto ap2 = yafl::maybe::Just([](auto func){ return func(2);});
 std::cout << (ap(yafl::maybe::Just(2)).value() == ap2(f).value()) << std::endl;
 ```
 
-#### Monad
+### Monad
 A monad is another higher-order abstraction that builds on top of functors and applicatives. 
 It encapsulates sequences of computation steps. Monads provide a way to chain operations together in a controlled manner, abstracting away the need for explicit sequencing and error handling. 
 
@@ -352,16 +351,16 @@ const auto rresult = v.bind([f,g](int i) { return f(i).bind(g);}).value();
 std::cout << (lresult == rresult) << std::endl;
 ```
 
-### Maybe
+## Maybe
 The Maybe Monad is a concept commonly used in functional programming languages, to handle computations that may or may not produce a value.
 It's particularly useful for situations where the result of a computation could be null or undefined. 
 The Maybe Monad provides a structured way to handle such cases without resorting to explicit null checks or throwing exceptions.
 
-#### Motivation
+### Motivation
 The Maybe Monad addresses the problem of null values or undefined behavior. In languages like C++, null pointers can lead to runtime errors and crashes. 
 The Maybe Monad offers a type-safe way to represent optional values while avoiding these issues.
 
-#### Structure
+### Structure
 The Maybe Monad consists of two possible states:
  - Just(value): Represents a valid value.
  - Nothing: Represents the absence of a value.
@@ -370,7 +369,7 @@ For each state it provides the functions `fmap`, `bind` and `operator()`, `hasVa
 Supports the retrieval of the wrapped value via the `value` and `valueOr` functions. 
 Note: These functions are not visible if type void is used.
 
-#### Implementation
+### Implementation
 In our implementation, the Maybe class implements the abstract classes Functor, Applicative and Monad.
 We support both void and any value types.
 Instead of returning null or throwing exceptions, functions `fmap`, `bind` and `operator()` return a Maybe monad instance.
@@ -379,7 +378,7 @@ If any step in the chain encounters a Nothing, the rest of the chain short-circu
 The Maybe Monad provides a structured way to handle errors without using exceptions.
 Instead of throwing exceptions, a computation that fails returns a Nothing, and the chain of operations can continue or stop gracefully.
 
-#### Benefits:
+### Benefits:
  - Safe Handling of Optionals: Prevents null pointer exceptions by encapsulating optional values
  - Functional Composition: Supports chaining of operations on optional values
  - Improved Code Readability: Enhances code readability by eliminating nested null checks. Expresses intent by using monadic operations.
@@ -387,16 +386,16 @@ Instead of throwing exceptions, a computation that fails returns a Nothing, and 
  - Reduced Error Surfaces: Makes code more robust and resilient
  - Type Safety: Ensures type safety by encapsulating optional values in a monad
 
-### Either
+## Either
 The Either Monad is a monadic structure that encapsulates two possible values, typically referred to as "left" and "right". 
 It's used to represent computations that might fail or have two distinct outcomes. 
 Is often used for error handling, where the "left" value represents an error or failure, and the "right" value represents a successful computation.
 
-#### Motivation
+### Motivation
 The Either Monad is designed to handle computations that might have two distinct outcomes, such as success and failure. 
 It provides a structured way to manage these outcomes while ensuring composability and type safety.
 
-#### Structure
+### Structure
 The Either Monad consists of two possible states:
 - Error(value): Represents an error value
 - Ok(value): Represents a valid value
@@ -406,7 +405,7 @@ For each state it also provides the functions `fmap`, `bind`, `operator()`, `isE
 Supports the retrieval of the wrapped error or value via the `value`, `valueOr`, `error`, `errorOr` functions.
 Note: These functions are not visible if type void is used.
 
-#### Implementation
+### Implementation
 In our implementation, the Either class implements the abstract classes Functor, Applicative and Monad.
 We support both void and any value types.
 Instead of returning null or throwing exceptions, functions `fmap`, `bind` and `operator()` return an Either monad instance.
@@ -416,7 +415,7 @@ If any step in the chain encounters an Error, the rest of the chain short-circui
 The Either monad is a powerful tool for managing computations with two distinct outcomes, such as success and failure. 
 It provides a structured way to handle errors, compose computations, and ensure a clear separation between successful and unsuccessful outcomes.
 
-#### Benefits:
+### Benefits:
 - Handling Success and Failure: Represents computations that can have either a successful result (Ok) or an error (Error)
 - Improved Error Handling: Offers a consistent error-handling mechanism across different parts of the code
 - Clear Separation of Concerns: Separates the handling of successful and failed computations.
@@ -425,7 +424,7 @@ It provides a structured way to handle errors, compose computations, and ensure 
 - Flexible Error Reporting: Enables capturing additional information about failures using Left values.
 - Improved Readability: Makes code more readable by explicitly handling success and failure cases.
 
-### Function lift
+## Function lift
 Lifting is a technique in functional programming that involves transforming regular functions into functions 
 that can operate on values wrapped within special types, such as our Maybe or Either types. 
 
@@ -435,7 +434,7 @@ It helps one avoid explicitly handling null values (Maybe) or error propagation 
 such behavior within the functor/monad itself.
 
 We provide a function lift, within namespace maybe, that lifts the provided function into the Maybe monad realm.
-#### Maybe Lift:
+### Maybe Lift:
 ```c++
 const auto funcOneArgRetInt = [](int i) { return 42 * i;};
 const auto liftedFunction = maybe::lift(funcOneArgRetInt);
@@ -452,7 +451,7 @@ const auto result4 = liftedFunctionMArg(maybe::Just(1), maybe::Just<int>(4), may
 
 We provide a function lift, within namespace either, that lifts the provided function into the Either monad realm.
 In this case one needs to explicitly specify the Error type since it cannot be deduced.
-#### Either Lift:
+### Either Lift:
 ```c++
 const auto funcOneArgRetInt = [](int i) { return 42 * i;};
 const auto liftedFunc_voiderror = yafl::either::lift(funcOneArgRetInt);
@@ -488,9 +487,9 @@ cmake .. -DCMAKE_INSTALL_PREFIX:PATH=<some path>
 cmake --build . --config Release --target install
 ```
 Note that YAFL will be installed in 
- - Header files will be installed in <PREFIX>/include
- - Static/Shared library files will be installed in <PREFIX>/lib
- - CMake target files will be installed in <PREFIX>/lib/cmake/Yafl
+ - Header files will be installed in \<PREFIX\>/include
+ - Static/Shared library files will be installed in \<PREFIX\>/lib
+ - CMake target files will be installed in \<PREFIX\>/lib/cmake/Yafl
 
 Example building the tests and coverage using ninja
 ```bash

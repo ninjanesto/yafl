@@ -1,9 +1,9 @@
 /**
- * \brief       Yet Another Functional Library
+ * \brief       Either class that implements Functor, Applicative and Monad
  *
  * \copyright   2023, Ernesto Festas.
  *              Distributed under MIT license (See accompanying LICENSE file)
- * \defgroup Either Either monad
+ * \defgroup    Either Either Monad
  */
 #pragma once
 
@@ -948,7 +948,7 @@ decltype(auto) lift(Callable&& callable) {
         using ReturnFunctionType = typename function::Info<Callable>::template LiftedSignature<FixedErrorType::template Type>;
 
         const ReturnFunctionType function =  [callable = std::forward<Callable>(callable)](auto&& ...args) -> Either<ErrorType, ReturnType> {
-            if (all_true([](const auto& v){ return v.isOk();}, args...)) {
+            if (all([](const auto &v) { return v.isOk(); }, args...)) {
                 const auto tp = tuple::map_append([](auto&& arg){ return arg.value();}, std::make_tuple(), args...);
                 if constexpr (std::is_void_v<ReturnType>) {
                     std::apply(callable, tp);

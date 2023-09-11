@@ -7,11 +7,11 @@ function(set_version _prefix _major _minor _patch OPTIONAL _tweak)
     if(DEFINED _tweak)
         set(${_prefix}_TWEAK ${_tweak} PARENT_SCOPE)
         set(${_prefix}_VERSION ${_major}.${_minor}.${_patch}-${_tweak} PARENT_SCOPE)
+        set(${_prefix}_SOVERSION ${_major}.${_minor}.${_patch}-${_tweak} PARENT_SCOPE)
     else()
         set(${_prefix}_VERSION ${_major}.${_minor}.${_patch} PARENT_SCOPE)
+        set(${_prefix}_SOVERSION ${_major}.${_minor}.${_patch} PARENT_SCOPE)
     endif()
-
-    set(${_prefix}_SOVERSION ${_major}.${_minor} PARENT_SCOPE)
 endfunction()
 
 function(set_default_compile_flags)

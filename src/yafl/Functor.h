@@ -1,9 +1,9 @@
 /**
- * \brief       Yet Another Functional Library
+ * \brief       YAFL core contains definitions for Functor, Applicative Functor and Monad
  *
  * \copyright   2023, Ernesto Festas.
  *              Distributed under MIT license (See accompanying LICENSE file)
- * \defgroup Core YAFL core
+ * \defgroup    Core YAFL core
  */
 #pragma once
 

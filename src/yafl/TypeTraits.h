@@ -1,11 +1,11 @@
 /**
- * \brief       Yet Another Functional Library
+ * \brief       Traits for Functions, Tuples and YAFL types
  *
  * \copyright   2023, Ernesto Festas.
  *              Distributed under MIT license (See accompanying LICENSE file)
- * \defgroup Function Function type traits
- * \defgroup Tuple Tuple type traits
- * \defgroup Type Yafl type traits
+ * \defgroup    Function Function type traits
+ * \defgroup    Tuple Tuple type traits
+ * \defgroup    Type Yafl type traits
  */
 #pragma once
 
