@@ -1,0 +1,9 @@
+<map id="yafl::Either&lt; ErrorType, ValueType &gt;" name="yafl::Either&lt; ErrorType, ValueType &gt;">
+<area shape="rect" id="node1" title="Either class." alt="" coords="663,87,835,129"/>
+<area shape="rect" id="node2" href="$group__Core.html" title=" " alt="" coords="423,7,571,63"/>
+<area shape="rect" id="node3" href="$group__Core.html#classyafl_1_1core_1_1Functor" title="Functional Functor class." alt="" coords="5,14,201,55"/>
+<area shape="rect" id="node4" href="$group__Core.html" title=" " alt="" coords="380,87,613,129"/>
+<area shape="rect" id="node5" href="$group__Core.html#classyafl_1_1core_1_1Applicative" title="Functional Applicative Functor class." alt="" coords="17,80,190,136"/>
+<area shape="rect" id="node6" href="$group__Core.html" title=" " alt="" coords="424,153,569,209"/>
+<area shape="rect" id="node7" href="$group__Core.html#classyafl_1_1core_1_1Monad" title="Functional Monad class." alt="" coords="13,161,194,202"/>
+</map>

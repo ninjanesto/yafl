@@ -1,0 +1,9 @@
+<map id="yafl::Maybe&lt; T &gt;" name="yafl::Maybe&lt; T &gt;">
+<area shape="rect" id="node1" title="Maybe class." alt="" coords="556,86,692,113"/>
+<area shape="rect" id="node2" href="$group__Core.html" title=" " alt="" coords="356,9,495,51"/>
+<area shape="rect" id="node3" href="$group__Core.html#classyafl_1_1core_1_1Functor" title="Functional Functor class." alt="" coords="5,5,201,47"/>
+<area shape="rect" id="node4" href="$group__Core.html" title=" " alt="" coords="344,79,507,120"/>
+<area shape="rect" id="node5" href="$group__Core.html#classyafl_1_1core_1_1Applicative" title="Functional Applicative Functor class." alt="" coords="17,71,190,127"/>
+<area shape="rect" id="node6" href="$group__Core.html" title=" " alt="" coords="353,148,498,189"/>
+<area shape="rect" id="node7" href="$group__Core.html#classyafl_1_1core_1_1Monad" title="Functional Monad class." alt="" coords="13,152,194,193"/>
+</map>

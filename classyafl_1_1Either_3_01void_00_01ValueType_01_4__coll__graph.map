@@ -1,0 +1,9 @@
+<map id="yafl::Either&lt; void, ValueType &gt;" name="yafl::Either&lt; void, ValueType &gt;">
+<area shape="rect" id="node1" title="Partial specialization of the Either class for void error and generic value type." alt="" coords="681,79,820,120"/>
+<area shape="rect" id="node2" href="$group__Core.html" title=" " alt="" coords="432,9,632,51"/>
+<area shape="rect" id="node3" href="$group__Core.html#classyafl_1_1core_1_1Functor" title="Functional Functor class." alt="" coords="5,5,201,47"/>
+<area shape="rect" id="node4" href="$group__Core.html" title=" " alt="" coords="432,79,632,120"/>
+<area shape="rect" id="node5" href="$group__Core.html#classyafl_1_1core_1_1Applicative" title="Functional Applicative Functor class." alt="" coords="17,71,190,127"/>
+<area shape="rect" id="node6" href="$group__Core.html" title=" " alt="" coords="437,148,627,189"/>
+<area shape="rect" id="node7" href="$group__Core.html#classyafl_1_1core_1_1Monad" title="Functional Monad class." alt="" coords="13,152,194,193"/>
+</map>

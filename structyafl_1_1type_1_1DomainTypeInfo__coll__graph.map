@@ -1,0 +1,5 @@
+<map id="yafl::type::DomainTypeInfo&lt; T &gt;" name="yafl::type::DomainTypeInfo&lt; T &gt;">
+<area shape="rect" id="node1" title="Type details for Yafl types." alt="" coords="5,229,240,256"/>
+<area shape="rect" id="node2" href="$structyafl_1_1type_1_1details_1_1DomainDetailsImpl.html" title=" " alt="" coords="38,124,207,180"/>
+<area shape="rect" id="node3" href="$structyafl_1_1type_1_1details_1_1DomainDetailsImpl.html" title="Default class that contains information about whether a given type is a Functor, Applicative or Monad..." alt="" coords="45,5,201,61"/>
+</map>

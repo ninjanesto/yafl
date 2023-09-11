@@ -1,0 +1,7 @@
+<map id="yafl::Maybe&lt; void &gt;" name="yafl::Maybe&lt; void &gt;">
+<area shape="rect" id="node1" title="Specialization of the Maybe class for void type." alt="" coords="559,46,715,73"/>
+<area shape="rect" id="node2" href="$group__Core.html" title=" " alt="" coords="367,5,506,47"/>
+<area shape="rect" id="node3" href="$group__Core.html#classyafl_1_1core_1_1Functor" title="Functional Functor class." alt="" coords="5,5,201,47"/>
+<area shape="rect" id="node4" href="$group__Core.html" title=" " alt="" coords="364,71,509,112"/>
+<area shape="rect" id="node5" href="$group__Core.html#classyafl_1_1core_1_1Monad" title="Functional Monad class." alt="" coords="13,71,194,112"/>
+</map>

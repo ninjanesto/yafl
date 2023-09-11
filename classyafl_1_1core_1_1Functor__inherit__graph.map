@@ -1,0 +1,15 @@
+<map id="yafl::core::Functor&lt; TDerivedFunctor, Args &gt;" name="yafl::core::Functor&lt; TDerivedFunctor, Args &gt;">
+<area shape="rect" id="node1" title="Functional Functor class." alt="" coords="5,203,201,245"/>
+<area shape="rect" id="node2" href="$group__Core.html" title=" " alt="" coords="458,5,606,61"/>
+<area shape="rect" id="node4" href="$group__Core.html" title=" " alt="" coords="463,86,601,127"/>
+<area shape="rect" id="node6" href="$group__Core.html" title=" " alt="" coords="458,152,606,208"/>
+<area shape="rect" id="node8" href="$group__Core.html" title=" " alt="" coords="463,233,601,274"/>
+<area shape="rect" id="node10" href="$group__Core.html" title=" " alt="" coords="432,298,632,339"/>
+<area shape="rect" id="node12" href="$group__Core.html" title=" " alt="" coords="451,363,613,405"/>
+<area shape="rect" id="node3" href="$group__Either.html#classyafl_1_1Either" title="Either class." alt="" coords="681,13,853,54"/>
+<area shape="rect" id="node5" href="$group__Maybe.html#classyafl_1_1Maybe" title="Maybe class." alt="" coords="699,93,835,120"/>
+<area shape="rect" id="node7" href="$group__Either.html#classyafl_1_1Either_3_01ErrorType_00_01void_01_4" title="Partial specialization of the Either class for generic error and void value type." alt="" coords="681,159,853,201"/>
+<area shape="rect" id="node9" href="$group__Maybe.html#classyafl_1_1Maybe_3_01void_01_4" title="Specialization of the Maybe class for void type." alt="" coords="689,240,845,267"/>
+<area shape="rect" id="node11" href="$group__Either.html#classyafl_1_1Either_3_01void_00_01ValueType_01_4" title="Partial specialization of the Either class for void error and generic value type." alt="" coords="698,298,837,339"/>
+<area shape="rect" id="node13" href="$group__Either.html#classyafl_1_1Either_3_01void_00_01void_01_4" title="Specialization of the Either class for void error and void value types." alt="" coords="698,363,837,405"/>
+</map>
