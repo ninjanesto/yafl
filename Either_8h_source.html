@@ -341,7 +341,7 @@ $(document).ready(function(){initNavTree('Either_8h_source.html',''); initResiza
 <div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;        }</div>
 <div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160; </div>
 <div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;    decltype(<span class="keyword">auto</span>) internal_apply()<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;        static_assert(std::is_invocable_v&lt;std::decay_t&lt;ValueType&gt;&gt;, <span class="stringliteral">&quot;Function that takes one or more arguments and therefore cannot be called without arguments&quot;</span>);</div>
+<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;        static_assert(std::is_invocable_v&lt;std::decay_t&lt;ValueType&gt;&gt;, <span class="stringliteral">&quot;Function that takes one or more arguments cannot be called without arguments&quot;</span>);</div>
 <div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160; </div>
 <div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;        <span class="keyword">using</span> ReturnType = std::remove_reference_t&lt;std::invoke_result_t&lt;std::decay_t&lt;ValueType&gt;&gt;&gt;;</div>
 <div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;        <span class="keywordflow">if</span> (<a class="code" href="group__Either.html#a7c5b9ea04a8fb1b1314914054ac5b684">isError</a>()) {</div>
@@ -596,7 +596,7 @@ $(document).ready(function(){initNavTree('Either_8h_source.html',''); initResiza
 <div class="line"><a name="l00777"></a><span class="lineno">  777</span>&#160;    }</div>
 <div class="line"><a name="l00778"></a><span class="lineno">  778</span>&#160; </div>
 <div class="line"><a name="l00779"></a><span class="lineno">  779</span>&#160;    decltype(<span class="keyword">auto</span>) internal_apply()<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00780"></a><span class="lineno">  780</span>&#160;        static_assert(std::is_invocable_v&lt;std::decay_t&lt;ValueType&gt;&gt;, <span class="stringliteral">&quot;Function that takes one or more arguments and therefore cannot be called without arguments&quot;</span>);</div>
+<div class="line"><a name="l00780"></a><span class="lineno">  780</span>&#160;        static_assert(std::is_invocable_v&lt;std::decay_t&lt;ValueType&gt;&gt;, <span class="stringliteral">&quot;Function that takes one or more arguments cannot be called without arguments&quot;</span>);</div>
 <div class="line"><a name="l00781"></a><span class="lineno">  781</span>&#160;        <span class="keywordflow">if</span> constexpr (std::is_invocable_v&lt;std::decay_t&lt;ValueType&gt;&gt;) {</div>
 <div class="line"><a name="l00782"></a><span class="lineno">  782</span>&#160;            <span class="keyword">using</span> ReturnType = std::remove_reference_t&lt;std::invoke_result_t&lt;std::decay_t&lt;ValueType&gt;&gt;&gt;;</div>
 <div class="line"><a name="l00783"></a><span class="lineno">  783</span>&#160;            <span class="keywordflow">if</span> (<a class="code" href="group__Either.html#a7c5b9ea04a8fb1b1314914054ac5b684">isError</a>()) {</div>

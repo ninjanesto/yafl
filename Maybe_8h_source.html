@@ -317,77 +317,79 @@ $(document).ready(function(){initNavTree('Maybe_8h_source.html',''); initResizab
 <div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;    }</div>
 <div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160; </div>
 <div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;    decltype(<span class="keyword">auto</span>) internal_apply()<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;        <span class="keyword">using</span> ReturnType = std::remove_reference_t&lt;std::invoke_result_t&lt;std::decay_t&lt;T&gt;&gt;&gt;;</div>
-<div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;        <span class="keywordflow">if</span> (!<a class="code" href="group__Maybe.html#a267bb3d28417865ec67238e54b2478b5">hasValue</a>()) {</div>
-<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;            <span class="keywordflow">return</span> <a class="code" href="group__Maybe.html#adb1f692adf2991a8bb10dc76faa10418">Maybe&lt;ReturnType&gt;::Nothing</a>();</div>
-<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;        } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;            <span class="keywordflow">if</span> constexpr (std::is_void_v&lt;ReturnType&gt;) {</div>
-<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;                std::invoke&lt;T&gt;(<a class="code" href="group__Maybe.html#a249db6f112529dc2464c8d6c21255d0b">value</a>());</div>
-<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;                <span class="keywordflow">return</span> <a class="code" href="group__Maybe.html#a1d8d53589b84e8a6810eae90d063db48">Maybe&lt;ReturnType&gt;::Just</a>();</div>
-<div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;            } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;                <span class="keywordflow">return</span> <a class="code" href="group__Maybe.html#a1d8d53589b84e8a6810eae90d063db48">Maybe&lt;ReturnType&gt;::Just</a>(std::invoke&lt;T&gt;(<a class="code" href="group__Maybe.html#a249db6f112529dc2464c8d6c21255d0b">value</a>()));</div>
-<div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;            }</div>
-<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;        }</div>
-<div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;    }</div>
-<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160; </div>
-<div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;    std::optional&lt;T&gt; _value;</div>
-<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;};</div>
-<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160; </div>
-<div class="line"><a name="l00377"></a><span class="lineno"><a class="line" href="namespaceyafl_1_1maybe.html">  377</a></span>&#160;<span class="keyword">namespace </span>maybe {</div>
+<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;        static_assert(std::is_invocable_v&lt;std::decay_t&lt;T&gt;&gt;, <span class="stringliteral">&quot;Function that takes one or more arguments cannot be called without arguments&quot;</span>);</div>
+<div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;        <span class="keyword">using</span> ReturnType = std::remove_reference_t&lt;std::invoke_result_t&lt;std::decay_t&lt;T&gt;&gt;&gt;;</div>
+<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160; </div>
+<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;        <span class="keywordflow">if</span> (!<a class="code" href="group__Maybe.html#a267bb3d28417865ec67238e54b2478b5">hasValue</a>()) {</div>
+<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;            <span class="keywordflow">return</span> <a class="code" href="group__Maybe.html#adb1f692adf2991a8bb10dc76faa10418">Maybe&lt;ReturnType&gt;::Nothing</a>();</div>
+<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;        } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;            <span class="keywordflow">if</span> constexpr (std::is_void_v&lt;ReturnType&gt;) {</div>
+<div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;                std::invoke&lt;T&gt;(<a class="code" href="group__Maybe.html#a249db6f112529dc2464c8d6c21255d0b">value</a>());</div>
+<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;                <span class="keywordflow">return</span> <a class="code" href="group__Maybe.html#a1d8d53589b84e8a6810eae90d063db48">Maybe&lt;ReturnType&gt;::Just</a>();</div>
+<div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;            } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;                <span class="keywordflow">return</span> <a class="code" href="group__Maybe.html#a1d8d53589b84e8a6810eae90d063db48">Maybe&lt;ReturnType&gt;::Just</a>(std::invoke&lt;T&gt;(<a class="code" href="group__Maybe.html#a249db6f112529dc2464c8d6c21255d0b">value</a>()));</div>
+<div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;            }</div>
+<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;        }</div>
+<div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;    }</div>
+<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160; </div>
+<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;    std::optional&lt;T&gt; _value;</div>
+<div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;};</div>
 <div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160; </div>
-<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> ValueType&gt;</div>
-<div class="line"><a name="l00386"></a><span class="lineno"><a class="line" href="group__Maybe.html#ga604ebff77410e511384767513b1aa0e9">  386</a></span>&#160;<a class="code" href="group__Maybe.html#classyafl_1_1Maybe">Maybe&lt;std::remove_reference_t&lt;ValueType&gt;</a>&gt; <a class="code" href="group__Maybe.html#ga604ebff77410e511384767513b1aa0e9">Nothing</a>() {</div>
-<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="group__Maybe.html#classyafl_1_1Maybe">Maybe&lt;std::remove_reference_t&lt;ValueType&gt;</a>&gt;<a class="code" href="group__Maybe.html#ga604ebff77410e511384767513b1aa0e9">::Nothing</a>();</div>
-<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;}</div>
-<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160; </div>
-<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> T = <span class="keywordtype">void</span>&gt;</div>
-<div class="line"><a name="l00397"></a><span class="lineno"><a class="line" href="group__Maybe.html#gabc73df34b07f8c2275122709d340a26e">  397</a></span>&#160;<a class="code" href="group__Maybe.html#classyafl_1_1Maybe_3_01void_01_4">Maybe&lt;void&gt;</a> <a class="code" href="group__Maybe.html#gabc73df34b07f8c2275122709d340a26e">Just</a>() { <span class="keywordflow">return</span> <a class="code" href="group__Maybe.html#a1d8d53589b84e8a6810eae90d063db48">Maybe&lt;void&gt;::Just</a>(); }</div>
-<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160; </div>
-<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> ValueType&gt;</div>
-<div class="line"><a name="l00407"></a><span class="lineno"><a class="line" href="group__Maybe.html#ga6dd659f1be7050bbdac59e6ab8915aa7">  407</a></span>&#160;<a class="code" href="group__Maybe.html#classyafl_1_1Maybe">Maybe&lt;std::remove_reference_t&lt;ValueType&gt;</a>&gt; <a class="code" href="group__Maybe.html#gabc73df34b07f8c2275122709d340a26e">Just</a>(ValueType&amp;&amp; args) {</div>
-<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="group__Maybe.html#classyafl_1_1Maybe">Maybe&lt;std::remove_reference_t&lt;ValueType&gt;</a>&gt;<a class="code" href="group__Maybe.html#gabc73df34b07f8c2275122709d340a26e">::Just</a>(std::forward&lt;ValueType&gt;(args));</div>
-<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;}</div>
-<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160; </div>
-<div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> Callable&gt;</div>
-<div class="line"><a name="l00419"></a><span class="lineno"><a class="line" href="group__Maybe.html#ga75f1c459fd3e0dd82778fceafbfafaf3">  419</a></span>&#160;decltype(<span class="keyword">auto</span>) <a class="code" href="group__Maybe.html#ga75f1c459fd3e0dd82778fceafbfafaf3">lift</a>(Callable &amp;&amp;callable) {</div>
-<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;    <span class="keywordflow">if</span> constexpr (std::is_invocable_v&lt;std::decay_t&lt;Callable&gt;&gt;) {</div>
-<div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;        <span class="keyword">using</span> ReturnType = std::remove_reference_t&lt;std::invoke_result_t&lt;std::decay_t&lt;Callable&gt;&gt;&gt;;</div>
-<div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;        <span class="keywordflow">if</span> constexpr (std::is_void_v&lt;ReturnType&gt;) {</div>
-<div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;            <span class="keywordflow">return</span> [callable = std::forward&lt;Callable&gt;(callable)]() {</div>
-<div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;                callable();</div>
-<div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;                <span class="keywordflow">return</span> <a class="code" href="group__Maybe.html#a1d8d53589b84e8a6810eae90d063db48">Maybe&lt;ReturnType&gt;::Just</a>();</div>
-<div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;            };</div>
-<div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160;        } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160;            <span class="keywordflow">return</span> [callable = std::forward&lt;Callable&gt;(callable)]() {</div>
-<div class="line"><a name="l00429"></a><span class="lineno">  429</span>&#160;                <span class="keywordflow">return</span> <a class="code" href="group__Maybe.html#a1d8d53589b84e8a6810eae90d063db48">Maybe&lt;ReturnType&gt;::Just</a>(callable());</div>
-<div class="line"><a name="l00430"></a><span class="lineno">  430</span>&#160;            };</div>
-<div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160;        }</div>
-<div class="line"><a name="l00432"></a><span class="lineno">  432</span>&#160;    } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160;        <span class="keyword">using</span> ReturnType = <span class="keyword">typename</span> <a class="code" href="group__Function.html#structyafl_1_1function_1_1Info">function::Info&lt;Callable&gt;::ReturnType</a>;</div>
-<div class="line"><a name="l00434"></a><span class="lineno">  434</span>&#160;        <span class="keyword">using</span> ReturnFunctionType = <span class="keyword">typename</span> <a class="code" href="group__Function.html#structyafl_1_1function_1_1Info">function::Info&lt;Callable&gt;::template</a> LiftedSignature&lt;Maybe&gt;;</div>
-<div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160; </div>
-<div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160;        <span class="keyword">const</span> ReturnFunctionType <span class="keyword">function</span> = [callable = std::forward&lt;Callable&gt;(callable)](<span class="keyword">auto</span>&amp;&amp; ...args) -&gt; <a class="code" href="group__Maybe.html#classyafl_1_1Maybe">Maybe&lt;ReturnType&gt;</a> {</div>
-<div class="line"><a name="l00437"></a><span class="lineno">  437</span>&#160;            <span class="keywordflow">if</span> (<a class="code" href="group__HOF.html#ga22373390c3f1b950c5ad4d050493c421">all</a>([](<span class="keyword">auto</span> &amp;&amp;v) { <span class="keywordflow">return</span> v.hasValue(); }, args...)) {</div>
-<div class="line"><a name="l00438"></a><span class="lineno">  438</span>&#160;                <span class="keyword">const</span> <span class="keyword">auto</span> tp = <a class="code" href="group__Tuple.html#ga76f2437175096df13a20a7e5f42cbd45">tuple::map_append</a>([](<span class="keyword">auto</span>&amp;&amp; arg) { <span class="keywordflow">return</span> arg.value(); }, std::make_tuple(), args...);</div>
-<div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160; </div>
-<div class="line"><a name="l00440"></a><span class="lineno">  440</span>&#160;                <span class="keywordflow">if</span> constexpr (std::is_void_v&lt;ReturnType&gt;) {</div>
-<div class="line"><a name="l00441"></a><span class="lineno">  441</span>&#160;                    std::apply(callable, tp);</div>
-<div class="line"><a name="l00442"></a><span class="lineno">  442</span>&#160;                    <span class="keywordflow">return</span> <a class="code" href="group__Maybe.html#a1d8d53589b84e8a6810eae90d063db48">Maybe&lt;ReturnType&gt;::Just</a>();</div>
-<div class="line"><a name="l00443"></a><span class="lineno">  443</span>&#160;                } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00444"></a><span class="lineno">  444</span>&#160;                    <span class="keywordflow">return</span> <a class="code" href="group__Maybe.html#a1d8d53589b84e8a6810eae90d063db48">Maybe&lt;ReturnType&gt;::Just</a>(std::apply(callable, tp));</div>
-<div class="line"><a name="l00445"></a><span class="lineno">  445</span>&#160;                }</div>
-<div class="line"><a name="l00446"></a><span class="lineno">  446</span>&#160;            } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00447"></a><span class="lineno">  447</span>&#160;                <span class="keywordflow">return</span> <a class="code" href="group__Maybe.html#adb1f692adf2991a8bb10dc76faa10418">Maybe&lt;ReturnType&gt;::Nothing</a>();</div>
-<div class="line"><a name="l00448"></a><span class="lineno">  448</span>&#160;            }</div>
-<div class="line"><a name="l00449"></a><span class="lineno">  449</span>&#160;        };</div>
-<div class="line"><a name="l00450"></a><span class="lineno">  450</span>&#160; </div>
-<div class="line"><a name="l00451"></a><span class="lineno">  451</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">function</span>;</div>
-<div class="line"><a name="l00452"></a><span class="lineno">  452</span>&#160;    }</div>
-<div class="line"><a name="l00453"></a><span class="lineno">  453</span>&#160;}</div>
-<div class="line"><a name="l00454"></a><span class="lineno">  454</span>&#160; </div>
-<div class="line"><a name="l00455"></a><span class="lineno">  455</span>&#160;} <span class="comment">// namespace maybe</span></div>
-<div class="line"><a name="l00456"></a><span class="lineno">  456</span>&#160;} <span class="comment">// namespace yafl</span></div>
+<div class="line"><a name="l00379"></a><span class="lineno"><a class="line" href="namespaceyafl_1_1maybe.html">  379</a></span>&#160;<span class="keyword">namespace </span>maybe {</div>
+<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160; </div>
+<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> ValueType&gt;</div>
+<div class="line"><a name="l00388"></a><span class="lineno"><a class="line" href="group__Maybe.html#ga604ebff77410e511384767513b1aa0e9">  388</a></span>&#160;<a class="code" href="group__Maybe.html#classyafl_1_1Maybe">Maybe&lt;std::remove_reference_t&lt;ValueType&gt;</a>&gt; <a class="code" href="group__Maybe.html#ga604ebff77410e511384767513b1aa0e9">Nothing</a>() {</div>
+<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="group__Maybe.html#classyafl_1_1Maybe">Maybe&lt;std::remove_reference_t&lt;ValueType&gt;</a>&gt;<a class="code" href="group__Maybe.html#ga604ebff77410e511384767513b1aa0e9">::Nothing</a>();</div>
+<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;}</div>
+<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160; </div>
+<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> T = <span class="keywordtype">void</span>&gt;</div>
+<div class="line"><a name="l00399"></a><span class="lineno"><a class="line" href="group__Maybe.html#gabc73df34b07f8c2275122709d340a26e">  399</a></span>&#160;<a class="code" href="group__Maybe.html#classyafl_1_1Maybe_3_01void_01_4">Maybe&lt;void&gt;</a> <a class="code" href="group__Maybe.html#gabc73df34b07f8c2275122709d340a26e">Just</a>() { <span class="keywordflow">return</span> <a class="code" href="group__Maybe.html#a1d8d53589b84e8a6810eae90d063db48">Maybe&lt;void&gt;::Just</a>(); }</div>
+<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160; </div>
+<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> ValueType&gt;</div>
+<div class="line"><a name="l00409"></a><span class="lineno"><a class="line" href="group__Maybe.html#ga6dd659f1be7050bbdac59e6ab8915aa7">  409</a></span>&#160;<a class="code" href="group__Maybe.html#classyafl_1_1Maybe">Maybe&lt;std::remove_reference_t&lt;ValueType&gt;</a>&gt; <a class="code" href="group__Maybe.html#gabc73df34b07f8c2275122709d340a26e">Just</a>(ValueType&amp;&amp; args) {</div>
+<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="group__Maybe.html#classyafl_1_1Maybe">Maybe&lt;std::remove_reference_t&lt;ValueType&gt;</a>&gt;<a class="code" href="group__Maybe.html#gabc73df34b07f8c2275122709d340a26e">::Just</a>(std::forward&lt;ValueType&gt;(args));</div>
+<div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;}</div>
+<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160; </div>
+<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> Callable&gt;</div>
+<div class="line"><a name="l00421"></a><span class="lineno"><a class="line" href="group__Maybe.html#ga75f1c459fd3e0dd82778fceafbfafaf3">  421</a></span>&#160;decltype(<span class="keyword">auto</span>) <a class="code" href="group__Maybe.html#ga75f1c459fd3e0dd82778fceafbfafaf3">lift</a>(Callable &amp;&amp;callable) {</div>
+<div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;    <span class="keywordflow">if</span> constexpr (std::is_invocable_v&lt;std::decay_t&lt;Callable&gt;&gt;) {</div>
+<div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;        <span class="keyword">using</span> ReturnType = std::remove_reference_t&lt;std::invoke_result_t&lt;std::decay_t&lt;Callable&gt;&gt;&gt;;</div>
+<div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;        <span class="keywordflow">if</span> constexpr (std::is_void_v&lt;ReturnType&gt;) {</div>
+<div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;            <span class="keywordflow">return</span> [callable = std::forward&lt;Callable&gt;(callable)]() {</div>
+<div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;                callable();</div>
+<div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160;                <span class="keywordflow">return</span> <a class="code" href="group__Maybe.html#a1d8d53589b84e8a6810eae90d063db48">Maybe&lt;ReturnType&gt;::Just</a>();</div>
+<div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160;            };</div>
+<div class="line"><a name="l00429"></a><span class="lineno">  429</span>&#160;        } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00430"></a><span class="lineno">  430</span>&#160;            <span class="keywordflow">return</span> [callable = std::forward&lt;Callable&gt;(callable)]() {</div>
+<div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160;                <span class="keywordflow">return</span> <a class="code" href="group__Maybe.html#a1d8d53589b84e8a6810eae90d063db48">Maybe&lt;ReturnType&gt;::Just</a>(callable());</div>
+<div class="line"><a name="l00432"></a><span class="lineno">  432</span>&#160;            };</div>
+<div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160;        }</div>
+<div class="line"><a name="l00434"></a><span class="lineno">  434</span>&#160;    } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160;        <span class="keyword">using</span> ReturnType = <span class="keyword">typename</span> <a class="code" href="group__Function.html#structyafl_1_1function_1_1Info">function::Info&lt;Callable&gt;::ReturnType</a>;</div>
+<div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160;        <span class="keyword">using</span> ReturnFunctionType = <span class="keyword">typename</span> <a class="code" href="group__Function.html#structyafl_1_1function_1_1Info">function::Info&lt;Callable&gt;::template</a> LiftedSignature&lt;Maybe&gt;;</div>
+<div class="line"><a name="l00437"></a><span class="lineno">  437</span>&#160; </div>
+<div class="line"><a name="l00438"></a><span class="lineno">  438</span>&#160;        <span class="keyword">const</span> ReturnFunctionType <span class="keyword">function</span> = [callable = std::forward&lt;Callable&gt;(callable)](<span class="keyword">auto</span>&amp;&amp; ...args) -&gt; <a class="code" href="group__Maybe.html#classyafl_1_1Maybe">Maybe&lt;ReturnType&gt;</a> {</div>
+<div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160;            <span class="keywordflow">if</span> (<a class="code" href="group__HOF.html#ga22373390c3f1b950c5ad4d050493c421">all</a>([](<span class="keyword">auto</span> &amp;&amp;v) { <span class="keywordflow">return</span> v.hasValue(); }, args...)) {</div>
+<div class="line"><a name="l00440"></a><span class="lineno">  440</span>&#160;                <span class="keyword">const</span> <span class="keyword">auto</span> tp = <a class="code" href="group__Tuple.html#ga76f2437175096df13a20a7e5f42cbd45">tuple::map_append</a>([](<span class="keyword">auto</span>&amp;&amp; arg) { <span class="keywordflow">return</span> arg.value(); }, std::make_tuple(), args...);</div>
+<div class="line"><a name="l00441"></a><span class="lineno">  441</span>&#160; </div>
+<div class="line"><a name="l00442"></a><span class="lineno">  442</span>&#160;                <span class="keywordflow">if</span> constexpr (std::is_void_v&lt;ReturnType&gt;) {</div>
+<div class="line"><a name="l00443"></a><span class="lineno">  443</span>&#160;                    std::apply(callable, tp);</div>
+<div class="line"><a name="l00444"></a><span class="lineno">  444</span>&#160;                    <span class="keywordflow">return</span> <a class="code" href="group__Maybe.html#a1d8d53589b84e8a6810eae90d063db48">Maybe&lt;ReturnType&gt;::Just</a>();</div>
+<div class="line"><a name="l00445"></a><span class="lineno">  445</span>&#160;                } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00446"></a><span class="lineno">  446</span>&#160;                    <span class="keywordflow">return</span> <a class="code" href="group__Maybe.html#a1d8d53589b84e8a6810eae90d063db48">Maybe&lt;ReturnType&gt;::Just</a>(std::apply(callable, tp));</div>
+<div class="line"><a name="l00447"></a><span class="lineno">  447</span>&#160;                }</div>
+<div class="line"><a name="l00448"></a><span class="lineno">  448</span>&#160;            } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00449"></a><span class="lineno">  449</span>&#160;                <span class="keywordflow">return</span> <a class="code" href="group__Maybe.html#adb1f692adf2991a8bb10dc76faa10418">Maybe&lt;ReturnType&gt;::Nothing</a>();</div>
+<div class="line"><a name="l00450"></a><span class="lineno">  450</span>&#160;            }</div>
+<div class="line"><a name="l00451"></a><span class="lineno">  451</span>&#160;        };</div>
+<div class="line"><a name="l00452"></a><span class="lineno">  452</span>&#160; </div>
+<div class="line"><a name="l00453"></a><span class="lineno">  453</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">function</span>;</div>
+<div class="line"><a name="l00454"></a><span class="lineno">  454</span>&#160;    }</div>
+<div class="line"><a name="l00455"></a><span class="lineno">  455</span>&#160;}</div>
+<div class="line"><a name="l00456"></a><span class="lineno">  456</span>&#160; </div>
+<div class="line"><a name="l00457"></a><span class="lineno">  457</span>&#160;} <span class="comment">// namespace maybe</span></div>
+<div class="line"><a name="l00458"></a><span class="lineno">  458</span>&#160;} <span class="comment">// namespace yafl</span></div>
 <div class="ttc" id="agroup__Core_html_classyafl_1_1core_1_1Applicative"><div class="ttname"><a href="group__Core.html#classyafl_1_1core_1_1Applicative">yafl::core::Applicative</a></div><div class="ttdoc">Functional Applicative Functor class.</div><div class="ttdef"><b>Definition:</b> Applicative.h:26</div></div>
 <div class="ttc" id="agroup__Core_html_classyafl_1_1core_1_1Functor"><div class="ttname"><a href="group__Core.html#classyafl_1_1core_1_1Functor">yafl::core::Functor</a></div><div class="ttdoc">Functional Functor class.</div><div class="ttdef"><b>Definition:</b> Functor.h:27</div></div>
 <div class="ttc" id="agroup__Core_html_classyafl_1_1core_1_1Monad"><div class="ttname"><a href="group__Core.html#classyafl_1_1core_1_1Monad">yafl::core::Monad</a></div><div class="ttdoc">Functional Monad class.</div><div class="ttdef"><b>Definition:</b> Monad.h:25</div></div>
@@ -415,9 +417,9 @@ $(document).ready(function(){initNavTree('Maybe_8h_source.html',''); initResizab
 <div class="ttc" id="agroup__Maybe_html_aeca634999613960e168a273a1dac7bd1"><div class="ttname"><a href="group__Maybe.html#aeca634999613960e168a273a1dac7bd1">yafl::Maybe::valueOr</a></div><div class="ttdeci">T valueOr(const T &amp;arg) const</div><div class="ttdoc">Extracts the wrapped value from the Maybe if exists.</div><div class="ttdef"><b>Definition:</b> Maybe.h:278</div></div>
 <div class="ttc" id="agroup__Maybe_html_classyafl_1_1Maybe"><div class="ttname"><a href="group__Maybe.html#classyafl_1_1Maybe">yafl::Maybe</a></div><div class="ttdoc">Maybe class.</div><div class="ttdef"><b>Definition:</b> Maybe.h:183</div></div>
 <div class="ttc" id="agroup__Maybe_html_classyafl_1_1Maybe_3_01void_01_4"><div class="ttname"><a href="group__Maybe.html#classyafl_1_1Maybe_3_01void_01_4">yafl::Maybe&lt; void &gt;</a></div><div class="ttdoc">Specialization of the Maybe class for void type.</div><div class="ttdef"><b>Definition:</b> Maybe.h:71</div></div>
-<div class="ttc" id="agroup__Maybe_html_ga604ebff77410e511384767513b1aa0e9"><div class="ttname"><a href="group__Maybe.html#ga604ebff77410e511384767513b1aa0e9">yafl::maybe::Nothing</a></div><div class="ttdeci">Maybe&lt; std::remove_reference_t&lt; ValueType &gt; &gt; Nothing()</div><div class="ttdoc">Function that helps build a Maybe with Nothing.</div><div class="ttdef"><b>Definition:</b> Maybe.h:386</div></div>
-<div class="ttc" id="agroup__Maybe_html_ga75f1c459fd3e0dd82778fceafbfafaf3"><div class="ttname"><a href="group__Maybe.html#ga75f1c459fd3e0dd82778fceafbfafaf3">yafl::maybe::lift</a></div><div class="ttdeci">decltype(auto) lift(Callable &amp;&amp;callable)</div><div class="ttdoc">Lift given callable into Maybe monad realm.</div><div class="ttdef"><b>Definition:</b> Maybe.h:419</div></div>
-<div class="ttc" id="agroup__Maybe_html_gabc73df34b07f8c2275122709d340a26e"><div class="ttname"><a href="group__Maybe.html#gabc73df34b07f8c2275122709d340a26e">yafl::maybe::Just</a></div><div class="ttdeci">Maybe&lt; void &gt; Just()</div><div class="ttdoc">Function that helps build a Maybe with a void &quot;value&quot;.</div><div class="ttdef"><b>Definition:</b> Maybe.h:397</div></div>
+<div class="ttc" id="agroup__Maybe_html_ga604ebff77410e511384767513b1aa0e9"><div class="ttname"><a href="group__Maybe.html#ga604ebff77410e511384767513b1aa0e9">yafl::maybe::Nothing</a></div><div class="ttdeci">Maybe&lt; std::remove_reference_t&lt; ValueType &gt; &gt; Nothing()</div><div class="ttdoc">Function that helps build a Maybe with Nothing.</div><div class="ttdef"><b>Definition:</b> Maybe.h:388</div></div>
+<div class="ttc" id="agroup__Maybe_html_ga75f1c459fd3e0dd82778fceafbfafaf3"><div class="ttname"><a href="group__Maybe.html#ga75f1c459fd3e0dd82778fceafbfafaf3">yafl::maybe::lift</a></div><div class="ttdeci">decltype(auto) lift(Callable &amp;&amp;callable)</div><div class="ttdoc">Lift given callable into Maybe monad realm.</div><div class="ttdef"><b>Definition:</b> Maybe.h:421</div></div>
+<div class="ttc" id="agroup__Maybe_html_gabc73df34b07f8c2275122709d340a26e"><div class="ttname"><a href="group__Maybe.html#gabc73df34b07f8c2275122709d340a26e">yafl::maybe::Just</a></div><div class="ttdeci">Maybe&lt; void &gt; Just()</div><div class="ttdoc">Function that helps build a Maybe with a void &quot;value&quot;.</div><div class="ttdef"><b>Definition:</b> Maybe.h:399</div></div>
 <div class="ttc" id="agroup__Tuple_html_ga76f2437175096df13a20a7e5f42cbd45"><div class="ttname"><a href="group__Tuple.html#ga76f2437175096df13a20a7e5f42cbd45">yafl::tuple::map_append</a></div><div class="ttdeci">decltype(auto) map_append(Callable &amp;&amp;callable, Tuple &amp;&amp;tuple, Head &amp;&amp;value)</div><div class="ttdoc">Function that applies callable to given value and appends the result into given tuple.</div><div class="ttdef"><b>Definition:</b> TypeTraits.h:174</div></div>
 <div class="ttc" id="anamespaceyafl_html"><div class="ttname"><a href="namespaceyafl.html">yafl</a></div><div class="ttdef"><b>Definition:</b> Applicative.h:13</div></div>
 <div class="ttc" id="astructyafl_1_1type_1_1details_1_1DomainDetailsImpl_3_01Maybe_3_01Inner_01_4_01_4_html_a58d7b76061dff6deced035e958e62c6d"><div class="ttname"><a href="structyafl_1_1type_1_1details_1_1DomainDetailsImpl_3_01Maybe_3_01Inner_01_4_01_4.html#a58d7b76061dff6deced035e958e62c6d">yafl::type::details::DomainDetailsImpl&lt; Maybe&lt; Inner &gt; &gt;::ValueType</a></div><div class="ttdeci">Inner ValueType</div><div class="ttdoc">Value Type.</div><div class="ttdef"><b>Definition:</b> Maybe.h:48</div></div>
