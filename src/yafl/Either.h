@@ -392,7 +392,7 @@ private:
         }
 
     decltype(auto) internal_apply() const {
-        static_assert(std::is_invocable_v<std::decay_t<ValueType>>, "Function that takes one or more arguments and therefore cannot be called without arguments");
+        static_assert(std::is_invocable_v<std::decay_t<ValueType>>, "Function that takes one or more arguments cannot be called without arguments");
 
         using ReturnType = std::remove_reference_t<std::invoke_result_t<std::decay_t<ValueType>>>;
         if (isError()) {
@@ -777,7 +777,7 @@ private:
     }
 
     decltype(auto) internal_apply() const {
-        static_assert(std::is_invocable_v<std::decay_t<ValueType>>, "Function that takes one or more arguments and therefore cannot be called without arguments");
+        static_assert(std::is_invocable_v<std::decay_t<ValueType>>, "Function that takes one or more arguments cannot be called without arguments");
         if constexpr (std::is_invocable_v<std::decay_t<ValueType>>) {
             using ReturnType = std::remove_reference_t<std::invoke_result_t<std::decay_t<ValueType>>>;
             if (isError()) {

@@ -357,7 +357,9 @@ private:
     }
 
     decltype(auto) internal_apply() const {
+        static_assert(std::is_invocable_v<std::decay_t<T>>, "Function that takes one or more arguments cannot be called without arguments");
         using ReturnType = std::remove_reference_t<std::invoke_result_t<std::decay_t<T>>>;
+
         if (!hasValue()) {
             return Maybe<ReturnType>::Nothing();
         } else {
