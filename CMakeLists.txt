@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 include(CommonBuildUtils)
 
-set_version(YetAnotherFunctionalLib 1 0 0 OPTIONAL snapshot)
+set_version(YetAnotherFunctionalLib 1 0 0)
 set_default_compile_flags()
 
 if(BUILD_YAFL_DOCS)

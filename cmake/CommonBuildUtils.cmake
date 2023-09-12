@@ -1,10 +1,15 @@
 include(CMakeParseArguments)
 
-function(set_version _prefix _major _minor _patch OPTIONAL _tweak)
+function(set_version _prefix _major _minor _patch)
     set(${_prefix}_MAJOR_VERSION ${_major} PARENT_SCOPE)
     set(${_prefix}_MINOR_VERSION ${_minor} PARENT_SCOPE)
     set(${_prefix}_PATCH_LEVEL ${_patch} PARENT_SCOPE)
-    if(DEFINED _tweak)
+
+    set (extra_args ${ARGN})
+    list(LENGTH extra_args extra_count)
+
+    if (${extra_count} GREATER 0)
+        list(GET extra_args 0 _tweak)
         set(${_prefix}_TWEAK ${_tweak} PARENT_SCOPE)
         set(${_prefix}_VERSION ${_major}.${_minor}.${_patch}-${_tweak} PARENT_SCOPE)
         set(${_prefix}_SOVERSION ${_major}.${_minor}.${_patch}-${_tweak} PARENT_SCOPE)
