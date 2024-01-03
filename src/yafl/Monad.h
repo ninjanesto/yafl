@@ -4,6 +4,7 @@
  * \copyright   2023, Ernesto Festas.
  *              Distributed under MIT license (See accompanying LICENSE file)
  * \defgroup    Core YAFL core
+ * \defgroup    Monad Monad (part of YAFL core)
  */
 #pragma once
 
@@ -15,6 +16,8 @@ namespace core {
 
 /**
  * @ingroup Core
+ * @ingroup Monad
+ *
  * Functional Monad class. Defines the bind function that receives a function from a -> M b and applies that function
  * to a given Monadic type, by unwrapping the value inside the monad and applying the function. Result type will depend
  * on the given function.
@@ -42,7 +45,8 @@ namespace monad {
 
 /**
  * @ingroup Monad
- * This function is used to bind (flatmap) a callable type to a value of type Monad
+ *
+ * This function is used to bind (flatmap) a callable type to a value of type Monad.
  * @tparam Callable callable type
  * @tparam MonadT monad type
  * @param callable function to be applied to the given monad
@@ -57,10 +61,11 @@ decltype(auto) bind(Callable&& callable, const MonadT& monad) {
 
 /**
  * @ingroup Monad
- * This function is used to bind (flatmap) a callable type to a value of type Monad
+ *
+ * This function is used to bind (flatmap) a callable type to a value of type Monad.
  * In this case the provided function is lifted to work at Monad level an so,
  * this function returns a new callable that receives a Monad as argument and returns
- * a Monad
+ * a Monad.
  * @tparam MonadType monad type
  * @tparam Callable callable type
  * @param callable function to be applied to the given functor

@@ -8,7 +8,7 @@
 
 [![Yafl Doxygen Docs](https://github.com/ninjanesto/yafl/actions/workflows/yafl-build-docs.yml/badge.svg)](https://github.com/ninjanesto/yafl/actions/workflows/yafl-build-docs.yml)
 
-# Yet Another Functional Library
+# Yet Another (C++) Functional Library
 Functional Programming concepts implemented in C++17
 
 # Table of Contents
@@ -517,13 +517,14 @@ It is a simple caesar cipher encoder/decoder application.
 This application receives a file, a seed and the mechanism (encode / decode) and outputs another file that contains the application the cipher.
 The main function for this application executes the same operations several times, using different YAFL approaches, just to present YAFL use cases.
 
-It can be build using CMake flag -DBUILD_YAFL_EXAMPLE=ON, and it generates the binary `ACC` in `<cmake build directory>/example/`
+It can be built using the CMake flag -DBUILD_YAFL_EXAMPLE=ON, and it generates the binary `ACC` in `<cmake build directory>/example/`
 
 Usage: `./ACC <-e|-d> <seed> <filename>`
 
 Note: Seed can be a value between 0 and 255
 
 ## Future
+ - Implement Monad transformers
  - Add BiFunctor implementation to Either type
  - Add other monads (Reader, Writer, State, Continuation, ...)
  - Bazel input flags and install targets

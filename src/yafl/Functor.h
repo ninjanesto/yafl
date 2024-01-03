@@ -4,6 +4,7 @@
  * \copyright   2023, Ernesto Festas.
  *              Distributed under MIT license (See accompanying LICENSE file)
  * \defgroup    Core YAFL core
+ * \defgroup    Functor Functor (part of YAFL core)
  */
 #pragma once
 
@@ -17,9 +18,10 @@ namespace core {
 /**
  * @ingroup Core
  * @ingroup Functor
+ *
  * Functional Functor class. Defines the fmap function that receives a function from a -> b and applies that function
  * to a given Functor by unwrapping the value inside the functor and applying the function. Result type will depend
- * on the given function
+ * on the given function.
  * @tparam TDerivedFunctor Type of functor that needs to implement the Functor contract.
  * @tparam Args Argument types for the given template type TDerivedFunctor
  */
@@ -43,7 +45,8 @@ public:
 namespace functor {
 /**
  * @ingroup Functor
- * This function is used to apply a callable type to a value of type Functor
+ *
+ * This function is used to apply a callable type to a value of type Functor.
  * @tparam Callable callable type
  * @tparam FunctorT functor type
  * @param callable function to be applied to the given functor
@@ -58,10 +61,11 @@ decltype(auto) fmap(Callable&& callable, const FunctorT& functor) {
 
 /**
  * @ingroup Functor
- * This function is used to apply a callable type to a value of type Functor
- * In this case the provided function is lifted to work at Functor level an so,
+ *
+ * This function is used to apply a callable type to a value of type Functor.
+ * In this case the provided function is lifted to work at Functor level and so,
  * this function returns a new callable that receives a Functor as argument and returns
- * a Functor
+ * a Functor.
  * @tparam FunctorType Functor type
  * @tparam Callable callable type
  * @param callable function to be applied to the given functor

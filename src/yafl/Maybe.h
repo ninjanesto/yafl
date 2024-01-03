@@ -21,6 +21,7 @@ namespace yafl {
 
 /**
  * @ingroup Maybe
+ *
  * Maybe class. This class implements the Maybe type by realizing concepts from functional programming
  * such as Functor, Applicative and Monad. The implementation for maybe class was based on Haskell Maybe
  * type as defined in https://hackage.haskell.org/package/base-4.18.0.0/docs/Data-Maybe.html
@@ -33,6 +34,7 @@ namespace details {
 
 /**
  * @ingroup Details
+ *
  * Maybe monad traits specialization that enable getting the inner type
  * @tparam Inner Inner type
 */
@@ -64,7 +66,8 @@ struct DomainDetailsImpl<Maybe<Inner>> {
 
 /**
  * @ingroup Maybe
- * Specialization of the Maybe class for void type
+ *
+ * Specialization of the Maybe class for void type.
  */
 template<>
 class Maybe<void> : public core::Functor<Maybe,void>,
@@ -175,7 +178,8 @@ private:
 
 /**
  * @ingroup Maybe
- * Generalization of the Maybe class for any type other than void
+ *
+ * Generalization of the Maybe class for any type other than void.
  */
 template <typename T>
 class Maybe : public core::Functor<Maybe, T>,
@@ -380,7 +384,8 @@ namespace maybe {
 
 /**
  * @ingroup Maybe
- * Function that helps build a Maybe with Nothing
+ *
+ * Function that helps build a Maybe with Nothing.
  * @tparam ValueType Maybe inner type
  * @return maybe with nothing
  */
@@ -391,7 +396,8 @@ Maybe<std::remove_reference_t<ValueType>> Nothing() {
 
 /**
  * @ingroup Maybe
- * Function that helps build a Maybe with a void "value"
+ *
+ * Function that helps build a Maybe with a void "value".
  * @tparam ValueType inner type defaulted to void
  * @return maybe with void value
  */
@@ -400,7 +406,8 @@ Maybe<void> Just() { return Maybe<void>::Just(); }
 
 /**
  * @ingroup Maybe
- * Function that helps build a Maybe with a value
+ *
+ * Function that helps build a Maybe with a value.
  * @tparam ValueType Maybe inner type
  * @param args Argument to be wrapped
  * @return maybe with the value wrapped
@@ -412,7 +419,8 @@ Maybe<std::remove_reference_t<ValueType>> Just(ValueType&& args) {
 
 /**
  * @ingroup Maybe
- * Lift given callable into Maybe monad realm
+ *
+ * Lifts given callable into Maybe monad realm.
  * @tparam Callable Callable type to lift
  * @param callable Callable to lift
  * @return callable lifted into into Maybe monad realm
