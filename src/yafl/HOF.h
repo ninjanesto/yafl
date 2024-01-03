@@ -15,8 +15,9 @@ namespace yafl {
 
 /**
  * @ingroup HOF
+ *
  * Function that applies given predicate to all input arguments and returns true
- * if ALL of the arguments satisfies the given predicate
+ * if ALL of the arguments satisfies the given predicate.
  * @tparam Predicate Predicate function type
  * @tparam Args Input arguments types
  * @param predicate predicate function
@@ -30,8 +31,9 @@ decltype(auto) all(Predicate&& predicate, Args&& ...args) {
 
 /**
  * @ingroup HOF
+ *
  * Function that applies given predicate to all input arguments and returns true
- * if ANY of the arguments satisfies the given predicate
+ * if ANY of the arguments satisfies the given predicate.
  * @tparam Predicate Predicate function type
  * @tparam Args Input arguments types
  * @param predicate predicate function
@@ -45,8 +47,9 @@ decltype(auto) any(Predicate&& predicate, Args&& ...args) {
 
 /**
  * @ingroup HOF
+ *
  * Compose functions. Similar as piping shell commands. Output of first function is
- * piped as input to the second function, except when output is void
+ * piped as input to the second function, except when output is void.
  * @tparam TLeft Left argument type
  * @tparam TRight Right argument type
  * @param lhs Left argument
@@ -84,8 +87,9 @@ decltype(auto) function_compose(TLeft&& lhs, TRight&& rhs) {
 
 /**
  * @ingroup HOF
+ *
  * Compose functions that return Monadic values. Similar as piping shell commands. Output of first function is
- * piped as input to the second function, except when output is void
+ * piped as input to the second function, except when output is void.
  * @tparam TLeft Left argument type
  * @tparam TRight Right argument type
  * @param lhs Left argument
@@ -123,7 +127,8 @@ decltype(auto) kleisli_compose(TLeft&& lhs, TRight&& rhs) {
 
 /**
  * @ingroup HOF
- * Generic composition. It can perform either function or monadic function (kleisli) composition
+ *
+ * Generic composition. It can perform either function or monadic function (kleisli) composition.
  * @tparam TLeft Left argument type
  * @tparam TRight Right argument type
  * @param lhs Left argument
@@ -142,7 +147,8 @@ decltype(auto) compose(TLeft&& lhs, TRight&& rhs) {
 
 /**
  * @ingroup HOF
- * Curry given callable
+ *
+ * Curry given callable.
  * @tparam Callable type of callable
  * @param callable function to execute
  * @return curried function
@@ -180,7 +186,8 @@ namespace {
 
 /**
  * @ingroup HOF
- * Uncurry given callable
+ *
+ * Uncurry given callable.
  * @tparam Callable callable type
  * @param callable callable to apply uncurry
  * @return Uncurried version of the given function
@@ -194,7 +201,8 @@ decltype(auto) uncurry(Callable&& callable) {
 
 /**
  * @ingroup HOF
- * Partial apply given function
+ *
+ * Partial apply given function.
  * @tparam Callable type of callable
  * @tparam Args type of args
  * @param callable function to partial apply given arguments
@@ -226,7 +234,8 @@ decltype(auto) partial(Callable&& callable, Args&& ...args) {
 
 /**
  * @ingroup HOF
- * Identity function
+ *
+ * Identity function.
  * @tparam Arg Type of argument
  * @param arg argument
  * @return argument
@@ -238,7 +247,8 @@ Arg id(Arg&& arg) {
 
 /**
  * @ingroup HOF
- * Function that always evaluates to the first argument, ignoring its second argument.
+ *
+ * Function that always evaluates to the first argument, ignoring its following arguments.
  * @tparam First Type of argument
  * @param first argument
  * @return Returns a function that always returns the configured first argument

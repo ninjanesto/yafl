@@ -20,6 +20,7 @@ namespace yafl {
 
 /**
  * @ingroup Either
+ *
  * Either class. This class implements the Either type by realizing concepts from functional programming
  * such as Functor, Applicative and Monad. The implementation for Either class was based on Haskell Either
  * type as defined in https://hackage.haskell.org/package/base-4.18.0.0/docs/Data-Either.html
@@ -31,8 +32,9 @@ namespace type {
 namespace details {
 
 /**
- * @ingroup Details
- * Either monad traits specialization that enable getting the inner error and value types
+ * @ingroup Type::Details
+ *
+ * Either monad traits specialization that enable getting the inner error and value types.
  * @tparam InnerError Error type
  * @tparam InnerValue Value type
  */
@@ -69,12 +71,14 @@ struct DomainDetailsImpl<Either < InnerError, InnerValue>> {
 } // namespace details
 
 /**
- * Helper struct that enables fixing error type and
- * exposes template alias for value type
+ * @ingroup Either
+ *
+ * Helper struct that enables to pin the error type and
+ * exposes a template alias for the value type
  * @tparam ErrorType
  */
 template <typename ErrorType>
-struct FixedErrorType {
+struct PinErrorType {
     template <typename ValueType>
     using Type = Either<ErrorType, ValueType>;
 };
@@ -82,6 +86,7 @@ struct FixedErrorType {
 
 /**
  * @ingroup Either
+ *
  * Specialization of the Either class for void error and void value types
  */
 template<>
@@ -202,6 +207,7 @@ private:
 
 /**
  * @ingroup Either
+ *
  * Partial specialization of the Either class for void error and generic value type
  */
 template <typename ValueType>
@@ -413,6 +419,7 @@ private:
 
 /**
  * @ingroup Either
+ *
  * Partial specialization of the Either class for generic error and void value type
  */
 template <typename ErrorType>
@@ -555,6 +562,7 @@ private:
 
 /**
  * @ingroup Either
+ *
  * Generalization of the Either class for any error and value types other than void
  */
 template <typename ErrorType, typename ValueType>
@@ -804,8 +812,9 @@ namespace either {
 
 /**
  * @ingroup Either
+ *
  * Helper function to create an Either that is an Ok.
- * Is this case this function is applicable when both error and value types are void
+ * Is this case this function is applicable when both error and value types are void.
  * @tparam ErrorType Type of error
  * @tparam ValueType Type of value
  * @return valid value Either
@@ -816,8 +825,9 @@ Ok() { return Either<void, void>::Ok(); }
 
 /**
  * @ingroup Either
+ *
  * Helper function to create an Either that is an Ok.
- * Is this case this function is applicable when error type is not void and value type is void
+ * Is this case this function is applicable when error type is not void and value type is void.
  * @tparam ErrorType Type of error
  * @tparam ValueType Type of value
  * @return valid value Either
@@ -828,8 +838,9 @@ Ok() { return Either<ErrorType, void>::Ok(); }
 
 /**
  * @ingroup Either
+ *
  * Helper function to create an Either that is an Ok.
- * Is this case this function is applicable when error type is not void and value type is not void
+ * Is this case this function is applicable when error type is not void and value type is not void.
  * @tparam ErrorType Type of error
  * @tparam ValueType Type of value
  * @param arg Value to be wrapped
@@ -841,8 +852,9 @@ Ok(const ValueType& arg) { return Either<ErrorType, ValueType>::Ok(arg); }
 
 /**
  * @ingroup Either
+ *
  * Helper function to create an Either that is an Ok.
- * Is this case this function is applicable when error type is void and value type is not void
+ * Is this case this function is applicable when error type is void and value type is not void.
  * @tparam ErrorType Type of error
  * @tparam ValueType Type of value
  * @param arg Value to be wrapped
@@ -866,8 +878,9 @@ Error() { return Either<void, void>::Error(); }
 
 /**
  * @ingroup Either
+ *
  * Helper function to create an Either that is an Error.
- * Is this case this function is applicable when error type is not void and value type is void
+ * Is this case this function is applicable when error type is not void and value type is void.
  * @tparam ErrorType Type of error
  * @tparam ValueType Type of value
  * @param arg Error to be wrapped
@@ -879,8 +892,9 @@ Error(const ErrorType& arg) { return Either<ErrorType, void>::Error(arg); }
 
 /**
  * @ingroup Either
+ *
  * Helper function to create an Either that is an Error.
- * Is this case this function is applicable when error type is not void and value type is not void
+ * Is this case this function is applicable when error type is not void and value type is not void.
  * @tparam ErrorType Type of error
  * @tparam ValueType Type of value
  * @param arg Error to be wrapped
@@ -892,8 +906,9 @@ Error(const ErrorType& arg) { return Either<ErrorType, ValueType>::Error(arg); }
 
 /**
  * @ingroup Either
+ *
  * Helper function to create an Either that is an Error.
- * Is this case this function is applicable when error type is void and value type is not void
+ * Is this case this function is applicable when error type is void and value type is not void.
  * @tparam ErrorType Type of error
  * @tparam ValueType Type of value
  * @return valid error Either
@@ -922,7 +937,8 @@ namespace details {
 
 /**
  * @ingroup Either
- * Lift given callable into the Either monad realm
+ *
+ * Lifts given callable into the Either monad realm.
  * @tparam ErrorType Type of Error
  * @tparam Callable Callable type to lift
  * @param callable Callable to lift
@@ -944,8 +960,8 @@ decltype(auto) lift(Callable&& callable) {
         }
     } else {
         using ReturnType = typename function::Info<Callable>::ReturnType;
-        using FixedErrorType = typename type::FixedErrorType<ErrorType>;
-        using ReturnFunctionType = typename function::Info<Callable>::template LiftedSignature<FixedErrorType::template Type>;
+        using PinErrorType = typename type::PinErrorType<ErrorType>;
+        using ReturnFunctionType = typename function::Info<Callable>::template LiftedSignature<PinErrorType::template Type>;
 
         const ReturnFunctionType function =  [callable = std::forward<Callable>(callable)](auto&& ...args) -> Either<ErrorType, ReturnType> {
             if (all([](const auto &v) { return v.isOk(); }, args...)) {

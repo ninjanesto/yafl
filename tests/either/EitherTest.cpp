@@ -187,7 +187,7 @@ TYPED_TEST(EitherTest, assertFmapComputesCorrectType) {
         }
         {
             const auto either = createOk<typename TypeParam::Error, typename TypeParam::Ok>();
-            const auto f = functor::fmap<type::FixedErrorType<typename TypeParam::Error>::template Type>([](const typename TypeParam::Ok&){});
+            const auto f = functor::fmap<type::PinErrorType<typename TypeParam::Error>::template Type>([](const typename TypeParam::Ok&){});
             const auto resultVoid = f(either);
             ASSERT_TRUE(resultVoid.isOk());
         }
@@ -241,7 +241,7 @@ TYPED_TEST(EitherTest, assertBindComputesCorrectType) {
         }
         {
             const auto either = createOk<void, void>();
-            const auto f = monad::bind<type::FixedErrorType<void>::template Type>([]() { return either::Ok<void, void>(); });
+            const auto f = monad::bind<type::PinErrorType<void>::template Type>([]() { return either::Ok<void, void>(); });
             const auto resultOk = f(either);
             ASSERT_TRUE(resultOk.isOk());
         }
@@ -276,7 +276,7 @@ TYPED_TEST(EitherTest, assertBindComputesCorrectType) {
         }
         {
             const auto either = createOk<typename TypeParam::Error, void>();
-            const auto f = monad::bind<type::FixedErrorType<typename TypeParam::Error>::template Type>([]() { return either::Ok<typename TypeParam::Error, void>(); });
+            const auto f = monad::bind<type::PinErrorType<typename TypeParam::Error>::template Type>([]() { return either::Ok<typename TypeParam::Error, void>(); });
             const auto resultOk = f(either);
             ASSERT_TRUE(resultOk.isOk());
         }
@@ -318,7 +318,7 @@ TYPED_TEST(EitherTest, assertBindComputesCorrectType) {
         }
         {
             const auto either = createOk<void, typename TypeParam::Ok>();
-            const auto f = monad::bind<type::FixedErrorType<void>::template Type>([](const typename TypeParam::Ok &) { return either::Ok<void, std::string>("42"); });
+            const auto f = monad::bind<type::PinErrorType<void>::template Type>([](const typename TypeParam::Ok &) { return either::Ok<void, std::string>("42"); });
             const auto resultOk = f(either);
             ASSERT_TRUE(resultOk.isOk());
             constexpr const auto areSameType = std::is_same_v<std::string, decltype(resultOk.value())>;
@@ -365,7 +365,7 @@ TYPED_TEST(EitherTest, assertBindComputesCorrectType) {
         }
         {
             const auto either = createOk<typename TypeParam::Error, typename TypeParam::Ok>();
-            const auto f = monad::bind<type::FixedErrorType<typename TypeParam::Error>::template Type>([](const typename TypeParam::Ok&){ return either::Ok<typename TypeParam::Error, std::string>(std::string("42")); });
+            const auto f = monad::bind<type::PinErrorType<typename TypeParam::Error>::template Type>([](const typename TypeParam::Ok&){ return either::Ok<typename TypeParam::Error, std::string>(std::string("42")); });
             const auto resultOk = f(either);
             ASSERT_TRUE(resultOk.isOk());
             constexpr const auto areSameType = std::is_same_v<std::string, decltype(resultOk.value())>;

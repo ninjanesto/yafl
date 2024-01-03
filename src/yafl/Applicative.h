@@ -4,6 +4,7 @@
  * \copyright   2023, Ernesto Festas.
  *              Distributed under MIT license (See accompanying LICENSE file)
  * \defgroup    Core YAFL core
+ * \defgroup    Applicative Applicative Functor (part of YAFL core)
  */
 #pragma once
 
@@ -16,6 +17,7 @@ namespace core {
 /**
  * @ingroup Core
  * @ingroup Applicative
+ *
  * Functional Applicative Functor class. Defines the apply function that performs a partial function application
  * of the received argument to the callable object of the Applicative Functor. The apply method receives a type A(a), unwraps
  * its value and performs a partial apply to the A (a->b) function. Result type will depend on the given function.
@@ -71,8 +73,9 @@ namespace applicative {
 
 /**
  * @ingroup Applicative
- * This function is used to apply a callable type to a value of type Applicative
- * Applicative Functors are used to apply sequential invocation (similar to partial invocation)
+ *
+ * This function is used to apply a callable type to a value of type Applicative.
+ * Applicative Functors are used to apply sequential invocation (similar to partial invocation).
  * @tparam ApplicableT callable type
  * @tparam ApplicableArg applicative argument type
  * @param callable function to be applied to the given applicative
@@ -86,7 +89,9 @@ decltype(auto) apply(ApplicableT&& callable, const ApplicableArg& applicative) {
 }
 
 /**
- * This function is used to apply a callable type to a value of type Applicative
+ * @ingroup Applicative
+ *
+ * This function is used to apply a callable type to a value of type Applicative.
  * Applicative Functors are used to apply sequential invocation (similar to partial invocation)
  * @tparam ApplicableT callable type
  * @tparam ApplicableArg applicative argument type

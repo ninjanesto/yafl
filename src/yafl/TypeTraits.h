@@ -23,6 +23,7 @@ namespace function {
 namespace details {
 /**
  * @ingroup Details
+ *
  * Forward declaration of Details struct
  * @tparam ...
  */
@@ -31,6 +32,7 @@ struct CallableDetails;
 
 /**
  * @ingroup Details
+ *
  * One or more argument function traits
  * Provides function type information
  * @tparam Ret Return type
@@ -59,6 +61,7 @@ struct CallableDetails<Ret, FirstArg, Args...> {
 
 /**
  * @ingroup Details
+ *
  * Zero arguments function traits
  * Provides function type information
  * @tparam Ret Return type
@@ -104,8 +107,9 @@ struct CallableHelper<std::function<Ret (*)(Args...)>> : details::CallableDetail
 
 /**
  * @ingroup Details
+ *
  * Helper struct that enables the construction of a std::function type using
- * the expanded provided tuple as the function input arguments
+ * the expanded provided tuple as the function input arguments.
  * @tparam Ret
  * @tparam Tuple
  */
@@ -114,6 +118,7 @@ struct FunctionFromTupleImpl;
 
 /**
  * @ingroup Details
+ *
  * Specialization for tuple with variadic arguments
  * @tparam Ret
  * @tparam Args
@@ -126,6 +131,7 @@ struct FunctionFromTupleImpl<Ret, std::tuple<Args...>> {
 
 /**
  * @ingroup Function
+ *
  * Template class that allows extracting information about a callable type (a function,
  * a lambda, a functor etc.).
  * It provides the callable return type, the number and types of arguments.
@@ -136,6 +142,7 @@ struct Info : details::CallableHelper<decltype(std::function{std::declval<std::d
 
 /**
  * @ingroup Function
+ *
  * Specialization for STL function
  * @tparam Ret function return type
  * @tparam Args function argument types
@@ -145,6 +152,7 @@ struct Info<std::function<Ret(Args...)>> : details::CallableHelper<std::function
 
 /**
  * @ingroup Function
+ *
  * Helper type that allows to construct a std::function type
  * using an expanded tuple as its input arguments
  * @tparam Ret function return type
@@ -161,6 +169,7 @@ using FunctionFromTuple = typename details::FunctionFromTupleImpl<Ret, Tuple>::F
 namespace tuple {
 /**
  * @ingroup Tuple
+ *
  * Function that applies callable to given value and appends the result into given tuple
  * @tparam Callable Function type of the Callable
  * @tparam Tuple Tuple type
@@ -177,6 +186,7 @@ decltype(auto) map_append(Callable&& callable, Tuple&& tuple, Head&& value) {
 
 /**
  * @ingroup Tuple
+ *
  * Function that applies callable to given value and appends the result into given tuple
  * @tparam Callable Function type of the Callable
  * @tparam Tuple Tuple type
@@ -197,6 +207,7 @@ decltype(auto) map_append(Callable&& callable, Tuple&& tuple, Head&& value, Tail
 
 /**
  * @ingroup Tuple
+ *
  * Compares two tuple types by index.
  * @tparam Index index of type to compare
  * @tparam Tuple1 left tuple to compare
@@ -212,6 +223,7 @@ constexpr bool compareTupleTypeByIndex(){
 namespace details {
 /**
  * @ingroup Details
+ *
  * Helper class that enables to check whether a tuple is a subset of another tuple.
  * It is a recursive function and this implementation is related with the generic case
  * @tparam Index last used index
@@ -235,6 +247,7 @@ struct IsTupleSubsetImpl {
 
 /**
  * @ingroup Details
+ *
  * Helper class that enables to check whether a tuple is a subset of another tuple.
  * It is a recursive function and this implementation is related with the end condition.
  * @tparam Index last used index
@@ -250,6 +263,7 @@ struct IsTupleSubsetImpl<Index, Tuple1, Tuple2, false> {
 
 /**
  * @ingroup Tuple
+ *
  * Extract information about whether a tuple is a subset of another tuple
  * If true extracts the index
  * @tparam Tuple1 Original tuple type
@@ -262,6 +276,7 @@ namespace details {
 
 /**
  * @ingroup Details
+ *
  * Helper class that enables the creation of a tuple type that is a subset of a given tuple
  * Subset is created starting from the given index.
  * This templated class is recursive and this implementation is related with the recursion body. It defines
@@ -284,6 +299,7 @@ struct CreateSubsetTupleFromIndex {
 
 /**
  * @ingroup Details
+ *
  * Helper class that enables the creation of a tuple type that is a subset of a given tuple
  * Subset is created starting from the given index.
  * This templated class is recursive and this implementation is related with the recursion end condition.
@@ -301,6 +317,7 @@ struct CreateSubsetTupleFromIndex<Index, Tuple, SubsetTuple, false> {
 
 /**
  * @ingroup Tuple
+ *
  * Creates a tuple subset type starting for the given index position
  * @tparam Index index position
  * @tparam Tuple tuple to extract subset
@@ -311,12 +328,14 @@ using TupleSubset = typename details::CreateSubsetTupleFromIndex<Index, Tuple, s
 
 /**
  * @ingroup Type
+ *
  * Yafl Type traits
  */
 namespace type {
 
 /**
  * @ingroup Type
+ *
  * Helper struct that enables debugging by showing the information about the type T
  * @tparam T type to show
  * Note: This will make the compile to fail but will show information for the types
@@ -326,6 +345,7 @@ struct WhatIsThis;
 
 /**
  * @ingroup Type
+ *
  * Helper struct that enables debugging by showing the information about the value of the Index
  * @tparam Index value to show
  * Note: This will make the compile to fail but will show information for the values
@@ -336,6 +356,7 @@ struct WhatIsThisValue;
 namespace details {
 /**
  * @ingroup Details
+ *
  * Default class that contains information about whether a given type is a Functor, Applicative or Monad.
  * It is specialized for both Maybe and Either classes.
  */
@@ -352,15 +373,17 @@ struct DomainDetailsImpl {
 
 /**
  * @ingroup Type
+ *
  * Type details for Yafl types.
  * Extracts information about whether type T is a Functor, Applicative or Monad
- * @tparam T
+ * @tparam T Type to check
  */
 template<typename T>
 struct DomainTypeInfo : public details::DomainDetailsImpl<std::decay_t<T>>{};
 
 /**
  * @ingroup Type
+ *
  * Helper class that introspects whether a type T is a Callable or not
  * @tparam T Type to check
  */
@@ -378,6 +401,7 @@ public:
 
 /**
  * @ingroup Type
+ *
  * Helper class that introspects whether a type T is a Callable with the provided Args or not
  * @tparam T Type to check
  * @tparam Args function argument types
