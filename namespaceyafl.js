@@ -1,15 +1,15 @@
 var namespaceyafl =
 [
     [ "applicative", "namespaceyafl_1_1applicative.html", [
-      [ "apply", "namespaceyafl_1_1applicative.html#a3cead7ad0dccbff54d6ff603cf186e74", null ],
-      [ "apply", "namespaceyafl_1_1applicative.html#aea9e4a36456fb6337034ea80b3b2df48", null ]
+      [ "apply", "group__Applicative.html#ga3cead7ad0dccbff54d6ff603cf186e74", null ],
+      [ "apply", "group__Applicative.html#gaea9e4a36456fb6337034ea80b3b2df48", null ]
     ] ],
     [ "core", "namespaceyafl_1_1core.html", "namespaceyafl_1_1core" ],
     [ "either", "namespaceyafl_1_1either.html", "namespaceyafl_1_1either" ],
     [ "function", "namespaceyafl_1_1function.html", "namespaceyafl_1_1function" ],
     [ "functor", "namespaceyafl_1_1functor.html", [
-      [ "fmap", "namespaceyafl_1_1functor.html#acacdb0fd042a404c05273eb551fd4877", null ],
-      [ "fmap", "namespaceyafl_1_1functor.html#ade2f458c9429ed6a139026bc43c8b0b5", null ]
+      [ "fmap", "group__Functor.html#gacacdb0fd042a404c05273eb551fd4877", null ],
+      [ "fmap", "group__Functor.html#gade2f458c9429ed6a139026bc43c8b0b5", null ]
     ] ],
     [ "maybe", "namespaceyafl_1_1maybe.html", [
       [ "Just", "group__Maybe.html#gabc73df34b07f8c2275122709d340a26e", null ],
@@ -18,8 +18,8 @@ var namespaceyafl =
       [ "Nothing", "group__Maybe.html#ga604ebff77410e511384767513b1aa0e9", null ]
     ] ],
     [ "monad", "namespaceyafl_1_1monad.html", [
-      [ "bind", "namespaceyafl_1_1monad.html#adf8aac031906c329029a5c25d43aa29b", null ],
-      [ "bind", "namespaceyafl_1_1monad.html#af83554e6e4dfdcbaf9092811f98ec0b8", null ]
+      [ "bind", "group__Monad.html#gadf8aac031906c329029a5c25d43aa29b", null ],
+      [ "bind", "group__Monad.html#gaf83554e6e4dfdcbaf9092811f98ec0b8", null ]
     ] ],
     [ "tuple", "namespaceyafl_1_1tuple.html", "namespaceyafl_1_1tuple" ],
     [ "type", "namespaceyafl_1_1type.html", "namespaceyafl_1_1type" ],

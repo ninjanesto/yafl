@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['maybe_20monad_289',['Maybe Monad',['../group__Maybe.html',1,'']]]
+  ['high_20order_20functions_293',['High Order Functions',['../group__HOF.html',1,'']]]
 ];

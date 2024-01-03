@@ -91,99 +91,15 @@ $(document).ready(function(){initNavTree('namespaceyafl_1_1functor.html',''); in
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ade2f458c9429ed6a139026bc43c8b0b5"><td class="memTemplParams" colspan="2">template&lt;typename Callable , typename FunctorT &gt; </td></tr>
-<tr class="memitem:ade2f458c9429ed6a139026bc43c8b0b5"><td class="memTemplItemLeft" align="right" valign="top">decltype(auto)&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceyafl_1_1functor.html#ade2f458c9429ed6a139026bc43c8b0b5">fmap</a> (Callable &amp;&amp;callable, const FunctorT &amp;functor)</td></tr>
-<tr class="memdesc:ade2f458c9429ed6a139026bc43c8b0b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function is used to apply a callable type to a value of type Functor.  <a href="namespaceyafl_1_1functor.html#ade2f458c9429ed6a139026bc43c8b0b5">More...</a><br /></td></tr>
-<tr class="separator:ade2f458c9429ed6a139026bc43c8b0b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acacdb0fd042a404c05273eb551fd4877"><td class="memTemplParams" colspan="2">template&lt;template&lt; typename... &gt; typename FunctorType, typename Callable &gt; </td></tr>
-<tr class="memitem:acacdb0fd042a404c05273eb551fd4877"><td class="memTemplItemLeft" align="right" valign="top">decltype(auto)&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceyafl_1_1functor.html#acacdb0fd042a404c05273eb551fd4877">fmap</a> (Callable &amp;&amp;callable)</td></tr>
-<tr class="memdesc:acacdb0fd042a404c05273eb551fd4877"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function is used to apply a callable type to a value of type Functor In this case the provided function is lifted to work at Functor level an so, this function returns a new callable that receives a Functor as argument and returns a Functor.  <a href="namespaceyafl_1_1functor.html#acacdb0fd042a404c05273eb551fd4877">More...</a><br /></td></tr>
-<tr class="separator:acacdb0fd042a404c05273eb551fd4877"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gade2f458c9429ed6a139026bc43c8b0b5"><td class="memTemplParams" colspan="2">template&lt;typename Callable , typename FunctorT &gt; </td></tr>
+<tr class="memitem:gade2f458c9429ed6a139026bc43c8b0b5"><td class="memTemplItemLeft" align="right" valign="top">decltype(auto)&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__Functor.html#gade2f458c9429ed6a139026bc43c8b0b5">fmap</a> (Callable &amp;&amp;callable, const FunctorT &amp;functor)</td></tr>
+<tr class="memdesc:gade2f458c9429ed6a139026bc43c8b0b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function is used to apply a callable type to a value of type Functor.  <a href="group__Functor.html#gade2f458c9429ed6a139026bc43c8b0b5">More...</a><br /></td></tr>
+<tr class="separator:gade2f458c9429ed6a139026bc43c8b0b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gacacdb0fd042a404c05273eb551fd4877"><td class="memTemplParams" colspan="2">template&lt;template&lt; typename... &gt; typename FunctorType, typename Callable &gt; </td></tr>
+<tr class="memitem:gacacdb0fd042a404c05273eb551fd4877"><td class="memTemplItemLeft" align="right" valign="top">decltype(auto)&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__Functor.html#gacacdb0fd042a404c05273eb551fd4877">fmap</a> (Callable &amp;&amp;callable)</td></tr>
+<tr class="memdesc:gacacdb0fd042a404c05273eb551fd4877"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function is used to apply a callable type to a value of type Functor.  <a href="group__Functor.html#gacacdb0fd042a404c05273eb551fd4877">More...</a><br /></td></tr>
+<tr class="separator:gacacdb0fd042a404c05273eb551fd4877"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Function Documentation</h2>
-<a id="acacdb0fd042a404c05273eb551fd4877"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#acacdb0fd042a404c05273eb551fd4877">&#9670;&nbsp;</a></span>fmap() <span class="overload">[1/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;template&lt; typename... &gt; typename FunctorType, typename Callable &gt; </div>
-      <table class="memname">
-        <tr>
-          <td class="memname">decltype(auto) yafl::functor::fmap </td>
-          <td>(</td>
-          <td class="paramtype">Callable &amp;&amp;&#160;</td>
-          <td class="paramname"><em>callable</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>This function is used to apply a callable type to a value of type Functor In this case the provided function is lifted to work at Functor level an so, this function returns a new callable that receives a Functor as argument and returns a Functor. </p>
-<dl class="tparams"><dt>Template Parameters</dt><dd>
-  <table class="tparams">
-    <tr><td class="paramname">FunctorType</td><td>Functor type </td></tr>
-    <tr><td class="paramname">Callable</td><td>callable type </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">callable</td><td>function to be applied to the given functor </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>Function lifted to work at Functor level </dd></dl>
-
-</div>
-</div>
-<a id="ade2f458c9429ed6a139026bc43c8b0b5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ade2f458c9429ed6a139026bc43c8b0b5">&#9670;&nbsp;</a></span>fmap() <span class="overload">[2/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Callable , typename FunctorT &gt; </div>
-      <table class="memname">
-        <tr>
-          <td class="memname">decltype(auto) yafl::functor::fmap </td>
-          <td>(</td>
-          <td class="paramtype">Callable &amp;&amp;&#160;</td>
-          <td class="paramname"><em>callable</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const FunctorT &amp;&#160;</td>
-          <td class="paramname"><em>functor</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>This function is used to apply a callable type to a value of type Functor. </p>
-<dl class="tparams"><dt>Template Parameters</dt><dd>
-  <table class="tparams">
-    <tr><td class="paramname">Callable</td><td>callable type </td></tr>
-    <tr><td class="paramname">FunctorT</td><td>functor type </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">callable</td><td>function to be applied to the given functor </td></tr>
-    <tr><td class="paramname">functor</td><td>functor to be used </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>Functor type containing the result of the function application </dd></dl>
-
-</div>
-</div>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

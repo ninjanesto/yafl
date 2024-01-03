@@ -92,7 +92,7 @@ $(document).ready(function(){initNavTree('index.html',''); initResizable(); });
 <p><a href="https://github.com/ninjanesto/yafl/actions/workflows/yafl-build-run-coverage.yml"><img src="https://github.com/ninjanesto/yafl/actions/workflows/yafl-build-run-coverage.yml/badge.svg" alt="Yafl Build and Run Coverage" style="pointer-events: none;" class="inline"/></a> <a href="https://codecov.io/gh/ninjanesto/yafl"><img src="https://codecov.io/gh/ninjanesto/yafl/graph/badge.svg?token=0XDHUSTRNG" alt="Yafl Coverage" style="pointer-events: none;" class="inline"/></a></p>
 <p><a href="https://github.com/ninjanesto/yafl/actions/workflows/yafl-build-docs.yml"><img src="https://github.com/ninjanesto/yafl/actions/workflows/yafl-build-docs.yml/badge.svg" alt="Yafl Doxygen Docs" style="pointer-events: none;" class="inline"/></a></p>
 <h1><a class="anchor" id="autotoc_md0"></a>
-Yet Another Functional Library</h1>
+Yet Another (C++) Functional Library</h1>
 <p>Functional Programming concepts implemented in C++17</p>
 <h1><a class="anchor" id="autotoc_md1"></a>
 Table of Contents</h1>
@@ -467,12 +467,13 @@ Bazel</h3>
 <h2><a class="anchor" id="autotoc_md37"></a>
 Example App</h2>
 <p>A sample application is provided with YAFL that shows briefly how this library can be used. It is a simple caesar cipher encoder/decoder application. This application receives a file, a seed and the mechanism (encode / decode) and outputs another file that contains the application the cipher. The main function for this application executes the same operations several times, using different YAFL approaches, just to present YAFL use cases.</p>
-<p>It can be build using CMake flag -DBUILD_YAFL_EXAMPLE=ON, and it generates the binary <code>ACC</code> in <code>&lt;cmake build directory&gt;/example/</code></p>
+<p>It can be built using the CMake flag -DBUILD_YAFL_EXAMPLE=ON, and it generates the binary <code>ACC</code> in <code>&lt;cmake build directory&gt;/example/</code></p>
 <p>Usage: <code>./ACC &lt;-e|-d&gt; &lt;seed&gt; &lt;filename&gt;</code></p>
 <p>Note: Seed can be a value between 0 and 255</p>
 <h2><a class="anchor" id="autotoc_md38"></a>
 Future</h2>
 <ul>
+<li>Implement Monad transformers</li>
 <li>Add BiFunctor implementation to Either type</li>
 <li>Add other monads (Reader, Writer, State, Continuation, ...)</li>
 <li>Bazel input flags and install targets</li>

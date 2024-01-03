@@ -25,7 +25,7 @@
 var NAVTREE =
 [
   [ "YAFL", "index.html", [
-    [ "Yet Another Functional Library", "index.html#autotoc_md0", null ],
+    [ "Yet Another (C++) Functional Library", "index.html#autotoc_md0", null ],
     [ "Table of Contents", "index.html#autotoc_md1", [
       [ "Introduction", "index.html#autotoc_md2", [
         [ "High Order Functions (HOF)", "index.html#autotoc_md3", [
@@ -90,7 +90,7 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "annotated.html",
-"structyafl_1_1function_1_1details_1_1CallableHelper_3_01std_1_1function_3_01Ret_07ClassType_1_1_5_08_07Args_8_8_8_08_4_01_4.html"
+"namespaceyafl_1_1either_1_1details.html"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

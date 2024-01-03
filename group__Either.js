@@ -19,6 +19,9 @@ var group__Either =
       [ "core::Functor< Either, ErrorType, ValueType >", "group__Either.html#ac61ca7c192b8dde9c291413019a3ebab", null ],
       [ "core::Monad< Either, ErrorType, ValueType >", "group__Either.html#a20eb8f00b985a7bcf7abaed98b95afb1", null ]
     ] ],
+    [ "PinErrorType", "group__Either.html#structyafl_1_1type_1_1PinErrorType", [
+      [ "Type", "group__Either.html#ae2b7eae4a977d282f8cadf39b1596a28", null ]
+    ] ],
     [ "Either< void, void >", "group__Either.html#classyafl_1_1Either_3_01void_00_01void_01_4", [
       [ "Either", "group__Either.html#a7485d00de6b9d817cd23fa7eab4e6131", null ],
       [ "Either", "group__Either.html#a2795f8a9bb72924bceef203c4f8d94c4", null ],

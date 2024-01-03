@@ -132,7 +132,7 @@ Functions</h2></td></tr>
 <tr class="separator:ga27e0f5912aab3004c1a36d45ac124f55"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga48a240fe803a7b7c9188b0b85951f95d"><td class="memTemplParams" colspan="2">template&lt;typename First &gt; </td></tr>
 <tr class="memitem:ga48a240fe803a7b7c9188b0b85951f95d"><td class="memTemplItemLeft" align="right" valign="top">decltype(auto)&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__HOF.html#ga48a240fe803a7b7c9188b0b85951f95d">yafl::constf</a> (First &amp;&amp;first)</td></tr>
-<tr class="memdesc:ga48a240fe803a7b7c9188b0b85951f95d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Function that always evaluates to the first argument, ignoring its second argument.  <a href="group__HOF.html#ga48a240fe803a7b7c9188b0b85951f95d">More...</a><br /></td></tr>
+<tr class="memdesc:ga48a240fe803a7b7c9188b0b85951f95d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Function that always evaluates to the first argument, ignoring its following arguments.  <a href="group__HOF.html#ga48a240fe803a7b7c9188b0b85951f95d">More...</a><br /></td></tr>
 <tr class="separator:ga48a240fe803a7b7c9188b0b85951f95d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -268,7 +268,7 @@ template&lt;typename TLeft , typename TRight &gt; </div>
 <p><code>#include &lt;src/yafl/HOF.h&gt;</code></p>
 
 <p>Generic composition. </p>
-<p>It can perform either function or monadic function (kleisli) composition </p><dl class="tparams"><dt>Template Parameters</dt><dd>
+<p>It can perform either function or monadic function (kleisli) composition. </p><dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">TLeft</td><td>Left argument type </td></tr>
     <tr><td class="paramname">TRight</td><td>Right argument type </td></tr>
@@ -306,7 +306,7 @@ template&lt;typename First &gt; </div>
 
 <p><code>#include &lt;src/yafl/HOF.h&gt;</code></p>
 
-<p>Function that always evaluates to the first argument, ignoring its second argument. </p>
+<p>Function that always evaluates to the first argument, ignoring its following arguments. </p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">First</td><td>Type of argument </td></tr>
@@ -391,7 +391,7 @@ template&lt;typename TLeft , typename TRight &gt; </div>
 <p><code>#include &lt;src/yafl/HOF.h&gt;</code></p>
 
 <p>Compose functions. </p>
-<p>Similar as piping shell commands. Output of first function is piped as input to the second function, except when output is void </p><dl class="tparams"><dt>Template Parameters</dt><dd>
+<p>Similar as piping shell commands. Output of first function is piped as input to the second function, except when output is void. </p><dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">TLeft</td><td>Left argument type </td></tr>
     <tr><td class="paramname">TRight</td><td>Right argument type </td></tr>
@@ -477,7 +477,7 @@ template&lt;typename TLeft , typename TRight &gt; </div>
 <p><code>#include &lt;src/yafl/HOF.h&gt;</code></p>
 
 <p>Compose functions that return Monadic values. </p>
-<p>Similar as piping shell commands. Output of first function is piped as input to the second function, except when output is void </p><dl class="tparams"><dt>Template Parameters</dt><dd>
+<p>Similar as piping shell commands. Output of first function is piped as input to the second function, except when output is void. </p><dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">TLeft</td><td>Left argument type </td></tr>
     <tr><td class="paramname">TRight</td><td>Right argument type </td></tr>

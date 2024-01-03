@@ -30,12 +30,11 @@ var hierarchy =
     [ "yafl::tuple::details::CreateSubsetTupleFromIndex< Index, Tuple, SubsetTuple, IsValid >", "structyafl_1_1tuple_1_1details_1_1CreateSubsetTupleFromIndex.html", null ],
     [ "yafl::tuple::details::CreateSubsetTupleFromIndex< Index, Tuple, SubsetTuple, false >", "structyafl_1_1tuple_1_1details_1_1CreateSubsetTupleFromIndex_3_01Index_00_01Tuple_00_01SubsetTuple_00_01false_01_4.html", null ],
     [ "yafl::type::details::DomainDetailsImpl< typename >", "structyafl_1_1type_1_1details_1_1DomainDetailsImpl.html", null ],
-    [ "yafl::type::details::DomainDetailsImpl< Either< InnerError, InnerValue > >", "structyafl_1_1type_1_1details_1_1DomainDetailsImpl_3_01Either_3_01InnerError_00_01InnerValue_01_4_01_4.html", null ],
+    [ "yafl::type::details::DomainDetailsImpl< Either< InnerError, InnerValue > >", "group__Type.html#structyafl_1_1type_1_1details_1_1DomainDetailsImpl_3_01Either_3_01InnerError_00_01InnerValue_01_4_01_4", null ],
     [ "yafl::type::details::DomainDetailsImpl< Maybe< Inner > >", "structyafl_1_1type_1_1details_1_1DomainDetailsImpl_3_01Maybe_3_01Inner_01_4_01_4.html", null ],
     [ "yafl::type::details::DomainDetailsImpl< std::decay_t< T > >", "structyafl_1_1type_1_1details_1_1DomainDetailsImpl.html", [
       [ "yafl::type::DomainTypeInfo< T >", "group__Type.html#structyafl_1_1type_1_1DomainTypeInfo", null ]
     ] ],
-    [ "yafl::type::FixedErrorType< ErrorType >", "structyafl_1_1type_1_1FixedErrorType.html", null ],
     [ "yafl::function::details::FunctionFromTupleImpl< Ret, Tuple >", "structyafl_1_1function_1_1details_1_1FunctionFromTupleImpl.html", null ],
     [ "yafl::function::details::FunctionFromTupleImpl< Ret, std::tuple< Args... > >", "structyafl_1_1function_1_1details_1_1FunctionFromTupleImpl_3_01Ret_00_01std_1_1tuple_3_01Args_8_8_8_01_4_01_4.html", null ],
     [ "yafl::core::Functor< TDerivedFunctor, Args >", "group__Core.html#classyafl_1_1core_1_1Functor", null ],
@@ -83,6 +82,7 @@ var hierarchy =
     [ "yafl::core::Monad< Maybe, void >", "group__Core.html", [
       [ "yafl::Maybe< void >", "group__Maybe.html#classyafl_1_1Maybe_3_01void_01_4", null ]
     ] ],
+    [ "yafl::type::PinErrorType< ErrorType >", "group__Either.html#structyafl_1_1type_1_1PinErrorType", null ],
     [ "yafl::type::WhatIsThis< T >", "group__Type.html#structyafl_1_1type_1_1WhatIsThis", null ],
     [ "yafl::type::WhatIsThisValue< Index >", "group__Type.html#structyafl_1_1type_1_1WhatIsThisValue", null ]
 ];

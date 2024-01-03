@@ -91,99 +91,15 @@ $(document).ready(function(){initNavTree('namespaceyafl_1_1monad.html',''); init
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:af83554e6e4dfdcbaf9092811f98ec0b8"><td class="memTemplParams" colspan="2">template&lt;typename Callable , typename MonadT &gt; </td></tr>
-<tr class="memitem:af83554e6e4dfdcbaf9092811f98ec0b8"><td class="memTemplItemLeft" align="right" valign="top">decltype(auto)&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceyafl_1_1monad.html#af83554e6e4dfdcbaf9092811f98ec0b8">bind</a> (Callable &amp;&amp;callable, const MonadT &amp;monad)</td></tr>
-<tr class="memdesc:af83554e6e4dfdcbaf9092811f98ec0b8"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function is used to bind (flatmap) a callable type to a value of type Monad.  <a href="namespaceyafl_1_1monad.html#af83554e6e4dfdcbaf9092811f98ec0b8">More...</a><br /></td></tr>
-<tr class="separator:af83554e6e4dfdcbaf9092811f98ec0b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adf8aac031906c329029a5c25d43aa29b"><td class="memTemplParams" colspan="2">template&lt;template&lt; typename... &gt; typename MonadType, typename Callable &gt; </td></tr>
-<tr class="memitem:adf8aac031906c329029a5c25d43aa29b"><td class="memTemplItemLeft" align="right" valign="top">decltype(auto)&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceyafl_1_1monad.html#adf8aac031906c329029a5c25d43aa29b">bind</a> (Callable &amp;&amp;callable)</td></tr>
-<tr class="memdesc:adf8aac031906c329029a5c25d43aa29b"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function is used to bind (flatmap) a callable type to a value of type Monad In this case the provided function is lifted to work at Monad level an so, this function returns a new callable that receives a Monad as argument and returns a Monad.  <a href="namespaceyafl_1_1monad.html#adf8aac031906c329029a5c25d43aa29b">More...</a><br /></td></tr>
-<tr class="separator:adf8aac031906c329029a5c25d43aa29b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaf83554e6e4dfdcbaf9092811f98ec0b8"><td class="memTemplParams" colspan="2">template&lt;typename Callable , typename MonadT &gt; </td></tr>
+<tr class="memitem:gaf83554e6e4dfdcbaf9092811f98ec0b8"><td class="memTemplItemLeft" align="right" valign="top">decltype(auto)&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__Monad.html#gaf83554e6e4dfdcbaf9092811f98ec0b8">bind</a> (Callable &amp;&amp;callable, const MonadT &amp;monad)</td></tr>
+<tr class="memdesc:gaf83554e6e4dfdcbaf9092811f98ec0b8"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function is used to bind (flatmap) a callable type to a value of type Monad.  <a href="group__Monad.html#gaf83554e6e4dfdcbaf9092811f98ec0b8">More...</a><br /></td></tr>
+<tr class="separator:gaf83554e6e4dfdcbaf9092811f98ec0b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gadf8aac031906c329029a5c25d43aa29b"><td class="memTemplParams" colspan="2">template&lt;template&lt; typename... &gt; typename MonadType, typename Callable &gt; </td></tr>
+<tr class="memitem:gadf8aac031906c329029a5c25d43aa29b"><td class="memTemplItemLeft" align="right" valign="top">decltype(auto)&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__Monad.html#gadf8aac031906c329029a5c25d43aa29b">bind</a> (Callable &amp;&amp;callable)</td></tr>
+<tr class="memdesc:gadf8aac031906c329029a5c25d43aa29b"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function is used to bind (flatmap) a callable type to a value of type Monad.  <a href="group__Monad.html#gadf8aac031906c329029a5c25d43aa29b">More...</a><br /></td></tr>
+<tr class="separator:gadf8aac031906c329029a5c25d43aa29b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Function Documentation</h2>
-<a id="adf8aac031906c329029a5c25d43aa29b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#adf8aac031906c329029a5c25d43aa29b">&#9670;&nbsp;</a></span>bind() <span class="overload">[1/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;template&lt; typename... &gt; typename MonadType, typename Callable &gt; </div>
-      <table class="memname">
-        <tr>
-          <td class="memname">decltype(auto) yafl::monad::bind </td>
-          <td>(</td>
-          <td class="paramtype">Callable &amp;&amp;&#160;</td>
-          <td class="paramname"><em>callable</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>This function is used to bind (flatmap) a callable type to a value of type Monad In this case the provided function is lifted to work at Monad level an so, this function returns a new callable that receives a Monad as argument and returns a Monad. </p>
-<dl class="tparams"><dt>Template Parameters</dt><dd>
-  <table class="tparams">
-    <tr><td class="paramname">MonadType</td><td>monad type </td></tr>
-    <tr><td class="paramname">Callable</td><td>callable type </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">callable</td><td>function to be applied to the given functor </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>Function lifted to work at Monad level </dd></dl>
-
-</div>
-</div>
-<a id="af83554e6e4dfdcbaf9092811f98ec0b8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af83554e6e4dfdcbaf9092811f98ec0b8">&#9670;&nbsp;</a></span>bind() <span class="overload">[2/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Callable , typename MonadT &gt; </div>
-      <table class="memname">
-        <tr>
-          <td class="memname">decltype(auto) yafl::monad::bind </td>
-          <td>(</td>
-          <td class="paramtype">Callable &amp;&amp;&#160;</td>
-          <td class="paramname"><em>callable</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const MonadT &amp;&#160;</td>
-          <td class="paramname"><em>monad</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>This function is used to bind (flatmap) a callable type to a value of type Monad. </p>
-<dl class="tparams"><dt>Template Parameters</dt><dd>
-  <table class="tparams">
-    <tr><td class="paramname">Callable</td><td>callable type </td></tr>
-    <tr><td class="paramname">MonadT</td><td>monad type </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">callable</td><td>function to be applied to the given monad </td></tr>
-    <tr><td class="paramname">monad</td><td>monad to be used </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>Monad type containing the result of the function application </dd></dl>
-
-</div>
-</div>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

@@ -87,58 +87,58 @@ $(document).ready(function(){initNavTree('Monad_8h_source.html',''); initResizab
 </div><!--header-->
 <div class="contents">
 <div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160; </div>
-<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#pragma once</span></div>
-<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160; </div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="preprocessor">#include &lt;memory&gt;</span></div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor">#include &lt;functional&gt;</span></div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160; </div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespaceyafl.html">yafl</a> {</div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="keyword">namespace </span>core {</div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160; </div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">template</span> &lt;<span class="keyword">typename</span>...&gt; <span class="keyword">typename</span> TDerivedMonad, <span class="keyword">typename</span> ...Args&gt;</div>
-<div class="line"><a name="l00025"></a><span class="lineno"><a class="line" href="group__Core.html">   25</a></span>&#160;<span class="keyword">class </span><a class="code" href="group__Core.html#classyafl_1_1core_1_1Monad">Monad</a> {</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> Callable&gt;</div>
-<div class="line"><a name="l00034"></a><span class="lineno"><a class="line" href="group__Core.html#a0d635c2c24371dddbd194ea4b6db5113">   34</a></span>&#160;    decltype(<span class="keyword">auto</span>) <a class="code" href="group__Core.html#a0d635c2c24371dddbd194ea4b6db5113">bind</a>(Callable&amp;&amp; callable)<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span><span class="keyword">const </span>TDerivedMonad&lt;Args...<span class="keyword">&gt;</span>*&gt;(<span class="keyword">this</span>)-&gt;internal_bind(std::forward&lt;Callable&gt;(callable));</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    }</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;};</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160; </div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;} <span class="comment">// namespace core</span></div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160; </div>
-<div class="line"><a name="l00041"></a><span class="lineno"><a class="line" href="namespaceyafl_1_1monad.html">   41</a></span>&#160;<span class="keyword">namespace </span>monad {</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160; </div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> Callable, <span class="keyword">typename</span> MonadT&gt;</div>
-<div class="line"><a name="l00053"></a><span class="lineno"><a class="line" href="namespaceyafl_1_1monad.html#af83554e6e4dfdcbaf9092811f98ec0b8">   53</a></span>&#160;decltype(<span class="keyword">auto</span>) <a class="code" href="namespaceyafl_1_1monad.html#af83554e6e4dfdcbaf9092811f98ec0b8">bind</a>(Callable&amp;&amp; callable, const MonadT&amp; monad) {</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    static_assert(<a class="code" href="group__Type.html#structyafl_1_1type_1_1DomainTypeInfo">type::DomainTypeInfo</a>&lt;std::decay_t&lt;MonadT&gt;&gt;::hasMonadicBase, <span class="stringliteral">&quot;MonadT argument not a Monad&quot;</span>);</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    <span class="keywordflow">return</span> monad.bind(std::forward&lt;Callable&gt;(callable));</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;}</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160; </div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">template</span>&lt;<span class="keyword">typename</span>...&gt; <span class="keyword">typename</span> MonadType, <span class="keyword">typename</span> Callable&gt;</div>
-<div class="line"><a name="l00070"></a><span class="lineno"><a class="line" href="namespaceyafl_1_1monad.html#adf8aac031906c329029a5c25d43aa29b">   70</a></span>&#160;decltype(<span class="keyword">auto</span>) <a class="code" href="namespaceyafl_1_1monad.html#af83554e6e4dfdcbaf9092811f98ec0b8">bind</a>(Callable&amp;&amp; callable) {</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    <span class="keywordflow">if</span> constexpr (std::is_invocable_v&lt;Callable&gt;) {</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;        <span class="keywordflow">return</span> [callable = std::forward&lt;Callable&gt;(callable)](<span class="keyword">const</span> MonadType&lt;void&gt; &amp;monad) {</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;            static_assert(<a class="code" href="group__Type.html#structyafl_1_1type_1_1DomainTypeInfo">type::DomainTypeInfo</a>&lt;MonadType&lt;void&gt;&gt;::hasMonadicBase, <span class="stringliteral">&quot;Argument not a Functor&quot;</span>);</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;            <span class="keywordflow">return</span> monad.bind(callable);</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;        };</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;        <span class="keyword">using</span> FirstArg = <span class="keyword">typename</span> <a class="code" href="group__Function.html#structyafl_1_1function_1_1Info">function::Info&lt;Callable&gt;::template</a> ArgType&lt;0&gt;;</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160; </div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;        <span class="keywordflow">return</span> [callable = std::forward&lt;Callable&gt;(callable)](<span class="keyword">const</span> MonadType&lt;FirstArg&gt; &amp;monad) {</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;            static_assert(<a class="code" href="group__Type.html#structyafl_1_1type_1_1DomainTypeInfo">type::DomainTypeInfo</a>&lt;MonadType&lt;FirstArg&gt;&gt;::hasMonadicBase, <span class="stringliteral">&quot;Argument not a Functor&quot;</span>);</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;            <span class="keywordflow">return</span> monad.bind(callable);</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;        };</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    }</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;}</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160; </div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;} <span class="comment">// namespace monad</span></div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;} <span class="comment">// namespace yafl</span></div>
-<div class="ttc" id="agroup__Core_html_a0d635c2c24371dddbd194ea4b6db5113"><div class="ttname"><a href="group__Core.html#a0d635c2c24371dddbd194ea4b6db5113">yafl::core::Monad::bind</a></div><div class="ttdeci">decltype(auto) bind(Callable &amp;&amp;callable) const</div><div class="ttdoc">Binds given callable (function, function object, lambda) to the Monad value.</div><div class="ttdef"><b>Definition:</b> Monad.h:34</div></div>
-<div class="ttc" id="agroup__Core_html_classyafl_1_1core_1_1Monad"><div class="ttname"><a href="group__Core.html#classyafl_1_1core_1_1Monad">yafl::core::Monad</a></div><div class="ttdoc">Functional Monad class.</div><div class="ttdef"><b>Definition:</b> Monad.h:25</div></div>
-<div class="ttc" id="agroup__Function_html_structyafl_1_1function_1_1Info"><div class="ttname"><a href="group__Function.html#structyafl_1_1function_1_1Info">yafl::function::Info</a></div><div class="ttdoc">Template class that allows extracting information about a callable type (a function,...</div><div class="ttdef"><b>Definition:</b> TypeTraits.h:135</div></div>
-<div class="ttc" id="agroup__Type_html_structyafl_1_1type_1_1DomainTypeInfo"><div class="ttname"><a href="group__Type.html#structyafl_1_1type_1_1DomainTypeInfo">yafl::type::DomainTypeInfo</a></div><div class="ttdoc">Type details for Yafl types.</div><div class="ttdef"><b>Definition:</b> TypeTraits.h:360</div></div>
-<div class="ttc" id="anamespaceyafl_1_1monad_html_af83554e6e4dfdcbaf9092811f98ec0b8"><div class="ttname"><a href="namespaceyafl_1_1monad.html#af83554e6e4dfdcbaf9092811f98ec0b8">yafl::monad::bind</a></div><div class="ttdeci">decltype(auto) bind(Callable &amp;&amp;callable, const MonadT &amp;monad)</div><div class="ttdoc">This function is used to bind (flatmap) a callable type to a value of type Monad.</div><div class="ttdef"><b>Definition:</b> Monad.h:53</div></div>
-<div class="ttc" id="anamespaceyafl_html"><div class="ttname"><a href="namespaceyafl.html">yafl</a></div><div class="ttdef"><b>Definition:</b> Applicative.h:13</div></div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#pragma once</span></div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160; </div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor">#include &lt;memory&gt;</span></div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor">#include &lt;functional&gt;</span></div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160; </div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespaceyafl.html">yafl</a> {</div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="keyword">namespace </span>core {</div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160; </div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">template</span> &lt;<span class="keyword">typename</span>...&gt; <span class="keyword">typename</span> TDerivedMonad, <span class="keyword">typename</span> ...Args&gt;</div>
+<div class="line"><a name="l00028"></a><span class="lineno"><a class="line" href="group__Core.html">   28</a></span>&#160;<span class="keyword">class </span><a class="code" href="group__Core.html#classyafl_1_1core_1_1Monad">Monad</a> {</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> Callable&gt;</div>
+<div class="line"><a name="l00037"></a><span class="lineno"><a class="line" href="group__Core.html#a0d635c2c24371dddbd194ea4b6db5113">   37</a></span>&#160;    decltype(<span class="keyword">auto</span>) <a class="code" href="group__Core.html#a0d635c2c24371dddbd194ea4b6db5113">bind</a>(Callable&amp;&amp; callable)<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span><span class="keyword">const </span>TDerivedMonad&lt;Args...<span class="keyword">&gt;</span>*&gt;(<span class="keyword">this</span>)-&gt;internal_bind(std::forward&lt;Callable&gt;(callable));</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    }</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;};</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160; </div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;} <span class="comment">// namespace core</span></div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160; </div>
+<div class="line"><a name="l00044"></a><span class="lineno"><a class="line" href="namespaceyafl_1_1monad.html">   44</a></span>&#160;<span class="keyword">namespace </span>monad {</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160; </div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> Callable, <span class="keyword">typename</span> MonadT&gt;</div>
+<div class="line"><a name="l00057"></a><span class="lineno"><a class="line" href="group__Monad.html#gaf83554e6e4dfdcbaf9092811f98ec0b8">   57</a></span>&#160;decltype(<span class="keyword">auto</span>) <a class="code" href="group__Monad.html#gaf83554e6e4dfdcbaf9092811f98ec0b8">bind</a>(Callable&amp;&amp; callable, const MonadT&amp; monad) {</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    static_assert(<a class="code" href="group__Type.html#structyafl_1_1type_1_1DomainTypeInfo">type::DomainTypeInfo</a>&lt;std::decay_t&lt;MonadT&gt;&gt;::hasMonadicBase, <span class="stringliteral">&quot;MonadT argument not a Monad&quot;</span>);</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    <span class="keywordflow">return</span> monad.bind(std::forward&lt;Callable&gt;(callable));</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;}</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160; </div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">template</span>&lt;<span class="keyword">typename</span>...&gt; <span class="keyword">typename</span> MonadType, <span class="keyword">typename</span> Callable&gt;</div>
+<div class="line"><a name="l00075"></a><span class="lineno"><a class="line" href="group__Monad.html#gadf8aac031906c329029a5c25d43aa29b">   75</a></span>&#160;decltype(<span class="keyword">auto</span>) <a class="code" href="group__Monad.html#gaf83554e6e4dfdcbaf9092811f98ec0b8">bind</a>(Callable&amp;&amp; callable) {</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    <span class="keywordflow">if</span> constexpr (std::is_invocable_v&lt;Callable&gt;) {</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;        <span class="keywordflow">return</span> [callable = std::forward&lt;Callable&gt;(callable)](<span class="keyword">const</span> MonadType&lt;void&gt; &amp;monad) {</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;            static_assert(<a class="code" href="group__Type.html#structyafl_1_1type_1_1DomainTypeInfo">type::DomainTypeInfo</a>&lt;MonadType&lt;void&gt;&gt;::hasMonadicBase, <span class="stringliteral">&quot;Argument not a Functor&quot;</span>);</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;            <span class="keywordflow">return</span> monad.bind(callable);</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;        };</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;        <span class="keyword">using</span> FirstArg = <span class="keyword">typename</span> <a class="code" href="group__Function.html#structyafl_1_1function_1_1Info">function::Info&lt;Callable&gt;::template</a> ArgType&lt;0&gt;;</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160; </div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;        <span class="keywordflow">return</span> [callable = std::forward&lt;Callable&gt;(callable)](<span class="keyword">const</span> MonadType&lt;FirstArg&gt; &amp;monad) {</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;            static_assert(<a class="code" href="group__Type.html#structyafl_1_1type_1_1DomainTypeInfo">type::DomainTypeInfo</a>&lt;MonadType&lt;FirstArg&gt;&gt;::hasMonadicBase, <span class="stringliteral">&quot;Argument not a Functor&quot;</span>);</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;            <span class="keywordflow">return</span> monad.bind(callable);</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;        };</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    }</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;}</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160; </div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;} <span class="comment">// namespace monad</span></div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;} <span class="comment">// namespace yafl</span></div>
+<div class="ttc" id="agroup__Core_html_a0d635c2c24371dddbd194ea4b6db5113"><div class="ttname"><a href="group__Core.html#a0d635c2c24371dddbd194ea4b6db5113">yafl::core::Monad::bind</a></div><div class="ttdeci">decltype(auto) bind(Callable &amp;&amp;callable) const</div><div class="ttdoc">Binds given callable (function, function object, lambda) to the Monad value.</div><div class="ttdef"><b>Definition:</b> Monad.h:37</div></div>
+<div class="ttc" id="agroup__Core_html_classyafl_1_1core_1_1Monad"><div class="ttname"><a href="group__Core.html#classyafl_1_1core_1_1Monad">yafl::core::Monad</a></div><div class="ttdoc">Functional Monad class.</div><div class="ttdef"><b>Definition:</b> Monad.h:28</div></div>
+<div class="ttc" id="agroup__Function_html_structyafl_1_1function_1_1Info"><div class="ttname"><a href="group__Function.html#structyafl_1_1function_1_1Info">yafl::function::Info</a></div><div class="ttdoc">Template class that allows extracting information about a callable type (a function,...</div><div class="ttdef"><b>Definition:</b> TypeTraits.h:141</div></div>
+<div class="ttc" id="agroup__Monad_html_gaf83554e6e4dfdcbaf9092811f98ec0b8"><div class="ttname"><a href="group__Monad.html#gaf83554e6e4dfdcbaf9092811f98ec0b8">yafl::monad::bind</a></div><div class="ttdeci">decltype(auto) bind(Callable &amp;&amp;callable, const MonadT &amp;monad)</div><div class="ttdoc">This function is used to bind (flatmap) a callable type to a value of type Monad.</div><div class="ttdef"><b>Definition:</b> Monad.h:57</div></div>
+<div class="ttc" id="agroup__Type_html_structyafl_1_1type_1_1DomainTypeInfo"><div class="ttname"><a href="group__Type.html#structyafl_1_1type_1_1DomainTypeInfo">yafl::type::DomainTypeInfo</a></div><div class="ttdoc">Type details for Yafl types.</div><div class="ttdef"><b>Definition:</b> TypeTraits.h:382</div></div>
+<div class="ttc" id="anamespaceyafl_html"><div class="ttname"><a href="namespaceyafl.html">yafl</a></div><div class="ttdef"><b>Definition:</b> Applicative.h:14</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

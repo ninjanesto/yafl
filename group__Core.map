@@ -1,0 +1,6 @@
+<map id="YAFL core" name="YAFL core">
+<area shape="rect" id="node1" title="YAFL core contains definitions for Functor, Applicative Functor and Monad." alt="" coords="5,77,91,102"/>
+<area shape="rect" id="node2" href="$group__Applicative.html" title=" " alt="" coords="285,5,432,45"/>
+<area shape="rect" id="node3" href="$group__Functor.html" title=" " alt="" coords="280,69,437,109"/>
+<area shape="rect" id="node4" href="$group__Monad.html" title=" " alt="" coords="282,133,435,173"/>
+</map>

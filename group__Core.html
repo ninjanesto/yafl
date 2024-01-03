@@ -91,6 +91,17 @@ $(document).ready(function(){initNavTree('group__Core.html',''); initResizable()
 
 <p>YAFL core contains definitions for Functor, Applicative Functor and Monad.  
 <a href="#details">More...</a></p>
+<div class="dynheader">
+Collaboration diagram for YAFL core:</div>
+<div class="dyncontent">
+<div class="center"><img src="group__Core.png" border="0" usemap="#agroup____Core" alt=""/></div>
+<map name="agroup____Core" id="agroup____Core">
+<area shape="rect" title="YAFL core contains definitions for Functor, Applicative Functor and Monad." alt="" coords="5,77,91,102"/>
+<area shape="rect" href="group__Applicative.html" title=" " alt="" coords="285,5,432,45"/>
+<area shape="rect" href="group__Functor.html" title=" " alt="" coords="280,69,437,109"/>
+<area shape="rect" href="group__Monad.html" title=" " alt="" coords="282,133,435,173"/>
+</map>
+</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
@@ -309,7 +320,7 @@ template&lt;typename Head , typename ... Tail&gt; </div>
 class yafl::core::Functor&lt; TDerivedFunctor, Args &gt;</h3>
 
 <p>Functional <a class="el" href="group__Core.html#classyafl_1_1core_1_1Functor" title="Functional Functor class.">Functor</a> class. </p>
-<p>Defines the fmap function that receives a function from a -&gt; b and applies that function to a given <a class="el" href="group__Core.html#classyafl_1_1core_1_1Functor" title="Functional Functor class.">Functor</a> by unwrapping the value inside the functor and applying the function. Result type will depend on the given function </p><dl class="tparams"><dt>Template Parameters</dt><dd>
+<p>Defines the fmap function that receives a function from a -&gt; b and applies that function to a given <a class="el" href="group__Core.html#classyafl_1_1core_1_1Functor" title="Functional Functor class.">Functor</a> by unwrapping the value inside the functor and applying the function. Result type will depend on the given function. </p><dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">TDerivedFunctor</td><td>Type of functor that needs to implement the <a class="el" href="group__Core.html#classyafl_1_1core_1_1Functor" title="Functional Functor class.">Functor</a> contract. </td></tr>
     <tr><td class="paramname">Args</td><td>Argument types for the given template type TDerivedFunctor </td></tr>

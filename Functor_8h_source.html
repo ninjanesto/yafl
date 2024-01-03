@@ -87,58 +87,58 @@ $(document).ready(function(){initNavTree('Functor_8h_source.html',''); initResiz
 </div><!--header-->
 <div class="contents">
 <div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160; </div>
-<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#pragma once</span></div>
-<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160; </div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="preprocessor">#include &lt;memory&gt;</span></div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor">#include &lt;functional&gt;</span></div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor">#include &quot;TypeTraits.h&quot;</span></div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160; </div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespaceyafl.html">yafl</a> {</div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="keyword">namespace </span>core {</div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160; </div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">template</span>&lt;<span class="keyword">typename</span>...&gt; <span class="keyword">typename</span> TDerivedFunctor, <span class="keyword">typename</span> ...Args&gt;</div>
-<div class="line"><a name="l00027"></a><span class="lineno"><a class="line" href="group__Core.html">   27</a></span>&#160;<span class="keyword">class </span><a class="code" href="group__Core.html#classyafl_1_1core_1_1Functor">Functor</a> {</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Callable&gt;</div>
-<div class="line"><a name="l00036"></a><span class="lineno"><a class="line" href="group__Core.html#a922307990f2f6aedff882acfc4d9abef">   36</a></span>&#160;    decltype(<span class="keyword">auto</span>) <a class="code" href="group__Core.html#a922307990f2f6aedff882acfc4d9abef">fmap</a>(Callable&amp;&amp; callable)<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span><span class="keyword">const </span>TDerivedFunctor&lt;Args...<span class="keyword">&gt;</span> *&gt;(<span class="keyword">this</span>)-&gt;internal_fmap(std::forward&lt;Callable&gt;(callable));</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    }</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;};</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160; </div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;} <span class="comment">// namespace core</span></div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#pragma once</span></div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160; </div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor">#include &lt;memory&gt;</span></div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor">#include &lt;functional&gt;</span></div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="preprocessor">#include &quot;TypeTraits.h&quot;</span></div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160; </div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespaceyafl.html">yafl</a> {</div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="keyword">namespace </span>core {</div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160; </div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">template</span>&lt;<span class="keyword">typename</span>...&gt; <span class="keyword">typename</span> TDerivedFunctor, <span class="keyword">typename</span> ...Args&gt;</div>
+<div class="line"><a name="l00029"></a><span class="lineno"><a class="line" href="group__Core.html">   29</a></span>&#160;<span class="keyword">class </span><a class="code" href="group__Core.html#classyafl_1_1core_1_1Functor">Functor</a> {</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Callable&gt;</div>
+<div class="line"><a name="l00038"></a><span class="lineno"><a class="line" href="group__Core.html#a922307990f2f6aedff882acfc4d9abef">   38</a></span>&#160;    decltype(<span class="keyword">auto</span>) <a class="code" href="group__Core.html#a922307990f2f6aedff882acfc4d9abef">fmap</a>(Callable&amp;&amp; callable)<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span><span class="keyword">const </span>TDerivedFunctor&lt;Args...<span class="keyword">&gt;</span> *&gt;(<span class="keyword">this</span>)-&gt;internal_fmap(std::forward&lt;Callable&gt;(callable));</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    }</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;};</div>
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160; </div>
-<div class="line"><a name="l00043"></a><span class="lineno"><a class="line" href="namespaceyafl_1_1functor.html">   43</a></span>&#160;<span class="keyword">namespace </span>functor {</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> Callable, <span class="keyword">typename</span> FunctorT&gt;</div>
-<div class="line"><a name="l00054"></a><span class="lineno"><a class="line" href="namespaceyafl_1_1functor.html#ade2f458c9429ed6a139026bc43c8b0b5">   54</a></span>&#160;decltype(<span class="keyword">auto</span>) <a class="code" href="namespaceyafl_1_1functor.html#ade2f458c9429ed6a139026bc43c8b0b5">fmap</a>(Callable&amp;&amp; callable, const FunctorT&amp; functor) {</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    static_assert(<a class="code" href="group__Type.html#structyafl_1_1type_1_1DomainTypeInfo">type::DomainTypeInfo&lt;FunctorT&gt;::hasFunctorBase</a>, <span class="stringliteral">&quot;FunctorT argument not a Functor&quot;</span>);</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    <span class="keywordflow">return</span> functor.fmap(std::forward&lt;Callable&gt;(callable));</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;}</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160; </div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">template</span>&lt;<span class="keyword">typename</span>...&gt; <span class="keyword">typename</span> FunctorType, <span class="keyword">typename</span> Callable&gt;</div>
-<div class="line"><a name="l00071"></a><span class="lineno"><a class="line" href="namespaceyafl_1_1functor.html#acacdb0fd042a404c05273eb551fd4877">   71</a></span>&#160;decltype(<span class="keyword">auto</span>) <a class="code" href="namespaceyafl_1_1functor.html#ade2f458c9429ed6a139026bc43c8b0b5">fmap</a>(Callable&amp;&amp; callable) {</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;    <span class="keywordflow">if</span> constexpr (std::is_invocable_v&lt;Callable&gt;) {</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;        <span class="keywordflow">return</span> [callable = std::forward&lt;Callable&gt;(callable)](<span class="keyword">const</span> FunctorType&lt;void&gt;&amp; functor) {</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;            static_assert(<a class="code" href="group__Type.html#structyafl_1_1type_1_1DomainTypeInfo">type::DomainTypeInfo</a>&lt;FunctorType&lt;void&gt;&gt;::hasFunctorBase, <span class="stringliteral">&quot;Argument not a Functor&quot;</span>);</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;            <span class="keywordflow">return</span> functor.fmap(callable);</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;        };</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;    } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;        <span class="keyword">using</span> FirstArg = <span class="keyword">typename</span> <a class="code" href="group__Function.html#structyafl_1_1function_1_1Info">function::Info&lt;Callable&gt;::template</a> ArgType&lt;0&gt;;</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160; </div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;        <span class="keywordflow">return</span> [callable = std::forward&lt;Callable&gt;(callable)](<span class="keyword">const</span> FunctorType&lt;FirstArg&gt;&amp; functor) {</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;            static_assert(<a class="code" href="group__Type.html#structyafl_1_1type_1_1DomainTypeInfo">type::DomainTypeInfo</a>&lt;FunctorType&lt;FirstArg&gt;&gt;::hasFunctorBase, <span class="stringliteral">&quot;Argument not a Functor&quot;</span>);</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;            <span class="keywordflow">return</span> functor.fmap(callable);</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;        };</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    }</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;}</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;} <span class="comment">// namespace functor</span></div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160; </div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;} <span class="comment">// namespace yafl</span></div>
-<div class="ttc" id="agroup__Core_html_a922307990f2f6aedff882acfc4d9abef"><div class="ttname"><a href="group__Core.html#a922307990f2f6aedff882acfc4d9abef">yafl::core::Functor::fmap</a></div><div class="ttdeci">decltype(auto) fmap(Callable &amp;&amp;callable) const</div><div class="ttdoc">Binds given callable (function, function object, lambda) to the Functor value.</div><div class="ttdef"><b>Definition:</b> Functor.h:36</div></div>
-<div class="ttc" id="agroup__Core_html_classyafl_1_1core_1_1Functor"><div class="ttname"><a href="group__Core.html#classyafl_1_1core_1_1Functor">yafl::core::Functor</a></div><div class="ttdoc">Functional Functor class.</div><div class="ttdef"><b>Definition:</b> Functor.h:27</div></div>
-<div class="ttc" id="agroup__Function_html_structyafl_1_1function_1_1Info"><div class="ttname"><a href="group__Function.html#structyafl_1_1function_1_1Info">yafl::function::Info</a></div><div class="ttdoc">Template class that allows extracting information about a callable type (a function,...</div><div class="ttdef"><b>Definition:</b> TypeTraits.h:135</div></div>
-<div class="ttc" id="agroup__Type_html_structyafl_1_1type_1_1DomainTypeInfo"><div class="ttname"><a href="group__Type.html#structyafl_1_1type_1_1DomainTypeInfo">yafl::type::DomainTypeInfo</a></div><div class="ttdoc">Type details for Yafl types.</div><div class="ttdef"><b>Definition:</b> TypeTraits.h:360</div></div>
-<div class="ttc" id="anamespaceyafl_1_1functor_html_ade2f458c9429ed6a139026bc43c8b0b5"><div class="ttname"><a href="namespaceyafl_1_1functor.html#ade2f458c9429ed6a139026bc43c8b0b5">yafl::functor::fmap</a></div><div class="ttdeci">decltype(auto) fmap(Callable &amp;&amp;callable, const FunctorT &amp;functor)</div><div class="ttdoc">This function is used to apply a callable type to a value of type Functor.</div><div class="ttdef"><b>Definition:</b> Functor.h:54</div></div>
-<div class="ttc" id="anamespaceyafl_html"><div class="ttname"><a href="namespaceyafl.html">yafl</a></div><div class="ttdef"><b>Definition:</b> Applicative.h:13</div></div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;} <span class="comment">// namespace core</span></div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160; </div>
+<div class="line"><a name="l00045"></a><span class="lineno"><a class="line" href="namespaceyafl_1_1functor.html">   45</a></span>&#160;<span class="keyword">namespace </span>functor {</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> Callable, <span class="keyword">typename</span> FunctorT&gt;</div>
+<div class="line"><a name="l00057"></a><span class="lineno"><a class="line" href="group__Functor.html#gade2f458c9429ed6a139026bc43c8b0b5">   57</a></span>&#160;decltype(<span class="keyword">auto</span>) <a class="code" href="group__Functor.html#gade2f458c9429ed6a139026bc43c8b0b5">fmap</a>(Callable&amp;&amp; callable, const FunctorT&amp; functor) {</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    static_assert(<a class="code" href="group__Type.html#structyafl_1_1type_1_1DomainTypeInfo">type::DomainTypeInfo&lt;FunctorT&gt;::hasFunctorBase</a>, <span class="stringliteral">&quot;FunctorT argument not a Functor&quot;</span>);</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    <span class="keywordflow">return</span> functor.fmap(std::forward&lt;Callable&gt;(callable));</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;}</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160; </div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">template</span>&lt;<span class="keyword">typename</span>...&gt; <span class="keyword">typename</span> FunctorType, <span class="keyword">typename</span> Callable&gt;</div>
+<div class="line"><a name="l00075"></a><span class="lineno"><a class="line" href="group__Functor.html#gacacdb0fd042a404c05273eb551fd4877">   75</a></span>&#160;decltype(<span class="keyword">auto</span>) <a class="code" href="group__Functor.html#gade2f458c9429ed6a139026bc43c8b0b5">fmap</a>(Callable&amp;&amp; callable) {</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    <span class="keywordflow">if</span> constexpr (std::is_invocable_v&lt;Callable&gt;) {</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;        <span class="keywordflow">return</span> [callable = std::forward&lt;Callable&gt;(callable)](<span class="keyword">const</span> FunctorType&lt;void&gt;&amp; functor) {</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;            static_assert(<a class="code" href="group__Type.html#structyafl_1_1type_1_1DomainTypeInfo">type::DomainTypeInfo</a>&lt;FunctorType&lt;void&gt;&gt;::hasFunctorBase, <span class="stringliteral">&quot;Argument not a Functor&quot;</span>);</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;            <span class="keywordflow">return</span> functor.fmap(callable);</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;        };</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;        <span class="keyword">using</span> FirstArg = <span class="keyword">typename</span> <a class="code" href="group__Function.html#structyafl_1_1function_1_1Info">function::Info&lt;Callable&gt;::template</a> ArgType&lt;0&gt;;</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160; </div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;        <span class="keywordflow">return</span> [callable = std::forward&lt;Callable&gt;(callable)](<span class="keyword">const</span> FunctorType&lt;FirstArg&gt;&amp; functor) {</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;            static_assert(<a class="code" href="group__Type.html#structyafl_1_1type_1_1DomainTypeInfo">type::DomainTypeInfo</a>&lt;FunctorType&lt;FirstArg&gt;&gt;::hasFunctorBase, <span class="stringliteral">&quot;Argument not a Functor&quot;</span>);</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;            <span class="keywordflow">return</span> functor.fmap(callable);</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;        };</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    }</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;}</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;} <span class="comment">// namespace functor</span></div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160; </div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;} <span class="comment">// namespace yafl</span></div>
+<div class="ttc" id="agroup__Core_html_a922307990f2f6aedff882acfc4d9abef"><div class="ttname"><a href="group__Core.html#a922307990f2f6aedff882acfc4d9abef">yafl::core::Functor::fmap</a></div><div class="ttdeci">decltype(auto) fmap(Callable &amp;&amp;callable) const</div><div class="ttdoc">Binds given callable (function, function object, lambda) to the Functor value.</div><div class="ttdef"><b>Definition:</b> Functor.h:38</div></div>
+<div class="ttc" id="agroup__Core_html_classyafl_1_1core_1_1Functor"><div class="ttname"><a href="group__Core.html#classyafl_1_1core_1_1Functor">yafl::core::Functor</a></div><div class="ttdoc">Functional Functor class.</div><div class="ttdef"><b>Definition:</b> Functor.h:29</div></div>
+<div class="ttc" id="agroup__Function_html_structyafl_1_1function_1_1Info"><div class="ttname"><a href="group__Function.html#structyafl_1_1function_1_1Info">yafl::function::Info</a></div><div class="ttdoc">Template class that allows extracting information about a callable type (a function,...</div><div class="ttdef"><b>Definition:</b> TypeTraits.h:141</div></div>
+<div class="ttc" id="agroup__Functor_html_gade2f458c9429ed6a139026bc43c8b0b5"><div class="ttname"><a href="group__Functor.html#gade2f458c9429ed6a139026bc43c8b0b5">yafl::functor::fmap</a></div><div class="ttdeci">decltype(auto) fmap(Callable &amp;&amp;callable, const FunctorT &amp;functor)</div><div class="ttdoc">This function is used to apply a callable type to a value of type Functor.</div><div class="ttdef"><b>Definition:</b> Functor.h:57</div></div>
+<div class="ttc" id="agroup__Type_html_structyafl_1_1type_1_1DomainTypeInfo"><div class="ttname"><a href="group__Type.html#structyafl_1_1type_1_1DomainTypeInfo">yafl::type::DomainTypeInfo</a></div><div class="ttdoc">Type details for Yafl types.</div><div class="ttdef"><b>Definition:</b> TypeTraits.h:382</div></div>
+<div class="ttc" id="anamespaceyafl_html"><div class="ttname"><a href="namespaceyafl.html">yafl</a></div><div class="ttdef"><b>Definition:</b> Applicative.h:14</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
